@@ -175,15 +175,15 @@ class Objeto : Nodo
     }
 }
 
-uint profundidad_árbol = 0;
+uint profundidad_árbol_gramatical = 0;
 
 void recorre_árbol_gramatical(Nodo n)
 {
-    profundidad_árbol++;
+    profundidad_árbol_gramatical++;
 
     if(n)
     {
-        for(int i = 1; i < profundidad_árbol; i++)
+        for(int i = 1; i < profundidad_árbol_gramatical; i++)
         {
             write("   ");
         }
@@ -199,7 +199,7 @@ void recorre_árbol_gramatical(Nodo n)
         }
     }
 
-    profundidad_árbol--;
+    profundidad_árbol_gramatical--;
 }
 
 void imprime_nodo_gramatical(Nodo n)
