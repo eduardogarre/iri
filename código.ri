@@ -1,4 +1,10 @@
+//Código de ejemplo
 objeto código;
+
+/*
+También usado para pruebas.
+Por ahora, la dirección de este archivo está grabada directamente en el código.
+*/
 
 declara e32 @sal(e32 %hola, r18 %lol);
 
