@@ -1,0 +1,12 @@
+{
+	"name": "iri",
+	"authors": [
+		"Eduardo"
+	],
+	"description": "Interprete de Representacion Intermedia",
+	"copyright": "Copyright © 2017, Eduardo",
+	"license": "proprietary",
+	"dependencies": {
+		"docopt": "~>0.6.1-b.6"
+	}
+}

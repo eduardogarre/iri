@@ -1,0 +1,14 @@
+objeto código;
+
+declara e32 @sal(e32 %hola, r18 %lol);
+
+global r64 @hola = r64 3.141592;
+
+externo n32 @lol;
+
+define e32 @inicio(r18 %lol, r18 %adiós, n288 %kease)
+{
+    local e32 %hola = e32 288;
+    %0 = sum e32 288, %288;
+    ret;
+}
