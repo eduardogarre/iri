@@ -26,11 +26,11 @@ void iri(dstring código)
 
 	writeln(resultado_lex);
 
-	Nodo árbol_sintaxis_abstracta = sintaxis.analiza(resultado_lex);
+	Nodo árbol_gramatical = sintaxis.analiza(resultado_lex);
 
 	writeln();
 
-	recorre_árbol(árbol_sintaxis_abstracta);
+	recorre_árbol_gramatical(árbol_gramatical);
 
 	writeln();
 }

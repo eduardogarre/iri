@@ -177,7 +177,7 @@ class Objeto : Nodo
 
 uint profundidad_árbol = 0;
 
-void recorre_árbol(Nodo n)
+void recorre_árbol_gramatical(Nodo n)
 {
     profundidad_árbol++;
 
@@ -190,19 +190,19 @@ void recorre_árbol(Nodo n)
         write("[hijos:");
         write(n.ramas.length);
         write("] ");
-        imprime_nodo(n);
+        imprime_nodo_gramatical(n);
 
         int i;
         for(i = 0; i < n.ramas.length; i++)
         {
-            recorre_árbol(n.ramas[i]);
+            recorre_árbol_gramatical(n.ramas[i]);
         }
     }
 
     profundidad_árbol--;
 }
 
-void imprime_nodo(Nodo n)
+void imprime_nodo_gramatical(Nodo n)
 {
     switch(n.categoría)
     {
