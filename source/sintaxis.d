@@ -16,7 +16,7 @@ public Nodo analiza(lexema[] lexemas)
 
 
 //OBJETO := [objeto NOMBRE;] [DECL_GLOB | DEF_GLOB]*
-Objeto objeto()
+private Objeto objeto()
 {
     uint c = cursor;
     bool línea = false;
@@ -70,7 +70,7 @@ Objeto objeto()
 
 
 //DECL_GLOB := ( EXT_ID | DEF_FUNC )
-Nodo declaración_global()
+private Nodo declaración_global()
 {
     uint c = cursor;
     
@@ -95,7 +95,7 @@ Nodo declaración_global()
 
 
 //DEF_GLOB := ( DEF_FUNC | DEF_ID )
-Nodo definición_global()
+private Nodo definición_global()
 {
     uint c = cursor;
 
@@ -117,7 +117,7 @@ Nodo definición_global()
 
 
 //DEF_FUNCIÓN := define TIPO ID_GLOBAL ( [TIPO]* ) BLOQUE
-DefineFunción define_función()
+private DefineFunción define_función()
 {
     uint c = cursor;
 
@@ -176,7 +176,7 @@ DefineFunción define_función()
 
 
 //DECL_FUNCIÓN := RESERV_DECL TIPO ID_GLOBAL NOTA_ABRE_PAREN [TIPO]* NOTA_CIERRA_PAREN
-DeclaraFunción declara_función()
+private DeclaraFunción declara_función()
 {
     uint c = cursor;
 
@@ -223,7 +223,7 @@ DeclaraFunción declara_función()
 
 
 //ARGUMENTOS := [ARGUMENTO [ NOTA_COMA ARGUMENTO]* ]
-Argumentos argumentos()
+private Argumentos argumentos()
 {
     uint c = cursor;
 
@@ -256,7 +256,7 @@ Argumentos argumentos()
 
 
 //ARGUMENTO := TIPO IDENTIFICADOR
-Argumento argumento()
+private Argumento argumento()
 {
     uint c = cursor;
 
@@ -279,7 +279,7 @@ Argumento argumento()
 
 
 //BLOQUE := NOTA_ABRE_LLAVE [AFIRMACIÓN]* NOTA_CIERRA_LLAVE
-Nodo bloque()
+private Nodo bloque()
 {
     uint c = cursor;
 
@@ -309,7 +309,7 @@ Nodo bloque()
 
 
 //AFIRMACIÓN := (ASIGNACIÓN | DEF_ID | OP) ;
-Nodo afirmación()
+private Nodo afirmación()
 {
     uint c = cursor;
     
@@ -635,7 +635,7 @@ private Nodo tipo()
 }
 
 
-Nodo nombre()
+private Nodo nombre()
 {
     if(cursor >= símbolos.length)
     {
@@ -667,7 +667,7 @@ Nodo nombre()
 }
 
 
-Nodo reservada(dstring txt)
+private Nodo reservada(dstring txt)
 {
     if(cursor >= símbolos.length)
     {
@@ -699,7 +699,7 @@ Nodo reservada(dstring txt)
 }
 
 
-Nodo notación(dstring c)
+private Nodo notación(dstring c)
 {
     if(cursor >= símbolos.length)
     {
