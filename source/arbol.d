@@ -12,8 +12,9 @@ enum Categoría
     LITERAL,
     IDENTIFICADOR,
     
-    DEFINE_IDENTIFICADOR,
-    IDENTIFICADOR_EXTERNO,
+    DECLARA_IDENTIFICADOR_GLOBAL,
+    DEFINE_IDENTIFICADOR_GLOBAL,
+    DEFINE_IDENTIFICADOR_LOCAL,
 
     OPERACIÓN,
     ASIGNACIÓN,
@@ -84,7 +85,7 @@ class Asignación : Nodo
     }
 }
 
-class DefineIdentificador : Nodo
+class DefineIdentificadorLocal : Nodo
 {
     dstring ámbito  = "";
     dstring tipo    = "";
@@ -93,20 +94,33 @@ class DefineIdentificador : Nodo
     this()
     {
         super();
-        this.categoría = Categoría.DEFINE_IDENTIFICADOR;
+        this.categoría = Categoría.DEFINE_IDENTIFICADOR_LOCAL;
     }
 }
 
-class IdentificadorExterno : Nodo
+class DefineIdentificadorGlobal : Nodo
 {
-    dstring ámbito  = "externo";
+    dstring ámbito  = "";
     dstring tipo    = "";
     dstring nombre  = "";
 
     this()
     {
         super();
-        this.categoría = Categoría.IDENTIFICADOR_EXTERNO;
+        this.categoría = Categoría.DEFINE_IDENTIFICADOR_GLOBAL;
+    }
+}
+
+class DeclaraIdentificadorGlobal : Nodo
+{
+    dstring ámbito  = "";
+    dstring tipo    = "";
+    dstring nombre  = "";
+
+    this()
+    {
+        super();
+        this.categoría = Categoría.DECLARA_IDENTIFICADOR_GLOBAL;
     }
 }
 
@@ -250,8 +264,8 @@ void imprime_nodo_gramatical(Nodo n)
             writeln();
             break;
 
-        case Categoría.DEFINE_IDENTIFICADOR:
-            auto did = cast(DefineIdentificador)n;
+        case Categoría.DEFINE_IDENTIFICADOR_LOCAL:
+            auto did = cast(DefineIdentificadorLocal)n;
             write(did.categoría);
             write(" [ámbito:");
             write(did.ámbito);
@@ -265,8 +279,23 @@ void imprime_nodo_gramatical(Nodo n)
             writeln();
             break;
 
-        case Categoría.IDENTIFICADOR_EXTERNO:
-            auto idex = cast(IdentificadorExterno)n;
+        case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
+            auto did = cast(DefineIdentificadorGlobal)n;
+            write(did.categoría);
+            write(" [ámbito:");
+            write(did.ámbito);
+            write("] [tipo:");
+            write(did.tipo);
+            write("] [nombre:");
+            write(did.nombre);
+            write("] [línea:");
+            write(did.línea);
+            write("]");
+            writeln();
+            break;
+
+        case Categoría.DECLARA_IDENTIFICADOR_GLOBAL:
+            auto idex = cast(DeclaraIdentificadorGlobal)n;
             write(idex.categoría);
             write(" [ámbito:");
             write(idex.ámbito);

@@ -237,200 +237,32 @@ private bool _cierracomentarioXL()
 
 private bool notación()
 {
-
-    if(mismocarácter(código[cursor],','))
+    if(   (código[cursor] == ',')
+        | (código[cursor] == '-')
+        | (código[cursor] == ':')
+        | (código[cursor] == ';')
+        | (código[cursor] == '=')
+        | (código[cursor] == '(')
+        | (código[cursor] == ')')
+        | (código[cursor] == '[')
+        | (código[cursor] == ']')
+        | (código[cursor] == '{')
+        | (código[cursor] == '}')
+        | (código[cursor] == '*')
+        | (código[cursor] == '#')
+        | (código[cursor] == '/')
+        | (código[cursor] == '\\')
+        )
     {
-        cursor++;
 
         lexema l;
         l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = ",";
+        l.símbolo  ~= código[cursor];
         l.línea     = línea;
 
         análisis ~= l;
 
-        return true;
-    }
-    else if(mismocarácter(código[cursor],'-'))
-    {
         cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = "-";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],':'))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = ":";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],';'))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = ";";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],'='))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = "=";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],'('))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = "(";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],')'))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = ")";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],'['))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = "[";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],']'))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = "]";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],'{'))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = "{";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],'}'))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = "}";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],'*'))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = "*";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],'#'))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = "#";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],'/'))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = "/";
-        l.línea     = línea;
-
-        análisis ~= l;
-
-        return true;
-    }
-    else if(mismocarácter(código[cursor],'\\'))
-    {
-        cursor++;
-
-        lexema l;
-        l.categoría = lexema_e.NOTACIÓN;
-        l.símbolo   = "\\";
-        l.línea     = línea;
-
-        análisis ~= l;
-
         return true;
     }
     else
@@ -456,6 +288,7 @@ private bool reservada()
          | (s == "declara")
          | (s == "define")
          | (s == "externo")
+         | (s == "constante")
          | (s == "objeto")
          | (s == "x")
          | (s == "y")

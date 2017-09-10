@@ -69,7 +69,7 @@ private Objeto objeto()
 }
 
 
-//DECL_GLOB := ( EXT_ID | DEF_FUNC )
+//DECL_GLOB := ( DECL_ID_GLOB | DECL_FUNC )
 private Nodo declaración_global()
 {
     uint c = cursor;
@@ -81,7 +81,7 @@ private Nodo declaración_global()
             return r;
         }
     }
-    else if(auto r = declara_identificador_externo())
+    else if(auto r = declara_identificador_global())
     {
         if(notación(";"))
         {
@@ -94,7 +94,7 @@ private Nodo declaración_global()
 }
 
 
-//DEF_GLOB := ( DEF_FUNC | DEF_ID )
+//DEF_GLOB := ( DEF_FUNC | DEF_ID_GLOB )
 private Nodo definición_global()
 {
     uint c = cursor;
@@ -103,7 +103,7 @@ private Nodo definición_global()
     {
         return r;
     }
-    else if(auto r = define_identificador())
+    else if(auto r = define_identificador_global())
     {
         if(notación(";"))
         {
@@ -308,7 +308,7 @@ private Nodo bloque()
 }
 
 
-//AFIRMACIÓN := (ASIGNACIÓN | DEF_ID | OP) ;
+//AFIRMACIÓN := (ASIGNACIÓN | DEF_ID_LOC | OP) ;
 private Nodo afirmación()
 {
     uint c = cursor;
@@ -327,7 +327,7 @@ private Nodo afirmación()
             return r;
         }
     }
-    else if(auto r = define_identificador())
+    else if(auto r = define_identificador_local())
     {
         if(notación(";"))
         {
@@ -340,79 +340,17 @@ private Nodo afirmación()
 }
 
 
-//EXT_ID := externo TIPO ID
-private IdentificadorExterno declara_identificador_externo()
+//DECL_ID_GLOB := ID = (externo | global) TIPO
+private DeclaraIdentificadorGlobal declara_identificador_global()
 {
     uint c = cursor;
     
-    auto e = new IdentificadorExterno();
-    if(auto n = reservada("externo"))
-    {
-        e.ámbito = "externo";
-        e.línea = n.línea;
-    }
-
-    if(auto n = tipo())
-    {
-        e.tipo = n.dato;
-    }
-    else
-    {
-        cursor = c;
-        return null;
-    }
-
+    auto e = new DeclaraIdentificadorGlobal();
+    
     if(auto id = identificador())
     {
         e.nombre = id.dato;
-    }
-    else
-    {
-        cursor = c;
-        return null;
-    }
-
-    return e;
-}
-
-
-//DEF_ID := [global | local] TIPO ID = LITERAL
-private DefineIdentificador define_identificador()
-{
-    uint c = cursor;
-    bool línea = false;
-    
-    auto i = new DefineIdentificador();
-    if(auto n = reservada("global"))
-    {
-        i.ámbito = "global";
-        i.línea = n.línea;
-        línea = true;
-    }
-    else if(auto n = reservada("local"))
-    {
-        i.ámbito = "local";
-        i.línea = n.línea;
-        línea = true;
-    }
-
-    if(auto n = tipo())
-    {
-        i.tipo = n.dato;
-        if(!línea)
-        {
-            i.línea = n.línea;
-        }
-    }
-    else
-    {
-        cursor = c;
-        return null;
-    }
-
-    if(auto id = identificador())
-    {
-        i.nombre = id.dato;
+        e.línea = id.línea;
     }
     else
     {
@@ -421,6 +359,123 @@ private DefineIdentificador define_identificador()
     }
 
     if(!notación("="))
+    {
+        cursor = c;
+        return null;
+    }
+
+    if(auto n = reservada("global"))
+    {
+        e.ámbito = "global";
+    }
+    else if(auto n = reservada("externo"))
+    {
+        e.ámbito = "externo";
+    }
+    else
+    {
+        cursor = c;
+        return null;
+    }
+
+    if(auto t = tipo())
+    {
+        e.tipo = t.dato;
+        return e;
+    }
+    else
+    {
+        cursor = c;
+        return null;
+    }
+}
+
+
+//DEF_ID_GLOB := ID = (global | constante) LITERAL
+private DefineIdentificadorGlobal define_identificador_global()
+{
+    uint c = cursor;
+    
+    auto i = new DefineIdentificadorGlobal();
+
+    if(auto id = identificador())
+    {
+        i.nombre = id.dato;
+        i.línea = id.línea;
+    }
+    else
+    {
+        cursor = c;
+        return null;
+    }
+
+    if(!notación("="))
+    {
+        cursor = c;
+        return null;
+    }
+
+    if(auto n = reservada("global"))
+    {
+        i.ámbito = "global";
+    }
+    else if(auto n = reservada("constante"))
+    {
+        i.ámbito = "constante";
+    }
+    else
+    {
+        cursor = c;
+        return null;
+    }
+
+    if(auto l = literal())
+    {
+        i.ramas ~= l;
+    }
+    else
+    {
+        cursor = c;
+        return null;
+    }
+
+    return i;
+}
+
+
+//DEF_ID_LOC := ID = (local | constante) LITERAL
+private DefineIdentificadorLocal define_identificador_local()
+{
+    uint c = cursor;
+    
+    auto i = new DefineIdentificadorLocal();
+
+    if(auto id = identificador())
+    {
+        i.nombre = id.dato;
+        i.línea = id.línea;
+    }
+    else
+    {
+        cursor = c;
+        return null;
+    }
+
+    if(!notación("="))
+    {
+        cursor = c;
+        return null;
+    }
+
+    if(auto n = reservada("local"))
+    {
+        i.ámbito = "local";
+    }
+    else if(auto n = reservada("constante"))
+    {
+        i.ámbito = "constante";
+    }
+    else
     {
         cursor = c;
         return null;

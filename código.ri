@@ -8,13 +8,17 @@ Por ahora, la dirección de este archivo está grabada directamente en el códig
 
 declara e32 @sal(e32 %hola, r18 %lol);
 
-global r64 @hola = r64 3.141592;
+@hola = global r64 3.141592;
 
-externo n32 @lol;
+
+@lol = externo n32;
+
+@lolazo = constante e64 288;
+
 
 define e32 @inicio(r18 %lol, r18 %adiós, n288 %kease)
 {
-    local e32 %hola = e32 288;
+    %hola = local e32  288;
     %0 = sum e32 288, %288;
     ret;
 }
