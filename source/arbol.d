@@ -1,6 +1,5 @@
 module arbol;
 
-import semantico;
 import std.conv;
 import std.stdint; // uint64_t y demás tipos
 import std.stdio;
@@ -160,18 +159,10 @@ class DefineFunción : Nodo
     dstring retorno;
     dstring nombre;
 
-    private TablaIdentificadores* _tid;
-
     this()
     {
         super();
         this.categoría = Categoría.DEFINE_FUNCIÓN;
-    }
-
-    bool tid(TablaIdentificadores * tid)
-    {
-        this._tid = tid;
-        return true;
     }
 }
 
@@ -191,17 +182,9 @@ class Módulo : Nodo
 {
     dstring nombre = "";
 
-    private TablaIdentificadores* _tid;
-
     this()
     {
         super();
         this.categoría = Categoría.MÓDULO;
-    }
-
-    bool tid(TablaIdentificadores * tid)
-    {
-        this._tid = tid;
-        return true;
     }
 }

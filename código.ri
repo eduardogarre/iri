@@ -16,11 +16,14 @@ declara e32 @sal(e32 %hola, r18 %lol);
 @lolazo = constante e64 288;
 
 
-define e32 @inicio(r18 %lol, r18 %adiós, n288 %kease)
+define e32 @adiós(r18 %lol, r18 %adiós, n288 %kease)
 {
-    %hola = local e32  288;
-    %0 = sum e32 288, %288;
-    ret;
+    %0 = local e32  288;
+    %1 = sum e32 288, %0;
+    ret %1;
 }
 
-@lolazo = constante e32 69;
+define e32 @inicio(r32 %pi)
+{
+    ret r32 3.14159;
+}

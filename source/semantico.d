@@ -17,21 +17,127 @@ bool analiza(Nodo n)
 
     paso1_identificadores_globales(n);
 
+    writeln();
+
+    paso2_ejecuta_inicio();
+
     return true;
 }
 
 void paso1_identificadores_globales(Nodo n)
 {
+    writeln("Recorre espacio de nombres 'global'.");
+
     paso1_recorre_nodo(n);
+}
+
+void paso2_ejecuta_inicio()
+{
+    writeln("Ejecuta '@inicio()'.");
+    
+    if(tid.lee_id("inicio").nombre != "inicio")
+    {
+        aborta("No has declarado la función '@inicio()'");
+    }
+
+    EntradaTablaIdentificadores eid = tid.lee_id("inicio");
+    // eid: dstring nombre, bool declarado, Nodo declaración, bool definido, Nodo definición;
+
+    if(!eid.definido)
+    {
+        aborta("No has definido la función '@inicio()'");
+    }
+
+    // Obtén en Nodo de la definición de @inicio()
+    DefineFunción def_inicio = cast(DefineFunción)eid.definición;
+
+    // Crea y configura la tabla de identificadores de la función @inicio()
+    auto tid_inicio = new TablaIdentificadores(tid, def_inicio);
+    tid_inicio.dueño = def_inicio;
+
+    // Establece la tabla de ids de @inicio() como la tid vigente.
+    tid = tid_inicio;
+
+    // Declara los argumentos de @inicio().
+    paso2_1_declara_argumentos(def_inicio);
+
+    // Define los argumentos de @inicio(): r32 pi 3.14159
+    auto literal = new Literal();
+    literal.dato = "3.14159";
+    literal.tipo = "r32";
+    literal.línea = def_inicio.línea;
+    tid.define_identificador("pi", literal);
+
+    // Comprueba las variables guardadas en las tablas de identificadores
+    writeln("Comprobando que %pi existe...");
+    recorre_nodo(tid.lee_id("%pi").definición);
+
+    writeln("Comprobando que %lolazo existe...");
+    recorre_nodo(tid.lee_id("%lolazo").definición);
+
+
+    //paso 2.2: obtén el bloque de @inicio(), para poder ejecutarlo.
+    Bloque bloque = paso2_2_obtén_bloque(def_inicio);
+
+    if(bloque is null)
+    {
+        aborta("No puedo ejecutar el bloque de @inicio");
+    }
+
+    //paso 2.3: recorre las ramas del bloque de @inicio()
+    for(int i = 0; i<bloque.ramas.length; i++)
+    {
+        auto n = bloque.ramas[i];
+
+        switch(n.categoría)
+        {
+            case Categoría.OPERACIÓN:
+                Operación o = cast(Operación)n;
+                if(!ejecuta_operación(o))
+                {
+                    aborta("Ocurrió un problema ejecutando la operación");
+                }
+
+                break;
+
+            default:
+                break;
+        }
+    }
+}
+
+void paso2_1_declara_argumentos(Nodo n)
+{
+    writeln("Declara los argumentos de @inicio().");
+    
+    paso2_1_recorre_nodo(n);
+}
+
+Bloque paso2_2_obtén_bloque(Nodo nodo)
+{
+    Bloque bloque = null;
+
+    for(int i = 0; i<nodo.ramas.length; i++)
+    {
+        Nodo r = cast(Nodo)nodo.ramas[i];
+        if(r.categoría == Categoría.BLOQUE)
+        {
+            bloque = cast(Bloque)r;
+            break;
+        }
+    }
+
+    return bloque;
 }
 
 struct EntradaTablaIdentificadores
 {
     dstring nombre;
-    bool declarado;
-    Nodo declaración;
-    bool definido;
-    Nodo definición;
+    bool    declarado;
+    Nodo    declaración;
+    bool    definido;
+    Nodo    definición;
+    Literal valor;
 }
 
 class TablaIdentificadores
@@ -80,14 +186,32 @@ class TablaIdentificadores
             id = identificador[1..$];
         }
 
-        return tabla[id];
+        auto tmp = id in tabla;
+        if(tmp is null)
+        {
+            //el identificador no se encuentra en la tabla actual
+            if(this.padre is null)
+            {
+                // esta es la tabla raíz
+                return EntradaTablaIdentificadores(null, false, null, false, null);
+            }
+            else
+            {
+                // examinar la tabla-padre
+                return padre.lee_id(identificador);
+            }
+        }
+        else
+        {
+            return tabla[id];
+        }
     }
 
     bool declara_identificador(dstring identificador, Nodo declaración)
     {
         if(identificador is null)
         {
-            error("Me has pasado un identificador nulo");
+            aborta("Me has pasado un identificador nulo");
             return false;
         }
 
@@ -101,7 +225,7 @@ class TablaIdentificadores
         if(id in tabla)
         {
             // El identificador ya está en uso.
-            error("Ya estabas usando el identificador '" ~ id ~ "'");
+            aborta("Ya estabas usando el identificador '" ~ id ~ "'");
             return false;
         }
 
@@ -120,7 +244,7 @@ class TablaIdentificadores
     {
         if(identificador is null)
         {
-            error("Me has pasado un identificador nulo");
+            aborta("Me has pasado un identificador nulo");
             return false;
         }
 
@@ -138,7 +262,7 @@ class TablaIdentificadores
             // El identificador ya está en uso.
             if(tabla[id].definido)
             {
-                error("Ya habías definido el identificador '" ~ id ~ "'");
+                aborta("Ya habías definido el identificador '" ~ id ~ "'");
 
                 return false;
             }
@@ -449,11 +573,102 @@ private void paso1_interpreta_nodo(Nodo n)
             // Crea la tabla de identificadores global, y la asocio al módulo.
             auto globtid = new TablaIdentificadores(null, obj);
 
-            obj.tid(&globtid);
+            globtid.dueño = obj;
+
             tid = globtid;
 
             break;
 
         default: break;
     }
+}
+
+void paso2_1_recorre_nodo(Nodo n)
+{
+    if(n)
+    {
+        paso2_1_interpreta_nodo(n);
+
+        int i;
+        for(i = 0; i < n.ramas.length; i++)
+        {
+            paso2_1_recorre_nodo(n.ramas[i]);
+        }
+    }
+}
+
+private void paso2_1_interpreta_nodo(Nodo n)
+{
+    switch(n.categoría)
+    {
+        case Categoría.ARGUMENTO:
+            auto a = cast(Argumento)n;
+
+            if(tid.declara_identificador(a.nombre, a))
+            {
+                writeln("declara " ~ tid.lee_id(a.nombre).nombre);
+            }
+            break;
+
+        default: break;
+    }
+}
+
+Literal lee_argumento(Nodo n)
+{
+    Literal lit = null;
+
+    if(n.categoría == Categoría.LITERAL)
+    {
+        lit = cast(Literal)n;
+    }
+    else if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        auto id = cast(Identificador)n;
+        // Accediendo a %pi...
+        Nodo l = (tid.lee_id("pi").definición);
+        if(l.categoría == Categoría.LITERAL)
+        {
+            lit = cast(Literal)l;
+        }
+    }
+
+    return lit;
+}
+
+bool ejecuta_operación(Operación op)
+{
+    switch(op.dato)
+    {
+        case "ret":
+            if(op.ramas.length == 0)
+            {
+                // ret no tiene argumento
+                writeln("op: ret");
+
+                return true;
+            }
+            else if(op.ramas.length == 1)
+            {
+                // ret tiene argumento
+                Nodo n = op.ramas[0];
+
+                Literal lit = lee_argumento(n);
+                if(lit is null)
+                {
+                    aborta("No he podido conseguir el argumento de op: ret []");
+                }
+                //auto lit = cast(Literal)(op.ramas[0]);
+                writeln("op: ret " ~ lit.tipo ~ ":" ~ lit.dato);
+
+                return true;
+            }
+
+            break;
+
+        default:
+            break;
+    }
+
+    return false;
 }
