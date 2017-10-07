@@ -1,5 +1,5 @@
 //Código de ejemplo
-objeto código;
+módulo código;
 
 /*
 También usado para pruebas.
@@ -22,3 +22,5 @@ define e32 @inicio(r18 %lol, r18 %adiós, n288 %kease)
     %0 = sum e32 288, %288;
     ret;
 }
+
+@lolazo = constante e32 69;

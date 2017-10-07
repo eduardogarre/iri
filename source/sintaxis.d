@@ -11,19 +11,19 @@ private lexema[] símbolos;
 public Nodo analiza(lexema[] lexemas)
 {
     símbolos = lexemas;
-    return objeto();
+    return módulo();
 }
 
 
-//OBJETO := [objeto NOMBRE;] [DECL_GLOB | DEF_GLOB]*
-private Objeto objeto()
+//MÓDULO := [módulo NOMBRE;] [DECL_GLOB | DEF_GLOB]*
+private Módulo módulo()
 {
     uint c = cursor;
     bool línea = false;
 
-    Objeto o = new Objeto();
+    Módulo o = new Módulo();
 
-    if(auto r = reservada("objeto"))
+    if(auto r = reservada("módulo"))
     {
         o.línea = r.línea;
         línea = true;

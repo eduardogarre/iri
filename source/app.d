@@ -4,6 +4,7 @@ import std.string;
 import apoyo;
 import arbol;
 static import lexico;
+static import semantico;
 static import sintaxis;
 
 dstring archivo = "código.ri";
@@ -30,7 +31,7 @@ void iri(dstring código)
 
 	writeln();
 
-	recorre_árbol_gramatical(árbol_gramatical);
+	bool resultado = semantico.analiza(árbol_gramatical);
 
 	writeln();
 }
