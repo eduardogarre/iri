@@ -2,6 +2,8 @@ module semantico;
 
 import apoyo;
 import arbol;
+import std.conv;
+import std.stdint;
 import std.stdio;
 
 // Implemento la tabla de identificadores como un diccionario:
@@ -13,27 +15,29 @@ bool analiza(Nodo n)
 {
     imprime_árbol(n);
 
-	writeln();
+	infoln();
 
     paso1_identificadores_globales(n);
 
-    writeln();
+    infoln();
 
-    paso2_ejecuta_inicio();
+    Bloque bloque = paso2_prepara_inicio();
+
+    paso3_ejecuta(bloque);
 
     return true;
 }
 
 void paso1_identificadores_globales(Nodo n)
 {
-    writeln("Recorre espacio de nombres 'global'.");
+    infoln("Recorre espacio de nombres 'global'.");
 
     paso1_recorre_nodo(n);
 }
 
-void paso2_ejecuta_inicio()
+Bloque paso2_prepara_inicio()
 {
-    writeln("Ejecuta '@inicio()'.");
+    infoln("Ejecuta '@inicio()'.");
     
     if(tid.lee_id("inicio").nombre != "inicio")
     {
@@ -48,7 +52,7 @@ void paso2_ejecuta_inicio()
         aborta("No has definido la función '@inicio()'");
     }
 
-    // Obtén en Nodo de la definición de @inicio()
+    // Obtén el Nodo de la definición de @inicio()
     DefineFunción def_inicio = cast(DefineFunción)eid.definición;
 
     // Crea y configura la tabla de identificadores de la función @inicio()
@@ -66,13 +70,13 @@ void paso2_ejecuta_inicio()
     literal.dato = "3.14159";
     literal.tipo = "r32";
     literal.línea = def_inicio.línea;
-    tid.define_identificador("pi", literal);
+    tid.define_identificador("pi", literal, literal);
 
     // Comprueba las variables guardadas en las tablas de identificadores
-    writeln("Comprobando que %pi existe...");
+    infoln("Comprobando que %pi existe...");
     recorre_nodo(tid.lee_id("%pi").definición);
 
-    writeln("Comprobando que %lolazo existe...");
+    infoln("Comprobando que %lolazo existe...");
     recorre_nodo(tid.lee_id("%lolazo").definición);
 
 
@@ -84,31 +88,182 @@ void paso2_ejecuta_inicio()
         aborta("No puedo ejecutar el bloque de @inicio");
     }
 
-    //paso 2.3: recorre las ramas del bloque de @inicio()
+    return bloque;
+}
+
+void paso3_ejecuta(Bloque bloque)
+{
+    Nodo resultado;
+    //recorre las ramas del bloque de @inicio()
     for(int i = 0; i<bloque.ramas.length; i++)
     {
-        auto n = bloque.ramas[i];
+        resultado = paso3_recorre_nodo(bloque.ramas[i]);
+    }
+}
 
+Nodo paso3_recorre_nodo(Nodo n)
+{
+    if(n)
+    {
         switch(n.categoría)
         {
-            case Categoría.OPERACIÓN:
-                Operación o = cast(Operación)n;
-                if(!ejecuta_operación(o))
-                {
-                    aborta("Ocurrió un problema ejecutando la operación");
-                }
+            case Categoría.LITERAL:
+                return n;
+                //break;
 
-                break;
+            case Categoría.IDENTIFICADOR:
+                auto l = cast(Identificador)n;
+                info(to!dstring(l.categoría));
+                info(" [id:");
+                info(l.dato);
+                info("] [línea:");
+                info(to!dstring(l.línea));
+                infoln("]");
+                return null;
+                //break;
+
+            case Categoría.OPERACIÓN:
+                auto o = cast(Operación)n;
+                return ejecuta_operación(o);
+                //break;
+
+            case Categoría.ASIGNACIÓN:
+                auto a = cast(Asignación)n;
+
+                auto id = cast(Identificador)a.ramas[0];
+
+                auto lit = cast(Literal)paso3_recorre_nodo(a.ramas[1]);
+
+                tid.define_identificador(id.dato, a, lit);
+
+                return null;
+                //break;
+
+            case Categoría.DEFINE_IDENTIFICADOR_LOCAL:
+                auto did = cast(DefineIdentificadorLocal)n;
+                info(to!dstring(did.categoría));
+                info(" [ámbito:");
+                info(did.ámbito);
+                info("] [tipo:");
+                info(did.tipo);
+                info("] [nombre:");
+                info(did.nombre);
+                info("] [línea:");
+                info(to!dstring(did.línea));
+                infoln("]");
+                return null;
+                //break;
+
+            case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
+                auto did = cast(DefineIdentificadorGlobal)n;
+                info(to!dstring(did.categoría));
+                info(" [ámbito:");
+                info(did.ámbito);
+                info("] [tipo:");
+                info(did.tipo);
+                info("] [nombre:");
+                info(did.nombre);
+                info("] [línea:");
+                info(to!dstring(did.línea));
+                infoln("]");
+                return null;
+                //break;
+
+            case Categoría.DECLARA_IDENTIFICADOR_GLOBAL:
+                auto idex = cast(DeclaraIdentificadorGlobal)n;
+                info(to!dstring(idex.categoría));
+                info(" [ámbito:");
+                info(idex.ámbito);
+                info("] [tipo:");
+                info(idex.tipo);
+                info("] [nombre:");
+                info(idex.nombre);
+                info("] [línea:");
+                info(to!dstring(idex.línea));
+                infoln("]");
+                return null;
+                //break;
+
+            case Categoría.BLOQUE:
+                auto b = cast(Bloque)n;
+                info(to!dstring(b.categoría));
+                info(" [línea:");
+                info(to!dstring(b.línea));
+                infoln("]");
+                return null;
+                //break;
+
+            case Categoría.ARGUMENTOS:
+                auto a = cast(Argumentos)n;
+                info(to!dstring(a.categoría));
+                info(" [línea:");
+                info(to!dstring(a.línea));
+                infoln("]");
+                return null;
+                //break;
+
+            case Categoría.ARGUMENTO:
+                auto a = cast(Argumento)n;
+                info(to!dstring(a.categoría));
+                info(" [tipo:");
+                info(a.tipo);
+                info("] [nombre:");
+                info(a.nombre);
+                info("] [línea:");
+                info(to!dstring(a.línea));
+                infoln("]");
+                return null;
+                //break;
+
+            case Categoría.DEFINE_FUNCIÓN:
+                auto df = cast(DefineFunción)n;
+                info(to!dstring(df.categoría));
+                info(" [ret:");
+                info(df.retorno);
+                info("] [nombre:");
+                info(df.nombre);
+                info("] [línea:");
+                info(to!dstring(df.línea));
+                infoln("]");
+                return null;
+                //break;
+
+            case Categoría.DECLARA_FUNCIÓN:
+                auto df = cast(DeclaraFunción)n;
+                info(to!dstring(df.categoría));
+                info(" [ret:");
+                info(df.retorno);
+                info("] [nombre:");
+                info(df.nombre);
+                info("] [línea:");
+                info(to!dstring(df.línea));
+                infoln("]");
+                return null;
+                //break;
+
+            case Categoría.MÓDULO:
+                auto obj = cast(Módulo)n;
+                info(to!dstring(obj.categoría));
+                info(" [nombre:");
+                info(obj.nombre);
+                info("] [línea:");
+                info(to!dstring(obj.línea));
+                infoln("]");
+                return null;
+                //break;
 
             default:
-                break;
+                return null;
+                //break;
         }
     }
+
+    return null;
 }
 
 void paso2_1_declara_argumentos(Nodo n)
 {
-    writeln("Declara los argumentos de @inicio().");
+    infoln("Declara los argumentos de @inicio().");
     
     paso2_1_recorre_nodo(n);
 }
@@ -193,7 +348,7 @@ class TablaIdentificadores
             if(this.padre is null)
             {
                 // esta es la tabla raíz
-                return EntradaTablaIdentificadores(null, false, null, false, null);
+                return EntradaTablaIdentificadores(null, false, null, false, null, null);
             }
             else
             {
@@ -240,7 +395,7 @@ class TablaIdentificadores
         return true;
     }
 
-    bool define_identificador(dstring identificador, Nodo definición)
+    bool define_identificador(dstring identificador, Nodo definición, Literal valor)
     {
         if(identificador is null)
         {
@@ -273,6 +428,7 @@ class TablaIdentificadores
         eid.nombre = id;
         eid.definido = true;
         eid.definición = definición;
+        eid.valor = valor;
 
         tabla[id] = eid;
 
@@ -295,11 +451,11 @@ void recorre_nodo(Nodo n)
     {
         for(int i = 1; i < profundidad_árbol_gramatical; i++)
         {
-            write("   ");
+            info("   ");
         }
-        write("[hijos:");
-        write(n.ramas.length);
-        write("] ");
+        info("[hijos:");
+        info(to!dstring(n.ramas.length));
+        info("] ");
         interpreta_nodo(n);
 
         int i;
@@ -318,159 +474,146 @@ private void interpreta_nodo(Nodo n)
     {
         case Categoría.LITERAL:
             auto l = cast(Literal)n;
-            write(l.categoría);
-            write(" [tipo:");
-            write(l.tipo);
-            write("] [dato:");
-            write(l.dato);
-            write("] [línea:");
-            write(l.línea);
-            write("]");
-            writeln();
+            info(to!dstring(l.categoría));
+            info(" [tipo:");
+            info(l.tipo);
+            info("] [dato:");
+            info(l.dato);
+            info("] [línea:");
+            info(to!dstring(l.línea));
+            infoln("]");
             break;
 
         case Categoría.IDENTIFICADOR:
             auto l = cast(Identificador)n;
-            write(l.categoría);
-            write(" [id:");
-            write(l.dato);
-            write("] [línea:");
-            write(l.línea);
-            write("]");
-            writeln();
+            info(to!dstring(l.categoría));
+            info(" [id:");
+            info(l.dato);
+            info("] [línea:");
+            info(to!dstring(l.línea));
+            infoln("]");
             break;
 
         case Categoría.OPERACIÓN:
             auto o = cast(Operación)n;
-            write(o.categoría);
-            write(" [op:");
-            write(o.dato);
-            write("] [línea:");
-            write(o.línea);
-            write("]");
-            writeln();
+            info(to!dstring(o.categoría));
+            info(" [op:");
+            info(o.dato);
+            info("] [línea:");
+            info(to!dstring(o.línea));
+            infoln("]");
             break;
 
         case Categoría.ASIGNACIÓN:
             auto a = cast(Asignación)n;
-            write(a.categoría);
-            write(" [línea:");
-            write(a.línea);
-            write("]");
-            writeln();
+            info(to!dstring(a.categoría));
+            info(" [línea:");
+            info(to!dstring(a.línea));
+            infoln("]");
             break;
 
         case Categoría.DEFINE_IDENTIFICADOR_LOCAL:
             auto did = cast(DefineIdentificadorLocal)n;
-            write(did.categoría);
-            write(" [ámbito:");
-            write(did.ámbito);
-            write("] [tipo:");
-            write(did.tipo);
-            write("] [nombre:");
-            write(did.nombre);
-            write("] [línea:");
-            write(did.línea);
-            write("]");
-            writeln();
+            info(to!dstring(did.categoría));
+            info(" [ámbito:");
+            info(did.ámbito);
+            info("] [tipo:");
+            info(did.tipo);
+            info("] [nombre:");
+            info(did.nombre);
+            info("] [línea:");
+            info(to!dstring(did.línea));
+            infoln("]");
             break;
 
         case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
             auto did = cast(DefineIdentificadorGlobal)n;
-            write(did.categoría);
-            write(" [ámbito:");
-            write(did.ámbito);
-            write("] [tipo:");
-            write(did.tipo);
-            write("] [nombre:");
-            write(did.nombre);
-            write("] [línea:");
-            write(did.línea);
-            write("]");
-            writeln();
+            info(to!dstring(did.categoría));
+            info(" [ámbito:");
+            info(did.ámbito);
+            info("] [tipo:");
+            info(did.tipo);
+            info("] [nombre:");
+            info(did.nombre);
+            info("] [línea:");
+            info(to!dstring(did.línea));
+            infoln("]");
             break;
 
         case Categoría.DECLARA_IDENTIFICADOR_GLOBAL:
             auto idex = cast(DeclaraIdentificadorGlobal)n;
-            write(idex.categoría);
-            write(" [ámbito:");
-            write(idex.ámbito);
-            write("] [tipo:");
-            write(idex.tipo);
-            write("] [nombre:");
-            write(idex.nombre);
-            write("] [línea:");
-            write(idex.línea);
-            write("]");
-            writeln();
+            info(to!dstring(idex.categoría));
+            info(" [ámbito:");
+            info(idex.ámbito);
+            info("] [tipo:");
+            info(idex.tipo);
+            info("] [nombre:");
+            info(idex.nombre);
+            info("] [línea:");
+            info(to!dstring(idex.línea));
+            infoln("]");
             break;
 
         case Categoría.BLOQUE:
             auto b = cast(Bloque)n;
-            write(b.categoría);
-            write(" [línea:");
-            write(b.línea);
-            write("]");
-            writeln();
+            info(to!dstring(b.categoría));
+            info(" [línea:");
+            info(to!dstring(b.línea));
+            infoln("]");
             break;
 
         case Categoría.ARGUMENTOS:
             auto a = cast(Argumentos)n;
-            write(a.categoría);
-            write(" [línea:");
-            write(a.línea);
-            write("]");
-            writeln();
+            info(to!dstring(a.categoría));
+            info(" [línea:");
+            info(to!dstring(a.línea));
+            infoln("]");
             break;
 
         case Categoría.ARGUMENTO:
             auto a = cast(Argumento)n;
-            write(a.categoría);
-            write(" [tipo:");
-            write(a.tipo);
-            write("] [nombre:");
-            write(a.nombre);
-            write("] [línea:");
-            write(a.línea);
-            write("]");
-            writeln();
+            info(to!dstring(a.categoría));
+            info(" [tipo:");
+            info(a.tipo);
+            info("] [nombre:");
+            info(a.nombre);
+            info("] [línea:");
+            info(to!dstring(a.línea));
+            infoln("]");
             break;
 
         case Categoría.DEFINE_FUNCIÓN:
             auto df = cast(DefineFunción)n;
-            write(df.categoría);
-            write(" [ret:");
-            write(df.retorno);
-            write("] [nombre:");
-            write(df.nombre);
-            write("] [línea:");
-            write(df.línea);
-            write("]");
-            writeln();
+            info(to!dstring(df.categoría));
+            info(" [ret:");
+            info(df.retorno);
+            info("] [nombre:");
+            info(df.nombre);
+            info("] [línea:");
+            info(to!dstring(df.línea));
+            infoln("]");
             break;
 
         case Categoría.DECLARA_FUNCIÓN:
             auto df = cast(DeclaraFunción)n;
-            write(df.categoría);
-            write(" [ret:");
-            write(df.retorno);
-            write("] [nombre:");
-            write(df.nombre);
-            write("] [línea:");
-            write(df.línea);
-            write("]");
-            writeln();
+            info(to!dstring(df.categoría));
+            info(" [ret:");
+            info(df.retorno);
+            info("] [nombre:");
+            info(df.nombre);
+            info("] [línea:");
+            info(to!dstring(df.línea));
+            infoln("]");
             break;
 
         case Categoría.MÓDULO:
             auto obj = cast(Módulo)n;
-            write(obj.categoría);
-            write(" [nombre:");
-            write(obj.nombre);
-            write("] [línea:");
-            write(obj.línea);
-            write("]");
-            writeln();
+            info(to!dstring(obj.categoría));
+            info(" [nombre:");
+            info(obj.nombre);
+            info("] [línea:");
+            info(to!dstring(obj.línea));
+            infoln("]");
             break;
 
         default: break;
@@ -518,9 +661,22 @@ private void paso1_interpreta_nodo(Nodo n)
         case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
             auto did = cast(DefineIdentificadorGlobal)n;
 
-            if(tid.define_identificador(did.nombre, did))
+            // Debería tener colgando un hijo de clase 'Literal'
+            if(did.ramas.length != 1)
             {
-                writeln("define " ~ tid.lee_id(did.nombre).nombre);
+                aborta("El nodo DefineIdentificadorGlobal debería tener un hijo 'Literal'");
+            }
+
+            if(did.ramas[0].categoría != Categoría.LITERAL)
+            {
+                aborta("El nodo DefineIdentificadorGlobal debería tener un hijo 'Literal'");
+            }
+
+            Literal lit = cast(Literal)(did.ramas[0]);
+
+            if(tid.define_identificador(did.nombre, did, lit))
+            {
+                infoln("define " ~ tid.lee_id(did.nombre).nombre);
             }
 
             break;
@@ -530,7 +686,7 @@ private void paso1_interpreta_nodo(Nodo n)
 
             if(tid.declara_identificador(idex.nombre, idex))
             {
-                writeln("declara " ~ tid.lee_id(idex.nombre).nombre);
+                infoln("declara " ~ tid.lee_id(idex.nombre).nombre);
             }
 
             break;
@@ -550,9 +706,9 @@ private void paso1_interpreta_nodo(Nodo n)
         case Categoría.DEFINE_FUNCIÓN:
             auto df = cast(DefineFunción)n;
 
-            if(tid.define_identificador(df.nombre, df))
+            if(tid.define_identificador(df.nombre, df, null))
             {
-                writeln("define " ~ tid.lee_id(df.nombre).nombre);
+                infoln("define " ~ tid.lee_id(df.nombre).nombre);
             }
 
             break;
@@ -562,7 +718,7 @@ private void paso1_interpreta_nodo(Nodo n)
 
             if(tid.declara_identificador(df.nombre, df))
             {
-                writeln("declara " ~ tid.lee_id(df.nombre).nombre);
+                infoln("declara " ~ tid.lee_id(df.nombre).nombre);
             }
 
             break;
@@ -606,7 +762,7 @@ private void paso2_1_interpreta_nodo(Nodo n)
 
             if(tid.declara_identificador(a.nombre, a))
             {
-                writeln("declara " ~ tid.lee_id(a.nombre).nombre);
+                infoln("declara " ~ tid.lee_id(a.nombre).nombre);
             }
             break;
 
@@ -626,7 +782,7 @@ Literal lee_argumento(Nodo n)
     {
         auto id = cast(Identificador)n;
         // Accediendo a %pi...
-        Nodo l = (tid.lee_id("pi").definición);
+        Nodo l = (tid.lee_id(id.dato).valor);
         if(l.categoría == Categoría.LITERAL)
         {
             lit = cast(Literal)l;
@@ -636,39 +792,713 @@ Literal lee_argumento(Nodo n)
     return lit;
 }
 
-bool ejecuta_operación(Operación op)
+Nodo ejecuta_operación(Operación op)
 {
     switch(op.dato)
     {
         case "ret":
-            if(op.ramas.length == 0)
-            {
-                // ret no tiene argumento
-                writeln("op: ret");
+            return op_ret(op);
+            //break;
 
-                return true;
-            }
-            else if(op.ramas.length == 1)
-            {
-                // ret tiene argumento
-                Nodo n = op.ramas[0];
+        case "sum":
+            return op_sum(op);
+            //break;
 
-                Literal lit = lee_argumento(n);
-                if(lit is null)
-                {
-                    aborta("No he podido conseguir el argumento de op: ret []");
-                }
-                //auto lit = cast(Literal)(op.ramas[0]);
-                writeln("op: ret " ~ lit.tipo ~ ":" ~ lit.dato);
+        case "res":
+            return op_res(op);
+            //break;
 
-                return true;
-            }
+        case "mul":
+            return op_mul(op);
+            //break;
 
-            break;
+        case "div":
+            return op_div(op);
+            //break;
 
         default:
             break;
     }
 
-    return false;
+    return null;
+}
+
+Literal op_ret(Operación op)
+{
+    if(op.dato != "ret")
+    {
+        aborta("Esperaba que el código de la operación fuera 'ret'");
+        return null;
+    }
+
+    if(op.ramas.length == 1)
+    {
+        // ret tiene argumento
+        Literal lit = lee_argumento(op.ramas[0]);
+        infoln("op: ret " ~ lit.tipo ~ " " ~ lit.dato ~ " [" ~ lit.dato ~ "]");
+        return lit;
+    }
+    else if(op.ramas.length == 0)
+    {
+        // ret no tiene argumento
+        infoln("op: ret");
+        return null;
+    }
+    else
+    {
+        aborta("Esperaba que 'ret' tuviera uno o ningún argumento");
+        return null;
+    }
+}
+
+Literal op_sum(Operación op)
+{
+    if(op.dato != "sum")
+    {
+        aborta("Esperaba que el código de la operación fuera 'sum'");
+        return null;
+    }
+
+    if(op.ramas.length != 2)
+    {
+        aborta("Esperaba que la operación 'sum' tuviera 2 argumentos");
+        return null;
+    }
+
+    Nodo n;
+    Literal lit0, lit1;
+    
+    n = op.ramas[0];
+    lit0 = lee_argumento(n);
+    
+    n = op.ramas[1];
+    lit1 = lee_argumento(n);
+
+    if(lit0.tipo != lit1.tipo)
+    {
+        aborta("Los tipos de la operación 'sum' debían ser iguales");
+        return null;
+    }
+
+    switch(lit0.tipo[0])
+    {
+        case 'e': //entero
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 2) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            int64_t resultado;
+            int64_t e0, e1;
+            
+            e0 = to!int64_t(lit0.dato);
+            e1 = to!int64_t(lit1.dato);
+
+            resultado = e0 + e1;
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: sum " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e0)
+                  ~ ", " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e1);
+
+            txt ~= " [" ~ to!dstring(resultado) ~ "]";
+
+            infoln(txt);
+
+            return l;
+            //break;
+
+        case 'n': //natural
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 1) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            uint64_t resultado;
+            uint64_t n0, n1;
+            
+            n0 = to!uint64_t(lit0.dato);
+            n1 = to!uint64_t(lit1.dato);
+
+            resultado = n0 + n1;
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: sum " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n0)
+                  ~ ", " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n1);
+
+            txt ~= " [" ~ to!dstring(resultado) ~ "]";
+
+            infoln(txt);
+
+            return l;
+            //break;
+
+        case 'r': //real
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 16) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            double resultado;
+            double r0, r1;
+            
+            r0 = to!double(lit0.dato);
+            r1 = to!double(lit1.dato);
+
+            resultado = r0 + r1;
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: sum " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r0)
+                  ~ ", " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r1);
+
+            txt ~= " [" ~ to!dstring(resultado) ~ "]";
+
+            infoln(txt);
+
+            return l;
+            //break;
+
+        default:
+            break;
+    }
+
+    
+
+    return lit0;
+}
+
+Literal op_res(Operación op)
+{
+    if(op.dato != "res")
+    {
+        aborta("Esperaba que el código de la operación fuera 'res'");
+        return null;
+    }
+
+    if(op.ramas.length != 2)
+    {
+        aborta("Esperaba que la operación 'res' tuviera 2 argumentos");
+        return null;
+    }
+
+    Nodo n;
+    Literal lit0, lit1;
+    
+    n = op.ramas[0];
+    lit0 = lee_argumento(n);
+    
+    n = op.ramas[1];
+    lit1 = lee_argumento(n);
+
+    if(lit0.tipo != lit1.tipo)
+    {
+        aborta("Los tipos de la operación 'res' debían ser iguales");
+        return null;
+    }
+
+    switch(lit0.tipo[0])
+    {
+        case 'e': //entero
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 2) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            int64_t resultado;
+            int64_t e0, e1;
+            
+            e0 = to!int64_t(lit0.dato);
+            e1 = to!int64_t(lit1.dato);
+
+            resultado = e0 - e1;
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: res " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e0)
+                  ~ ", " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e1);
+
+            txt ~= " [" ~ to!dstring(resultado) ~ "]";
+
+            infoln(txt);
+
+            return l;
+            //break;
+
+        case 'n': //natural
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 1) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            uint64_t resultado;
+            uint64_t n0, n1;
+            
+            n0 = to!uint64_t(lit0.dato);
+            n1 = to!uint64_t(lit1.dato);
+
+            resultado = n0 - n1;
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: res " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n0)
+                  ~ ", " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n1);
+
+            txt ~= " [" ~ to!dstring(resultado) ~ "]";
+
+            infoln(txt);
+
+            return l;
+            //break;
+
+        case 'r': //real
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 16) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            double resultado;
+            double r0, r1;
+            
+            r0 = to!double(lit0.dato);
+            r1 = to!double(lit1.dato);
+
+            resultado = r0 - r1;
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: res " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r0)
+                  ~ ", " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r1);
+
+            txt ~= " [" ~ to!dstring(resultado) ~ "]";
+
+            infoln(txt);
+
+            return l;
+            //break;
+
+        default:
+            break;
+    }
+
+    
+
+    return lit0;
+}
+
+Literal op_mul(Operación op)
+{
+    if(op.dato != "mul")
+    {
+        aborta("Esperaba que el código de la operación fuera 'mul'");
+        return null;
+    }
+
+    if(op.ramas.length != 2)
+    {
+        aborta("Esperaba que la operación 'mul' tuviera 2 argumentos");
+        return null;
+    }
+
+    Nodo n;
+    Literal lit0, lit1;
+    
+    n = op.ramas[0];
+    lit0 = lee_argumento(n);
+    
+    n = op.ramas[1];
+    lit1 = lee_argumento(n);
+
+    if(lit0.tipo != lit1.tipo)
+    {
+        aborta("Los tipos de la operación 'mul' debían ser iguales");
+        return null;
+    }
+
+    switch(lit0.tipo[0])
+    {
+        case 'e': //entero
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 2) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            int64_t resultado;
+            int64_t e0, e1;
+            
+            e0 = to!int64_t(lit0.dato);
+            e1 = to!int64_t(lit1.dato);
+
+            resultado = e0 * e1;
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: mul " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e0)
+                  ~ ", " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e1);
+
+            txt ~= " [" ~ to!dstring(resultado) ~ "]";
+
+            infoln(txt);
+
+            return l;
+            //break;
+
+        case 'n': //natural
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 1) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            uint64_t resultado;
+            uint64_t n0, n1;
+            
+            n0 = to!uint64_t(lit0.dato);
+            n1 = to!uint64_t(lit1.dato);
+
+            resultado = n0 * n1;
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: mul " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n0)
+                  ~ ", " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n1);
+
+            txt ~= " [" ~ to!dstring(resultado) ~ "]";
+
+            infoln(txt);
+
+            return l;
+            //break;
+
+        case 'r': //real
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 16) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            double resultado;
+            double r0, r1;
+            
+            r0 = to!double(lit0.dato);
+            r1 = to!double(lit1.dato);
+
+            resultado = r0 * r1;
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: mul " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r0)
+                  ~ ", " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r1);
+
+            txt ~= " [" ~ to!dstring(resultado) ~ "]";
+
+            infoln(txt);
+
+            return l;
+            //break;
+
+        default:
+            break;
+    }
+
+    
+
+    return lit0;
+}
+
+Literal op_div(Operación op)
+{
+    if(op.dato != "div")
+    {
+        aborta("Esperaba que el código de la operación fuera 'div'");
+        return null;
+    }
+
+    if(op.ramas.length != 2)
+    {
+        aborta("Esperaba que la operación 'div' tuviera 2 argumentos");
+        return null;
+    }
+
+    Nodo n;
+    Literal lit0, lit1;
+    
+    n = op.ramas[0];
+    lit0 = lee_argumento(n);
+    
+    n = op.ramas[1];
+    lit1 = lee_argumento(n);
+
+    if(lit0.tipo != lit1.tipo)
+    {
+        aborta("Los tipos de la operación 'div' debían ser iguales");
+        return null;
+    }
+
+    switch(lit0.tipo[0])
+    {
+        case 'e': //entero
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 2) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            int64_t resultado;
+            int64_t e0, e1;
+            
+            e0 = to!int64_t(lit0.dato);
+            e1 = to!int64_t(lit1.dato);
+
+            resultado = e0 / e1;
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: div " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e0)
+                  ~ ", " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e1);
+
+            txt ~= " [" ~ to!dstring(resultado) ~ "]";
+
+            infoln(txt);
+
+            return l;
+            //break;
+
+        case 'n': //natural
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 1) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            uint64_t resultado;
+            uint64_t n0, n1;
+            
+            n0 = to!uint64_t(lit0.dato);
+            n1 = to!uint64_t(lit1.dato);
+
+            resultado = n0 / n1;
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: div " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n0)
+                  ~ ", " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n1);
+
+            txt ~= " [" ~ to!dstring(resultado) ~ "]";
+
+            infoln(txt);
+
+            return l;
+            //break;
+
+        case 'r': //real
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 16) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            double resultado;
+            double r0, r1;
+            
+            r0 = to!double(lit0.dato);
+            r1 = to!double(lit1.dato);
+
+            resultado = r0 / r1;
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: div " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r0)
+                  ~ ", " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r1);
+
+            txt ~= " [" ~ to!dstring(resultado) ~ "]";
+
+            infoln(txt);
+
+            return l;
+            //break;
+
+        default:
+            break;
+    }
+
+    
+
+    return lit0;
 }

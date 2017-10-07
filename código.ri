@@ -1,5 +1,5 @@
 //Código de ejemplo
-módulo código;
+//módulo código;
 
 /*
 También usado para pruebas.
@@ -13,17 +13,20 @@ declara e32 @sal(e32 %hola, r18 %lol);
 
 @lol = externo n32;
 
-@lolazo = constante e64 288;
+@lolazo = constante e32 288;
 
 
 define e32 @adiós(r18 %lol, r18 %adiós, n288 %kease)
 {
-    %0 = local e32  288;
+    %0 = local e32 288;
     %1 = sum e32 288, %0;
+    %2 = sum e32 288, e32 42;
     ret %1;
 }
 
 define e32 @inicio(r32 %pi)
 {
-    ret r32 3.14159;
+    %0 = sum e32 288, %lolazo;
+    %1 = sum e32 29, %0;
+    ret %1;
 }

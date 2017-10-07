@@ -7,7 +7,7 @@ import std.stdio; // write(), writeln()
 import std.uni; // isAlpha(), isNumber(), isAlphaNum(), isWhite()
 import std.utf; // toUTF32()
 
-bool INFO;
+bool INFO = false;
 
 
 struct lexema
@@ -30,6 +30,29 @@ enum lexema_e
     NOMBRE
 }
 
+void infoln()
+{
+    if(INFO)
+    {
+        writeln();
+    }
+}
+
+void infoln(dstring txt)
+{
+    if(INFO)
+    {
+        writeln(txt);
+    }
+}
+
+void info(dstring txt)
+{
+    if(INFO)
+    {
+        write(txt);
+    }
+}
 
 void error(dstring s)
 {

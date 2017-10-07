@@ -1,3 +1,4 @@
+import std.conv;
 import std.stdio;
 import std.string;
 
@@ -11,7 +12,7 @@ dstring archivo = "código.ri";
 
 void main()
 {
-	INFO = false;
+	INFO = true;
 
 	dstring código_ri = leearchivo(archivo);
 
@@ -23,15 +24,15 @@ void iri(dstring código)
 
 	lexema[] resultado_lex = lexico.analiza(código);
 
-	writeln();
+	infoln();
 
-	writeln(resultado_lex);
+	info(to!dstring(resultado_lex));
 
 	Nodo árbol_gramatical = sintaxis.analiza(resultado_lex);
 
-	writeln();
+	infoln();
 
 	bool resultado = semantico.analiza(árbol_gramatical);
 
-	writeln();
+	infoln();
 }

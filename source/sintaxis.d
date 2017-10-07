@@ -576,9 +576,7 @@ private Operación operación()
                     o.ramas ~= i;
                     continue;
                 }
-                else cursor = c1;
-
-                if(Literal l = literal())
+                else if(Literal l = literal())
                 {
                     o.ramas ~= l;
                     continue;
@@ -696,8 +694,7 @@ private Nodo nombre()
     {
         if(INFO)
         {
-            write("ERROR: he llegado al final del archivo y esperaba nombre");
-            writeln("'");
+            write("INFO: he llegado al final del archivo buscando un nombre");
         }
         
         return null;
@@ -728,7 +725,7 @@ private Nodo reservada(dstring txt)
     {
         if(INFO)
         {
-            write("ERROR: he llegado al final del archivo y esperaba '");
+            write("INFO: he llegado al final del archivo y buscaba '");
             write(txt);
             writeln("'");
         }
@@ -760,7 +757,7 @@ private Nodo notación(dstring c)
     {
         if(INFO)
         {
-            write("ERROR: he llegado al final del archivo y esperaba '");
+            write("INFO: he llegado al final del archivo y buscaba '");
             write(c);
             writeln("'");
         }
