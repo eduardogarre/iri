@@ -6,6 +6,7 @@ import std.stdio;
 
 enum Categoría
 {
+    RESERVADA,
     TIPO,
     NÚMERO,
     TEXTO,
@@ -43,6 +44,15 @@ class Nodo
     this()
     {
 
+    }
+}
+
+class Reservada : Nodo
+{
+    this()
+    {
+        super();
+        this.categoría = Categoría.RESERVADA;
     }
 }
 

@@ -561,6 +561,14 @@ private Operación operación()
 
             cursor++;
 
+            if(símbolos[cursor].categoría == lexema_e.RESERVADA)
+            {
+                lexema l = símbolos[cursor];
+
+                Nodo r = reservada(l.símbolo);
+                o.ramas ~= r;
+            }
+
             if(LlamaFunción f = llama_función())
             {
                 o.ramas ~= f;
@@ -835,7 +843,7 @@ private Nodo nombre()
 }
 
 
-private Nodo reservada(dstring txt)
+private Reservada reservada(dstring txt)
 {
     if(cursor >= símbolos.length)
     {
@@ -856,7 +864,8 @@ private Nodo reservada(dstring txt)
             writeln("not["d ~ txt ~ "]"d);
         }
 
-        Nodo n = new Nodo();
+        Reservada n = new Reservada();
+        n.dato = txt;
         n.línea = símbolos[cursor].línea;
 
         cursor++;

@@ -466,6 +466,16 @@ private void interpreta_nodo(Nodo n)
 {
     switch(n.categoría)
     {
+        case Categoría.RESERVADA:
+            auto l = cast(Reservada)n;
+            charlatán(to!dstring(l.categoría));
+            charlatán("] [dato:");
+            charlatán(l.dato);
+            charlatán("] [línea:");
+            charlatán(to!dstring(l.línea));
+            charlatánln("]");
+            break;
+
         case Categoría.LITERAL:
             auto l = cast(Literal)n;
             charlatán(to!dstring(l.categoría));
@@ -826,6 +836,10 @@ Nodo ejecuta_operación(Operación op)
             return op_llama(op);
             //break;
 
+        case "cmp":
+            return op_cmp(op);
+            //break;
+
         default:
             break;
     }
@@ -883,6 +897,11 @@ Literal op_sum(Operación op)
     
     n = op.ramas[1];
     lit1 = lee_argumento(n);
+
+    if((lit0 is null) || (lit1 is null))
+    {
+        return null;
+    }
 
     if(lit0.tipo != lit1.tipo)
     {
@@ -1047,6 +1066,11 @@ Literal op_res(Operación op)
     n = op.ramas[1];
     lit1 = lee_argumento(n);
 
+    if((lit0 is null) || (lit1 is null))
+    {
+        return null;
+    }
+
     if(lit0.tipo != lit1.tipo)
     {
         aborta("Los tipos de la operación 'res' debían ser iguales");
@@ -1209,6 +1233,11 @@ Literal op_mul(Operación op)
     
     n = op.ramas[1];
     lit1 = lee_argumento(n);
+
+    if((lit0 is null) || (lit1 is null))
+    {
+        return null;
+    }
 
     if(lit0.tipo != lit1.tipo)
     {
@@ -1373,6 +1402,11 @@ Literal op_div(Operación op)
     n = op.ramas[1];
     lit1 = lee_argumento(n);
 
+    if((lit0 is null) || (lit1 is null))
+    {
+        return null;
+    }
+
     if(lit0.tipo != lit1.tipo)
     {
         aborta("Los tipos de la operación 'div' debían ser iguales");
@@ -1534,10 +1568,293 @@ Literal op_llama(Operación op)
     foreach(Nodo n; f.ramas)
     {
         Literal l = lee_argumento(n);
-        charlatán(l.tipo ~ " " ~ l.dato ~ " ");
+        info(l.tipo ~ " " ~ l.dato ~ " ");
     }
 
     infoln(")");
 
     return null;
+}
+
+Literal op_cmp(Operación op)
+{
+    if(op.dato != "cmp")
+    {
+        aborta("Esperaba que el código de la operación fuera 'cmp'");
+        return null;
+    }
+
+    if(op.ramas.length != 3)
+    {
+        aborta("Esperaba que la operación 'cmp' tuviera 2 argumentos");
+        return null;
+    }
+
+    auto r = op.ramas[0];
+
+    dstring comparación = r.dato;
+
+    dstring s = comparación;
+
+    if(   (s == "ig") // igual
+        | (s == "dif") // diferente
+        | (s == "ma") // mayor
+        | (s == "me") // menor
+        | (s == "mai") // mayor o igual
+        | (s == "mei") // menor o igual
+        )
+    {}
+    else
+    {
+        aborta("El comando de comparación es incorrecto");
+    }
+
+    Nodo n;
+    Literal lit0, lit1;
+    bool resultado;
+    
+    n = op.ramas[1];
+    lit0 = lee_argumento(n);
+    
+    n = op.ramas[2];
+    lit1 = lee_argumento(n);
+
+    if((lit0 is null) || (lit1 is null))
+    {
+        aborta("Los argumentos son incorrectos");
+    }
+
+    if(lit0.tipo != lit1.tipo)
+    {
+        aborta("Los tipos de la operación 'cmp' debían ser iguales");
+    }
+
+    switch(lit0.tipo[0])
+    {
+        case 'e': //entero
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 2) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            int64_t var0, var1;
+            
+            var0 = to!int64_t(lit0.dato);
+            var1 = to!int64_t(lit1.dato);
+
+            if(comparación == "ig")
+            {
+                // igual que...
+                resultado = var0 == var1;
+            }
+            else if(comparación == "dif")
+            {
+                // diferente a...
+                resultado = var0 != var1;
+            }
+            else if(comparación ==  "ma")
+            {
+                // mayor que...
+                resultado = var0 > var1;
+            }
+            else if(comparación ==  "me")
+            {
+                // menor que...
+                resultado = var0 < var1;
+            }
+            else if(comparación ==  "mai")
+            {
+                // mayor o igual que...
+                resultado = var0 >= var1;
+            }
+            else if(comparación ==  "mei")
+            {
+                // menor o igual que...
+                resultado = var0 <= var1;
+            }
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: cmp " ~ comparación ~ " e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(var0)
+                  ~ ", " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(var1);
+
+            dstring cero = to!dstring(0);
+            dstring uno  = to!dstring(1);
+
+            txt ~= " [" ~ (resultado?uno:cero) ~ "]";
+
+            infoln(txt);
+
+            break;
+
+        case 'n': //natural
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 1) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            uint64_t var0, var1;
+            
+            var0 = to!uint64_t(lit0.dato);
+            var1 = to!uint64_t(lit1.dato);
+
+            if(comparación == "ig")
+            {
+                // igual que...
+                resultado = var0 == var1;
+            }
+            else if(comparación == "dif")
+            {
+                // diferente a...
+                resultado = var0 != var1;
+            }
+            else if(comparación ==  "ma")
+            {
+                // mayor que...
+                resultado = var0 > var1;
+            }
+            else if(comparación ==  "me")
+            {
+                // menor que...
+                resultado = var0 < var1;
+            }
+            else if(comparación ==  "mai")
+            {
+                // mayor o igual que...
+                resultado = var0 >= var1;
+            }
+            else if(comparación ==  "mei")
+            {
+                // menor o igual que...
+                resultado = var0 <= var1;
+            }
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: cmp " ~ comparación ~ " n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(var0)
+                  ~ ", " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(var1);
+
+            dstring cero = to!dstring(0);
+            dstring uno  = to!dstring(1);
+
+            txt ~= " [" ~ (resultado?uno:cero) ~ "]";
+
+            infoln(txt);
+
+            break;
+
+        case 'r': //real
+            for(int i = 1; i < lit0.tipo.length; i++)
+            {
+                if(!esdígito(lit0.tipo[i]))
+                {
+                    aborta("Formato incorrecto del 'tipo'");
+                    return null;
+                }
+            }
+
+            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+
+            if((tamaño < 16) || (tamaño > 64))
+            {
+                aborta("El tamaño del tipo se sale del rango");
+                return null;
+            }
+
+            double var0, var1;
+            
+            var0 = to!double(lit0.dato);
+            var1 = to!double(lit1.dato);
+
+            if(comparación == "ig")
+            {
+                // igual que...
+                resultado = var0 == var1;
+            }
+            else if(comparación == "dif")
+            {
+                // diferente a...
+                resultado = var0 != var1;
+            }
+            else if(comparación ==  "ma")
+            {
+                // mayor que...
+                resultado = var0 > var1;
+            }
+            else if(comparación ==  "me")
+            {
+                // menor que...
+                resultado = var0 < var1;
+            }
+            else if(comparación ==  "mai")
+            {
+                // mayor o igual que...
+                resultado = var0 >= var1;
+            }
+            else if(comparación ==  "mei")
+            {
+                // menor o igual que...
+                resultado = var0 <= var1;
+            }
+
+            auto l = new Literal();
+            l.dato = to!dstring(resultado);
+            l.tipo = lit0.tipo;
+
+            dstring txt;
+            txt = "op: cmp " ~ comparación ~ " r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(var0)
+                  ~ ", " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(var1);
+
+            dstring cero = to!dstring(0);
+            dstring uno  = to!dstring(1);
+
+            txt ~= " [" ~ (resultado?uno:cero) ~ "]";
+
+            infoln(txt);
+            break;
+
+        default:
+            break;
+    }
+
+    dstring cero = to!dstring(0);
+    dstring uno  = to!dstring(1);
+
+    dstring txt = (resultado?uno:cero);
+
+    Literal resul = new Literal;
+    resul.tipo = "n1";
+    resul.dato = txt;
+
+    return resul;
 }

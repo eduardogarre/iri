@@ -29,9 +29,9 @@ define e32 @adiós(r18 %lol, r18 %adiós, n288 %kease)
 
 define e32 @inicio(r32 %pi)
 {
-    %0 = llama e32 @adiós(%pi, @xd, @roto2, e32 42);
+    %a = cmp ig e32 42, e32 42;
+    %0 = llama e32 @adiós(%pi, %a);
     %1 = sum e32 288, @roto2;
     %2 = sum @xd, %1;
     ret %2;
 }
-
