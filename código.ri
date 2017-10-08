@@ -13,7 +13,9 @@ declara e32 @sal(e32 %hola, r18 %lol);
 
 @lol = externo n32;
 
-@lolazo = constante e32 288;
+@roto2 = constante e32 288;
+
+@xd = constante e32 42;
 
 
 define e32 @adiós(r18 %lol, r18 %adiós, n288 %kease)
@@ -27,9 +29,9 @@ define e32 @adiós(r18 %lol, r18 %adiós, n288 %kease)
 
 define e32 @inicio(r32 %pi)
 {
-    %0 = llama e32 @adiós(%pi);
-    %1 = sum e32 288, %lolazo;
-    %2 = sum e32 29, %1;
+    %0 = llama e32 @adiós(%pi, @xd, @roto2, e32 42);
+    %1 = sum e32 288, @roto2;
+    %2 = sum @xd, %1;
     ret %2;
 }
 

@@ -72,13 +72,6 @@ Bloque paso2_prepara_inicio()
     literal.línea = def_inicio.línea;
     tid.define_identificador("pi", literal, literal);
 
-    // Comprueba las variables guardadas en las tablas de identificadores
-    infoln("Comprobando que %pi existe...");
-    recorre_nodo(tid.lee_id("%pi").definición);
-
-    infoln("Comprobando que %lolazo existe...");
-    recorre_nodo(tid.lee_id("%lolazo").definición);
-
 
     //paso 2.2: obtén el bloque de @inicio(), para poder ejecutarlo.
     Bloque bloque = paso2_2_obtén_bloque(def_inicio);
@@ -348,6 +341,7 @@ class TablaIdentificadores
             if(this.padre is null)
             {
                 // esta es la tabla raíz
+                aborta("No habías declarado el id " ~ identificador);
                 return EntradaTablaIdentificadores(null, false, null, false, null, null);
             }
             else
