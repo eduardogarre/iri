@@ -65,6 +65,11 @@ private Módulo módulo()
         break;
     }
 
+    if(!fda())
+    {
+        aborta("Esperaba llegar al final del archivo");
+    }
+
     return o;
 }
 
@@ -204,7 +209,7 @@ private DeclaraFunción declara_función()
             return null;
         }
 
-        if(Nodo a = argumentos)
+        if(Nodo a = argumentos())
         {
             df.ramas ~= a;
         }
@@ -527,6 +532,14 @@ private Asignación asignación()
         a.ramas ~= r2;
         return a;
     }
+    else if(Nodo f = llama_función())
+    {
+        r2 = f;
+        a.línea = r1.línea;
+        a.ramas ~= r1;
+        a.ramas ~= r2;
+        return a;
+    }
 
     cursor = c;
     return null;
@@ -548,7 +561,11 @@ private Operación operación()
 
             cursor++;
 
-            if(Identificador i = identificador())
+            if(LlamaFunción f = llama_función())
+            {
+                o.ramas ~= f;
+            }
+            else if(Identificador i = identificador())
             {
                 o.ramas ~= i;
             }
@@ -604,12 +621,12 @@ private Identificador identificador()
     {
         if(símbolos[cursor].categoría == lexema_e.IDENTIFICADOR)
         {
-            Identificador i = new Identificador();
-            i.dato = símbolos[cursor].símbolo;
-            i.línea = símbolos[cursor].línea;
+            Identificador id = new Identificador();
+            id.dato = símbolos[cursor].símbolo;
+            id.línea = símbolos[cursor].línea;
             
             cursor++;
-            return i;
+            return id;
         }
     }
 
@@ -617,6 +634,105 @@ private Identificador identificador()
     return null;
 }
 
+
+//LLAMA_FUNCIÓN -- TIPO IDENTIFICADOR '(' [ (LITERAL | IDENTIFICADOR) [, (LITERAL | IDENTIFICADOR) ]* ] ')'
+private LlamaFunción llama_función()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        LlamaFunción  f  = new LlamaFunción();
+
+        if(Nodo t = tipo())
+        {
+            f.tipo = t.dato;
+        }
+        else
+        {
+            cursor = c;
+            return null;
+        }
+
+        if(símbolos[cursor].categoría != lexema_e.IDENTIFICADOR)
+        {
+            cursor = c;
+            return null;
+        }
+
+        if(Nodo r = identificador())
+        {
+            f.nombre = r.dato;
+            f.línea = r.línea;
+        }
+        else
+        {
+            return null;
+        }
+
+        if(!(notación("(")))
+        {
+            return null;
+        }
+        
+
+        if(Identificador i = identificador())
+        {
+            f.ramas ~= i;
+        }
+        else if(Literal l = literal())
+        {
+            f.ramas ~= l;
+        }
+        else if(notación(")"))
+        {
+            return f;
+        }
+        else
+        {
+            cursor = c;
+            return null;
+        }
+
+        while(true)
+        {
+            uint c1 = cursor;
+
+            if(!notación(","))
+            {
+                cursor = c1;
+                break;
+            }
+
+            if(Identificador i = identificador())
+            {
+                f.ramas ~= i;
+                continue;
+            }
+            else if(Literal l = literal())
+            {
+                f.ramas ~= l;
+                continue;
+            }
+            else cursor = c1;
+
+            break;
+        }
+
+        if(notación(")"))
+        {
+            return f;
+        }
+        else
+        {
+            cursor = c;
+            return null;
+        }
+    }
+
+    cursor = c;
+    return null;
+}
 
 //LITERAL -- TIPO NÚMERO
 private Literal literal()
@@ -780,4 +896,10 @@ private Nodo notación(dstring c)
     }
 
     return null;
+}
+
+
+private bool fda()
+{
+    return (símbolos[cursor].categoría == lexema_e.FDA);
 }

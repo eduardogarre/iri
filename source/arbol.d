@@ -17,6 +17,7 @@ enum Categoría
     DEFINE_IDENTIFICADOR_LOCAL,
 
     OPERACIÓN,
+    LLAMA_FUNCIÓN,
     ASIGNACIÓN,
 
     AFIRMACIÓN,
@@ -45,6 +46,17 @@ class Nodo
     }
 }
 
+class Tipo : Nodo
+{
+    dstring tipo;
+
+    this()
+    {
+        super();
+        this.categoría = Categoría.TIPO;
+    }
+}
+
 class Literal : Nodo
 {
     dstring tipo;
@@ -64,6 +76,18 @@ class Identificador : Nodo
     {
         super();
         this.categoría = Categoría.IDENTIFICADOR;
+    }
+}
+
+class LlamaFunción : Nodo
+{
+    dstring nombre;
+    dstring tipo;
+
+    this()
+    {
+        super();
+        this.categoría = Categoría.LLAMA_FUNCIÓN;
     }
 }
 

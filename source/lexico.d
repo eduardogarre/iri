@@ -96,6 +96,12 @@ public lexema[] analiza(dstring cód)
         break;
     }
 
+    lexema fda;
+    fda.categoría = lexema_e.FDA;
+    fda.línea = línea;
+
+    análisis ~= fda;
+
     return análisis;
 }
 

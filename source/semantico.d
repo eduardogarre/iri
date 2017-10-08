@@ -494,6 +494,18 @@ private void interpreta_nodo(Nodo n)
             infoln("]");
             break;
 
+        case Categoría.LLAMA_FUNCIÓN:
+            auto l = cast(LlamaFunción)n;
+            info(to!dstring(l.categoría));
+            info(" [id:");
+            info(l.nombre);
+            info(" [devuelve:");
+            info(l.tipo);
+            info("] [línea:");
+            info(to!dstring(l.línea));
+            infoln("]");
+            break;
+
         case Categoría.OPERACIÓN:
             auto o = cast(Operación)n;
             info(to!dstring(o.categoría));
@@ -814,6 +826,10 @@ Nodo ejecuta_operación(Operación op)
 
         case "div":
             return op_div(op);
+            //break;
+
+        case "llama":
+            return op_llama(op);
             //break;
 
         default:
@@ -1501,4 +1517,33 @@ Literal op_div(Operación op)
     
 
     return lit0;
+}
+
+Literal op_llama(Operación op)
+{
+    if(op.dato != "llama")
+    {
+        aborta("Esperaba que el código de la operación fuera 'llama'");
+        return null;
+    }
+
+    if(op.ramas.length != 1)
+    {
+        aborta("Esperaba que la operación 'llama' se acompañara de una función");
+        return null;
+    }
+
+    LlamaFunción f = cast(LlamaFunción)op.ramas[0];
+
+    info("op: llama " ~ f.tipo ~ " " ~ f.nombre ~ "(");
+    
+    foreach(Nodo n; f.ramas)
+    {
+        Literal l = lee_argumento(n);
+        info(l.tipo ~ " " ~ l.dato ~ " ");
+    }
+
+    infoln(")");
+
+    return null;
 }

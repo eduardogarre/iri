@@ -27,7 +27,9 @@ enum lexema_e
     TEXTO,
     REGISTRO,
     NOTACIÓN,
-    NOMBRE
+    NOMBRE,
+    
+    FDA // Final De Archivo
 }
 
 void infoln()

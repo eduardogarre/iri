@@ -1,5 +1,5 @@
 //Código de ejemplo
-//módulo código;
+módulo código;
 
 /*
 También usado para pruebas.
@@ -24,9 +24,12 @@ define e32 @adiós(r18 %lol, r18 %adiós, n288 %kease)
     ret %1;
 }
 
+
 define e32 @inicio(r32 %pi)
 {
-    %0 = sum e32 288, %lolazo;
-    %1 = sum e32 29, %0;
-    ret %1;
+    %0 = llama e32 @adiós(%pi);
+    %1 = sum e32 288, %lolazo;
+    %2 = sum e32 29, %1;
+    ret %2;
 }
+
