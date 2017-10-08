@@ -7,8 +7,8 @@ import std.stdio; // write(), writeln()
 import std.uni; // isAlpha(), isNumber(), isAlphaNum(), isWhite()
 import std.utf; // toUTF32()
 
-bool CHARLANTÁN = false;
-bool INFO = true;
+bool CHARLATÁN = false;
+bool INFO = false;
 
 
 struct lexema
@@ -33,6 +33,30 @@ enum lexema_e
     FDA // Final De Archivo
 }
 
+void infoln()
+{
+    if(INFO)
+    {
+        writeln();
+    }
+}
+
+void infoln(dstring txt)
+{
+    if(INFO)
+    {
+        writeln(txt);
+    }
+}
+
+void info(dstring txt)
+{
+    if(INFO)
+    {
+        write(txt);
+    }
+}
+
 void charlatánln()
 {
     if(CHARLATÁN)
@@ -51,7 +75,7 @@ void charlatánln(dstring txt)
 
 void charlatán(dstring txt)
 {
-    if(INFO)
+    if(CHARLATÁN)
     {
         write(txt);
     }

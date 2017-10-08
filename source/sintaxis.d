@@ -808,9 +808,9 @@ private Nodo nombre()
 {
     if(cursor >= símbolos.length)
     {
-        if(INFO)
+        if(CHARLATÁN)
         {
-            write("INFO: he llegado al final del archivo buscando un nombre");
+            write("CHARLATÁN: he llegado al final del archivo buscando un nombre");
         }
         
         return null;
@@ -818,7 +818,7 @@ private Nodo nombre()
 
     if(símbolos[cursor].categoría == lexema_e.NOMBRE)
     {
-        if(INFO)
+        if(CHARLATÁN)
         {
             writeln("not["d ~ símbolos[cursor].símbolo ~ "]"d);
         }
@@ -839,9 +839,9 @@ private Nodo reservada(dstring txt)
 {
     if(cursor >= símbolos.length)
     {
-        if(INFO)
+        if(CHARLATÁN)
         {
-            write("INFO: he llegado al final del archivo y buscaba '");
+            write("CHARLATÁN: he llegado al final del archivo y buscaba '");
             write(txt);
             writeln("'");
         }
@@ -851,7 +851,7 @@ private Nodo reservada(dstring txt)
 
     if((símbolos[cursor].categoría == lexema_e.RESERVADA) && (símbolos[cursor].símbolo == txt))
     {
-        if(INFO)
+        if(CHARLATÁN)
         {
             writeln("not["d ~ txt ~ "]"d);
         }
@@ -871,9 +871,9 @@ private Nodo notación(dstring c)
 {
     if(cursor >= símbolos.length)
     {
-        if(INFO)
+        if(CHARLATÁN)
         {
-            write("INFO: he llegado al final del archivo y buscaba '");
+            write("CHARLATÁN: he llegado al final del archivo y buscaba '");
             write(c);
             writeln("'");
         }
@@ -883,7 +883,7 @@ private Nodo notación(dstring c)
 
     if((símbolos[cursor].categoría == lexema_e.NOTACIÓN) && (símbolos[cursor].símbolo == c))
     {
-        if(INFO)
+        if(CHARLATÁN)
         {
             writeln("not["d ~ c ~ "]"d);
         }
