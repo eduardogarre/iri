@@ -15,11 +15,11 @@ bool analiza(Nodo n)
 {
     imprime_árbol(n);
 
-	infoln();
+	charlatánln();
 
     paso1_identificadores_globales(n);
 
-    infoln();
+    charlatánln();
 
     Bloque bloque = paso2_prepara_inicio();
 
@@ -30,14 +30,14 @@ bool analiza(Nodo n)
 
 void paso1_identificadores_globales(Nodo n)
 {
-    infoln("Recorre espacio de nombres 'global'.");
+    charlatánln("Recorre espacio de nombres 'global'.");
 
     paso1_recorre_nodo(n);
 }
 
 Bloque paso2_prepara_inicio()
 {
-    infoln("Ejecuta '@inicio()'.");
+    charlatánln("Ejecuta '@inicio()'.");
     
     if(tid.lee_id("inicio").nombre != "inicio")
     {
@@ -106,12 +106,12 @@ Nodo paso3_recorre_nodo(Nodo n)
 
             case Categoría.IDENTIFICADOR:
                 auto l = cast(Identificador)n;
-                info(to!dstring(l.categoría));
-                info(" [id:");
-                info(l.dato);
-                info("] [línea:");
-                info(to!dstring(l.línea));
-                infoln("]");
+                charlatán(to!dstring(l.categoría));
+                charlatán(" [id:");
+                charlatán(l.dato);
+                charlatán("] [línea:");
+                charlatán(to!dstring(l.línea));
+                charlatánln("]");
                 return null;
                 //break;
 
@@ -134,114 +134,114 @@ Nodo paso3_recorre_nodo(Nodo n)
 
             case Categoría.DEFINE_IDENTIFICADOR_LOCAL:
                 auto did = cast(DefineIdentificadorLocal)n;
-                info(to!dstring(did.categoría));
-                info(" [ámbito:");
-                info(did.ámbito);
-                info("] [tipo:");
-                info(did.tipo);
-                info("] [nombre:");
-                info(did.nombre);
-                info("] [línea:");
-                info(to!dstring(did.línea));
-                infoln("]");
+                charlatán(to!dstring(did.categoría));
+                charlatán(" [ámbito:");
+                charlatán(did.ámbito);
+                charlatán("] [tipo:");
+                charlatán(did.tipo);
+                charlatán("] [nombre:");
+                charlatán(did.nombre);
+                charlatán("] [línea:");
+                charlatán(to!dstring(did.línea));
+                charlatánln("]");
                 return null;
                 //break;
 
             case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
                 auto did = cast(DefineIdentificadorGlobal)n;
-                info(to!dstring(did.categoría));
-                info(" [ámbito:");
-                info(did.ámbito);
-                info("] [tipo:");
-                info(did.tipo);
-                info("] [nombre:");
-                info(did.nombre);
-                info("] [línea:");
-                info(to!dstring(did.línea));
-                infoln("]");
+                charlatán(to!dstring(did.categoría));
+                charlatán(" [ámbito:");
+                charlatán(did.ámbito);
+                charlatán("] [tipo:");
+                charlatán(did.tipo);
+                charlatán("] [nombre:");
+                charlatán(did.nombre);
+                charlatán("] [línea:");
+                charlatán(to!dstring(did.línea));
+                charlatánln("]");
                 return null;
                 //break;
 
             case Categoría.DECLARA_IDENTIFICADOR_GLOBAL:
                 auto idex = cast(DeclaraIdentificadorGlobal)n;
-                info(to!dstring(idex.categoría));
-                info(" [ámbito:");
-                info(idex.ámbito);
-                info("] [tipo:");
-                info(idex.tipo);
-                info("] [nombre:");
-                info(idex.nombre);
-                info("] [línea:");
-                info(to!dstring(idex.línea));
-                infoln("]");
+                charlatán(to!dstring(idex.categoría));
+                charlatán(" [ámbito:");
+                charlatán(idex.ámbito);
+                charlatán("] [tipo:");
+                charlatán(idex.tipo);
+                charlatán("] [nombre:");
+                charlatán(idex.nombre);
+                charlatán("] [línea:");
+                charlatán(to!dstring(idex.línea));
+                charlatánln("]");
                 return null;
                 //break;
 
             case Categoría.BLOQUE:
                 auto b = cast(Bloque)n;
-                info(to!dstring(b.categoría));
-                info(" [línea:");
-                info(to!dstring(b.línea));
-                infoln("]");
+                charlatán(to!dstring(b.categoría));
+                charlatán(" [línea:");
+                charlatán(to!dstring(b.línea));
+                charlatánln("]");
                 return null;
                 //break;
 
             case Categoría.ARGUMENTOS:
                 auto a = cast(Argumentos)n;
-                info(to!dstring(a.categoría));
-                info(" [línea:");
-                info(to!dstring(a.línea));
-                infoln("]");
+                charlatán(to!dstring(a.categoría));
+                charlatán(" [línea:");
+                charlatán(to!dstring(a.línea));
+                charlatánln("]");
                 return null;
                 //break;
 
             case Categoría.ARGUMENTO:
                 auto a = cast(Argumento)n;
-                info(to!dstring(a.categoría));
-                info(" [tipo:");
-                info(a.tipo);
-                info("] [nombre:");
-                info(a.nombre);
-                info("] [línea:");
-                info(to!dstring(a.línea));
-                infoln("]");
+                charlatán(to!dstring(a.categoría));
+                charlatán(" [tipo:");
+                charlatán(a.tipo);
+                charlatán("] [nombre:");
+                charlatán(a.nombre);
+                charlatán("] [línea:");
+                charlatán(to!dstring(a.línea));
+                charlatánln("]");
                 return null;
                 //break;
 
             case Categoría.DEFINE_FUNCIÓN:
                 auto df = cast(DefineFunción)n;
-                info(to!dstring(df.categoría));
-                info(" [ret:");
-                info(df.retorno);
-                info("] [nombre:");
-                info(df.nombre);
-                info("] [línea:");
-                info(to!dstring(df.línea));
-                infoln("]");
+                charlatán(to!dstring(df.categoría));
+                charlatán(" [ret:");
+                charlatán(df.retorno);
+                charlatán("] [nombre:");
+                charlatán(df.nombre);
+                charlatán("] [línea:");
+                charlatán(to!dstring(df.línea));
+                charlatánln("]");
                 return null;
                 //break;
 
             case Categoría.DECLARA_FUNCIÓN:
                 auto df = cast(DeclaraFunción)n;
-                info(to!dstring(df.categoría));
-                info(" [ret:");
-                info(df.retorno);
-                info("] [nombre:");
-                info(df.nombre);
-                info("] [línea:");
-                info(to!dstring(df.línea));
-                infoln("]");
+                charlatán(to!dstring(df.categoría));
+                charlatán(" [ret:");
+                charlatán(df.retorno);
+                charlatán("] [nombre:");
+                charlatán(df.nombre);
+                charlatán("] [línea:");
+                charlatán(to!dstring(df.línea));
+                charlatánln("]");
                 return null;
                 //break;
 
             case Categoría.MÓDULO:
                 auto obj = cast(Módulo)n;
-                info(to!dstring(obj.categoría));
-                info(" [nombre:");
-                info(obj.nombre);
-                info("] [línea:");
-                info(to!dstring(obj.línea));
-                infoln("]");
+                charlatán(to!dstring(obj.categoría));
+                charlatán(" [nombre:");
+                charlatán(obj.nombre);
+                charlatán("] [línea:");
+                charlatán(to!dstring(obj.línea));
+                charlatánln("]");
                 return null;
                 //break;
 
@@ -256,7 +256,7 @@ Nodo paso3_recorre_nodo(Nodo n)
 
 void paso2_1_declara_argumentos(Nodo n)
 {
-    infoln("Declara los argumentos de @inicio().");
+    charlatánln("Declara los argumentos de @inicio().");
     
     paso2_1_recorre_nodo(n);
 }
@@ -445,11 +445,11 @@ void recorre_nodo(Nodo n)
     {
         for(int i = 1; i < profundidad_árbol_gramatical; i++)
         {
-            info("   ");
+            charlatán("   ");
         }
-        info("[hijos:");
-        info(to!dstring(n.ramas.length));
-        info("] ");
+        charlatán("[hijos:");
+        charlatán(to!dstring(n.ramas.length));
+        charlatán("] ");
         interpreta_nodo(n);
 
         int i;
@@ -468,158 +468,158 @@ private void interpreta_nodo(Nodo n)
     {
         case Categoría.LITERAL:
             auto l = cast(Literal)n;
-            info(to!dstring(l.categoría));
-            info(" [tipo:");
-            info(l.tipo);
-            info("] [dato:");
-            info(l.dato);
-            info("] [línea:");
-            info(to!dstring(l.línea));
-            infoln("]");
+            charlatán(to!dstring(l.categoría));
+            charlatán(" [tipo:");
+            charlatán(l.tipo);
+            charlatán("] [dato:");
+            charlatán(l.dato);
+            charlatán("] [línea:");
+            charlatán(to!dstring(l.línea));
+            charlatánln("]");
             break;
 
         case Categoría.IDENTIFICADOR:
             auto l = cast(Identificador)n;
-            info(to!dstring(l.categoría));
-            info(" [id:");
-            info(l.dato);
-            info("] [línea:");
-            info(to!dstring(l.línea));
-            infoln("]");
+            charlatán(to!dstring(l.categoría));
+            charlatán(" [id:");
+            charlatán(l.dato);
+            charlatán("] [línea:");
+            charlatán(to!dstring(l.línea));
+            charlatánln("]");
             break;
 
         case Categoría.LLAMA_FUNCIÓN:
             auto l = cast(LlamaFunción)n;
-            info(to!dstring(l.categoría));
-            info(" [id:");
-            info(l.nombre);
-            info(" [devuelve:");
-            info(l.tipo);
-            info("] [línea:");
-            info(to!dstring(l.línea));
-            infoln("]");
+            charlatán(to!dstring(l.categoría));
+            charlatán(" [id:");
+            charlatán(l.nombre);
+            charlatán(" [devuelve:");
+            charlatán(l.tipo);
+            charlatán("] [línea:");
+            charlatán(to!dstring(l.línea));
+            charlatánln("]");
             break;
 
         case Categoría.OPERACIÓN:
             auto o = cast(Operación)n;
-            info(to!dstring(o.categoría));
-            info(" [op:");
-            info(o.dato);
-            info("] [línea:");
-            info(to!dstring(o.línea));
-            infoln("]");
+            charlatán(to!dstring(o.categoría));
+            charlatán(" [op:");
+            charlatán(o.dato);
+            charlatán("] [línea:");
+            charlatán(to!dstring(o.línea));
+            charlatánln("]");
             break;
 
         case Categoría.ASIGNACIÓN:
             auto a = cast(Asignación)n;
-            info(to!dstring(a.categoría));
-            info(" [línea:");
-            info(to!dstring(a.línea));
-            infoln("]");
+            charlatán(to!dstring(a.categoría));
+            charlatán(" [línea:");
+            charlatán(to!dstring(a.línea));
+            charlatánln("]");
             break;
 
         case Categoría.DEFINE_IDENTIFICADOR_LOCAL:
             auto did = cast(DefineIdentificadorLocal)n;
-            info(to!dstring(did.categoría));
-            info(" [ámbito:");
-            info(did.ámbito);
-            info("] [tipo:");
-            info(did.tipo);
-            info("] [nombre:");
-            info(did.nombre);
-            info("] [línea:");
-            info(to!dstring(did.línea));
-            infoln("]");
+            charlatán(to!dstring(did.categoría));
+            charlatán(" [ámbito:");
+            charlatán(did.ámbito);
+            charlatán("] [tipo:");
+            charlatán(did.tipo);
+            charlatán("] [nombre:");
+            charlatán(did.nombre);
+            charlatán("] [línea:");
+            charlatán(to!dstring(did.línea));
+            charlatánln("]");
             break;
 
         case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
             auto did = cast(DefineIdentificadorGlobal)n;
-            info(to!dstring(did.categoría));
-            info(" [ámbito:");
-            info(did.ámbito);
-            info("] [tipo:");
-            info(did.tipo);
-            info("] [nombre:");
-            info(did.nombre);
-            info("] [línea:");
-            info(to!dstring(did.línea));
-            infoln("]");
+            charlatán(to!dstring(did.categoría));
+            charlatán(" [ámbito:");
+            charlatán(did.ámbito);
+            charlatán("] [tipo:");
+            charlatán(did.tipo);
+            charlatán("] [nombre:");
+            charlatán(did.nombre);
+            charlatán("] [línea:");
+            charlatán(to!dstring(did.línea));
+            charlatánln("]");
             break;
 
         case Categoría.DECLARA_IDENTIFICADOR_GLOBAL:
             auto idex = cast(DeclaraIdentificadorGlobal)n;
-            info(to!dstring(idex.categoría));
-            info(" [ámbito:");
-            info(idex.ámbito);
-            info("] [tipo:");
-            info(idex.tipo);
-            info("] [nombre:");
-            info(idex.nombre);
-            info("] [línea:");
-            info(to!dstring(idex.línea));
-            infoln("]");
+            charlatán(to!dstring(idex.categoría));
+            charlatán(" [ámbito:");
+            charlatán(idex.ámbito);
+            charlatán("] [tipo:");
+            charlatán(idex.tipo);
+            charlatán("] [nombre:");
+            charlatán(idex.nombre);
+            charlatán("] [línea:");
+            charlatán(to!dstring(idex.línea));
+            charlatánln("]");
             break;
 
         case Categoría.BLOQUE:
             auto b = cast(Bloque)n;
-            info(to!dstring(b.categoría));
-            info(" [línea:");
-            info(to!dstring(b.línea));
-            infoln("]");
+            charlatán(to!dstring(b.categoría));
+            charlatán(" [línea:");
+            charlatán(to!dstring(b.línea));
+            charlatánln("]");
             break;
 
         case Categoría.ARGUMENTOS:
             auto a = cast(Argumentos)n;
-            info(to!dstring(a.categoría));
-            info(" [línea:");
-            info(to!dstring(a.línea));
-            infoln("]");
+            charlatán(to!dstring(a.categoría));
+            charlatán(" [línea:");
+            charlatán(to!dstring(a.línea));
+            charlatánln("]");
             break;
 
         case Categoría.ARGUMENTO:
             auto a = cast(Argumento)n;
-            info(to!dstring(a.categoría));
-            info(" [tipo:");
-            info(a.tipo);
-            info("] [nombre:");
-            info(a.nombre);
-            info("] [línea:");
-            info(to!dstring(a.línea));
-            infoln("]");
+            charlatán(to!dstring(a.categoría));
+            charlatán(" [tipo:");
+            charlatán(a.tipo);
+            charlatán("] [nombre:");
+            charlatán(a.nombre);
+            charlatán("] [línea:");
+            charlatán(to!dstring(a.línea));
+            charlatánln("]");
             break;
 
         case Categoría.DEFINE_FUNCIÓN:
             auto df = cast(DefineFunción)n;
-            info(to!dstring(df.categoría));
-            info(" [ret:");
-            info(df.retorno);
-            info("] [nombre:");
-            info(df.nombre);
-            info("] [línea:");
-            info(to!dstring(df.línea));
-            infoln("]");
+            charlatán(to!dstring(df.categoría));
+            charlatán(" [ret:");
+            charlatán(df.retorno);
+            charlatán("] [nombre:");
+            charlatán(df.nombre);
+            charlatán("] [línea:");
+            charlatán(to!dstring(df.línea));
+            charlatánln("]");
             break;
 
         case Categoría.DECLARA_FUNCIÓN:
             auto df = cast(DeclaraFunción)n;
-            info(to!dstring(df.categoría));
-            info(" [ret:");
-            info(df.retorno);
-            info("] [nombre:");
-            info(df.nombre);
-            info("] [línea:");
-            info(to!dstring(df.línea));
-            infoln("]");
+            charlatán(to!dstring(df.categoría));
+            charlatán(" [ret:");
+            charlatán(df.retorno);
+            charlatán("] [nombre:");
+            charlatán(df.nombre);
+            charlatán("] [línea:");
+            charlatán(to!dstring(df.línea));
+            charlatánln("]");
             break;
 
         case Categoría.MÓDULO:
             auto obj = cast(Módulo)n;
-            info(to!dstring(obj.categoría));
-            info(" [nombre:");
-            info(obj.nombre);
-            info("] [línea:");
-            info(to!dstring(obj.línea));
-            infoln("]");
+            charlatán(to!dstring(obj.categoría));
+            charlatán(" [nombre:");
+            charlatán(obj.nombre);
+            charlatán("] [línea:");
+            charlatán(to!dstring(obj.línea));
+            charlatánln("]");
             break;
 
         default: break;
@@ -682,7 +682,7 @@ private void paso1_interpreta_nodo(Nodo n)
 
             if(tid.define_identificador(did.nombre, did, lit))
             {
-                infoln("define " ~ tid.lee_id(did.nombre).nombre);
+                charlatánln("define " ~ tid.lee_id(did.nombre).nombre);
             }
 
             break;
@@ -692,7 +692,7 @@ private void paso1_interpreta_nodo(Nodo n)
 
             if(tid.declara_identificador(idex.nombre, idex))
             {
-                infoln("declara " ~ tid.lee_id(idex.nombre).nombre);
+                charlatánln("declara " ~ tid.lee_id(idex.nombre).nombre);
             }
 
             break;
@@ -714,7 +714,7 @@ private void paso1_interpreta_nodo(Nodo n)
 
             if(tid.define_identificador(df.nombre, df, null))
             {
-                infoln("define " ~ tid.lee_id(df.nombre).nombre);
+                charlatánln("define " ~ tid.lee_id(df.nombre).nombre);
             }
 
             break;
@@ -724,7 +724,7 @@ private void paso1_interpreta_nodo(Nodo n)
 
             if(tid.declara_identificador(df.nombre, df))
             {
-                infoln("declara " ~ tid.lee_id(df.nombre).nombre);
+                charlatánln("declara " ~ tid.lee_id(df.nombre).nombre);
             }
 
             break;
@@ -768,7 +768,7 @@ private void paso2_1_interpreta_nodo(Nodo n)
 
             if(tid.declara_identificador(a.nombre, a))
             {
-                infoln("declara " ~ tid.lee_id(a.nombre).nombre);
+                charlatánln("declara " ~ tid.lee_id(a.nombre).nombre);
             }
             break;
 
@@ -1534,7 +1534,7 @@ Literal op_llama(Operación op)
     foreach(Nodo n; f.ramas)
     {
         Literal l = lee_argumento(n);
-        info(l.tipo ~ " " ~ l.dato ~ " ");
+        charlatán(l.tipo ~ " " ~ l.dato ~ " ");
     }
 
     infoln(")");

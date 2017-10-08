@@ -24,15 +24,15 @@ void iri(dstring código)
 
 	lexema[] resultado_lex = lexico.analiza(código);
 
-	infoln();
+	charlatánln();
 
-	info(to!dstring(resultado_lex));
+	charlatán(to!dstring(resultado_lex));
 
 	Nodo árbol_gramatical = sintaxis.analiza(resultado_lex);
 
-	infoln();
+	charlatánln();
 
 	bool resultado = semantico.analiza(árbol_gramatical);
 
-	infoln();
+	charlatánln();
 }
