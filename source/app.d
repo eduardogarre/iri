@@ -4,6 +4,7 @@ import std.string;
 
 import apoyo;
 import arbol;
+static import interprete;
 static import lexico;
 static import semantico;
 static import sintaxis;
@@ -33,7 +34,9 @@ void iri(dstring código)
 
 	charlatánln();
 
-	bool resultado = semantico.analiza(árbol_gramatical);
+	Nodo árbol_semántico = semantico.analiza(árbol_gramatical);
 
 	charlatánln();
+
+	bool resultado = interprete.analiza(árbol_semántico);
 }
