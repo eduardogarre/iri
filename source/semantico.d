@@ -6,10 +6,15 @@ import std.conv;
 import std.stdint;
 import std.stdio;
 
-// Implemento la tabla de identificadores como un diccionario:
-// Para acceder a cada una de las entradas, se usa el nombre del identificador.
-// Para el análisis semántico creo una tabla desechable de identificadores.
+// tareas a realizar durante el análisis semántico:
+// Coincidencia de tipos
+// Los argumentos con los que llamas a una función coinciden con la declaración
+// de la función
+// Todas las variables en la tabla están definidas
+// Las variables son declaradas y definidas una sola vez en el ámbito activo
 
+
+// Para el análisis semántico creo una tabla desechable de identificadores.
 TablaIdentificadores tid;
 
 Nodo analiza(Nodo n)

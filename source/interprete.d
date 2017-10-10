@@ -5,8 +5,6 @@ import arbol;
 import std.conv;
 import std.stdint;
 
-// Implemento la tabla de identificadores como un diccionario:
-// Para acceder a cada una de las entradas, se usa el nombre del identificador.
 // Esta tabla es la que se usará realmente para la ejecución/interpretación.
 
 TablaIdentificadores tid;

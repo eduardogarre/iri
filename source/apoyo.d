@@ -34,16 +34,12 @@ enum lexema_e
     FDA // Final De Archivo
 }
 
-struct EntradaTablaIdentificadores
-{
-    dstring nombre;
-    bool    declarado;
-    Nodo    declaración;
-    bool    definido;
-    Nodo    definición;
-    Literal valor;
-}
-
+// 'TablaIdentificadores' implementa la tabla de identificadores.
+// Para ello usa un diccionario:
+// Para acceder a cada una de las entradas, se usa el nombre del identificador.
+// A través del diccionario la estructura 'EntradaTablaIdentificadores', que
+// contiene, entre otros, el Nodo 'declaración', el Nodo 'definición' y, en su
+// caso, el Literal del 'valor actual'.
 class TablaIdentificadores
 {
     TablaIdentificadores padre;
@@ -184,6 +180,16 @@ class TablaIdentificadores
 
         return true;
     }
+}
+
+struct EntradaTablaIdentificadores
+{
+    dstring nombre;
+    bool    declarado;
+    Nodo    declaración;
+    bool    definido;
+    Nodo    definición;
+    Literal valor;
 }
 
 void infoln()
