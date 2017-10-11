@@ -845,6 +845,7 @@ private bool operación()
          | (s == "llama")
          | (s == "ret")
          | (s == "conv")
+         | (s == "phi")
          )
         {
             resultado = true;

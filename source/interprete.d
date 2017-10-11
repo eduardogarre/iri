@@ -612,6 +612,10 @@ Nodo ejecuta_operación(Operación op)
             return op_slt(op);
             //break;
 
+        case "phi":
+            return op_phi(op);
+            //break;
+
         default:
             break;
     }
@@ -2275,5 +2279,52 @@ Etiqueta op_slt(Operación op)
     }
 
     aborta("Esperaba que 'ret' tuviera uno o dos argumentos");
+    return null;
+}
+
+Literal op_phi(Operación op)
+{
+    dstring etiqueta;
+    if(tid.última_etiqueta().length > 0)
+    {
+        etiqueta = tid.última_etiqueta();
+        charlatánln("ETIQUETA: " ~ etiqueta);
+    }
+    else
+    {
+        aborta("PHI: No ha llegado a declararse ninguna etiqueta");
+    }
+
+    if(op.dato != "phi")
+    {
+        aborta("Esperaba que el código de la operación fuera 'phi'");
+        return null;
+    }
+
+    if((op.ramas.length > 1) && ((op.ramas.length % 2) == 0))
+    {
+        // phi tiene un número par de argumentos
+        for(int i = 1; i < (op.ramas.length); i+2)
+        {
+            Nodo n = op.ramas[i];
+            if(n.categoría != Categoría.ETIQUETA)
+            {
+                aborta("Esperaba una etiqueta");
+            }
+            else
+            {
+                auto e = cast(Etiqueta)n;
+                if(e.dato == etiqueta)
+                {
+                    return cast(Literal)op.ramas[i - 1];
+                }
+            }
+        }
+
+        aborta("La última etiqueta no se ha declarado en 'phi'");
+        return null;
+    }
+    
+    aborta("Esperaba que 'phi' tuviera un número par de argumentos");
     return null;
 }

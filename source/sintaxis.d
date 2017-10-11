@@ -602,6 +602,72 @@ private Operación operación()
             {
                 o.ramas ~= e;
             }
+            else if(auto t = tipo())
+            {
+                int c1 = cursor;
+                // para el nodo phi
+                // %id = phi <tipo> [valor, etiqueta], ...
+
+                while(true)
+                {
+                    if(!notación("["))
+                    {
+                        // esperaba una dupla
+                        cursor = c1;
+                        break;
+                    }
+                    
+                    Literal lit;
+                    Etiqueta eti;
+
+
+
+                    if(auto num = número())
+                    {
+                        lit = new Literal();
+                        lit.dato = num.dato;
+                        lit.tipo = t.tipo;
+                        lit.línea = t.línea;
+                    }
+
+                    if(!notación(","))
+                    {
+                        // esperaba una coma
+                        cursor = c1;
+                        break;
+                    }
+
+                    if(auto e = etiqueta())
+                    {
+                        eti = e;
+                    }
+                    else
+                    {
+                        cursor = c1;
+                        break;
+                    }
+
+                    if(!notación("]"))
+                    {
+                        cursor = c1;
+                        break;
+                    }
+                    else
+                    {
+                        o.ramas ~= lit;
+                        o.ramas ~= eti;
+                    }
+
+                    writeln("PRUEBA");
+
+                    if(!notación(","))
+                    {
+                        break;
+                    }
+                }
+
+                return o;
+            }
             else
             {
                 return o;
