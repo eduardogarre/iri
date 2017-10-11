@@ -308,10 +308,17 @@ bool esletra(dchar c)
     dchar subrayado = '_';
     bool s = (subrayado == c);
 
+    dchar punto = '.';
+    bool p = (punto == c);
+
+    dchar almohadilla = '#';
+    bool alm = (almohadilla == c);
+
+
     bool a = isAlpha(c);
 
 
-    return s || a;
+    return s || a || p || alm;
 }
 
 bool esdígito(dchar c)
@@ -324,8 +331,21 @@ bool esalfanum(dchar c)
     dchar subrayado = '_';
     bool s = (subrayado == c);
 
+    dchar punto = '.';
+    bool p = (punto == c);
+
+    dchar almohadilla = '#';
+    bool alm = (almohadilla == c);
+
+    dchar másque = '>';
+    bool ma = (másque == c);
+
+    dchar menosque = '<';
+    bool me = (menosque == c);
+
+
     bool a = isAlphaNum(c);
 
 
-    return s || a;
+    return s || a || p || alm || ma || me;
 }

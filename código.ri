@@ -17,7 +17,7 @@ declara e32 @sal(e32 %hola, r18 %lol);
 
 @xd = constante e32 42;
 
-@prueba = constante n9 12;
+@mi.prueba<hola>#adios.xyz#entero#real = constante e32 12;
 
 
 define e32 @adiós(r64 %real, n1 %booleano)
@@ -31,7 +31,7 @@ define e32 @adiós(r64 %real, n1 %booleano)
 
 define e32 @inicio(r32 %pi)
 {
-    %x = conv e32 18 a e6;
+    %x = conv @mi.prueba<hola>#adios.xyz#entero#real a e6;
 
     %a = cmp ig e32 42, e32 41;
     slt %a, :lol;
