@@ -49,6 +49,16 @@ void imprime_árbol(Nodo n)
         
         switch(n.categoría)
         {
+            case Categoría.TIPO:
+                auto l = cast(Tipo)n;
+                charlatán(to!dstring(l.categoría));
+                charlatán(" [tipo:");
+                charlatán(l.tipo);
+                charlatán("] [línea:");
+                charlatán(to!dstring(l.línea));
+                charlatánln("]");
+                break;
+
             case Categoría.RESERVADA:
                 auto l = cast(Reservada)n;
                 charlatán(to!dstring(l.categoría));
