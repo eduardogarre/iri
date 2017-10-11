@@ -33,9 +33,9 @@ define e32 @inicio(r32 %pi)
 {
     %x = conv e32 18 a e6;
 
-    slt :lol;
-
     %a = cmp ig e32 42, e32 42;
+    slt %a, :lol;
+
     %w = llama e32 @adiós(%pi, %a);
 
 lol:

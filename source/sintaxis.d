@@ -627,6 +627,10 @@ private Operación operación()
                     o.ramas ~= l;
                     continue;
                 }
+                else if(auto e = etiqueta())
+                {
+                    o.ramas ~= e;
+                }
                 else cursor = c1;
 
                 break;

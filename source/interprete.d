@@ -2136,7 +2136,7 @@ Etiqueta op_slt(Operación op)
 
     if(op.ramas.length == 1)
     {
-        // ret tiene argumento
+        // Salto incondicional
         Etiqueta etiqueta = cast(Etiqueta)(op.ramas[0]);
 
         if(tid.lee_id(etiqueta.dato).nombre)
@@ -2152,7 +2152,43 @@ Etiqueta op_slt(Operación op)
             return etiqueta;
         }
     }
+    else if(op.ramas.length == 2)
+    {
+        // Salto condicional
+        Literal lit = lee_argumento(op.ramas[0]);
+        bool condición = false;
 
-    aborta("Esperaba que 'ret' tuviera una etiqueta como argumento");
+        if(lit.tipo == "n1")
+        {
+            condición = (lit.dato == "1");
+        }
+        
+        if(condición)
+        {
+            // Se cumple la condición
+            Etiqueta etiqueta = cast(Etiqueta)(op.ramas[1]);
+
+            if(tid.lee_id(etiqueta.dato).nombre)
+            {
+                dstring nombre = tid.lee_id(etiqueta.dato).nombre;
+
+                Literal l = cast(Literal)(tid.lee_id(etiqueta.dato).valor);
+                int contador = to!int(l.dato);
+                etiqueta.línea = contador;
+
+                infoln("op: slt [n1:1] " ~ nombre ~ "["
+                     ~ to!dstring(contador) ~ "]");
+
+                return etiqueta;
+            }
+        }
+        else
+        {
+            // No se cumple la condición
+            return null;
+        }
+    }
+
+    aborta("Esperaba que 'ret' tuviera uno o dos argumentos");
     return null;
 }
