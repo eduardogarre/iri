@@ -132,14 +132,14 @@ private DefineFunción define_función()
         auto df = new DefineFunción();
         df.línea = n.línea;
 
-        if(Nodo r = tipo())
+        if(Tipo r = tipo())
         {
-            df.retorno = r.dato;
+            df.retorno = r.tipo;
         }
 
-        if(Nodo r = identificador())
+        if(Identificador r = identificador())
         {
-            df.nombre = r.dato;
+            df.nombre = r.nombre;
         }
         else
         {
@@ -190,14 +190,14 @@ private DeclaraFunción declara_función()
         auto df = new DeclaraFunción();
         df.línea = n.línea;
 
-        if(Nodo r = tipo())
+        if(Tipo r = tipo())
         {
-            df.retorno = r.dato;
+            df.retorno = r.tipo;
         }
 
-        if(Nodo r = identificador())
+        if(Identificador r = identificador())
         {
-            df.nombre = r.dato;
+            df.nombre = r.nombre;
         }
         else
         {
@@ -270,8 +270,8 @@ private Argumento argumento()
     {
         if(auto i = identificador())
         {
-            a.tipo = t.dato;
-            a.nombre = i.dato;
+            a.tipo = t.tipo;
+            a.nombre = i.nombre;
             a.línea = t.línea;
 
             return a;
@@ -354,7 +354,7 @@ private DeclaraIdentificadorGlobal declara_identificador_global()
     
     if(auto id = identificador())
     {
-        e.nombre = id.dato;
+        e.nombre = id.nombre;
         e.línea = id.línea;
     }
     else
@@ -385,7 +385,7 @@ private DeclaraIdentificadorGlobal declara_identificador_global()
 
     if(auto t = tipo())
     {
-        e.tipo = t.dato;
+        e.tipo = t.tipo;
         return e;
     }
     else
@@ -405,7 +405,7 @@ private DefineIdentificadorGlobal define_identificador_global()
 
     if(auto id = identificador())
     {
-        i.nombre = id.dato;
+        i.nombre = id.nombre;
         i.línea = id.línea;
     }
     else
@@ -457,7 +457,7 @@ private DefineIdentificadorLocal define_identificador_local()
 
     if(auto id = identificador())
     {
-        i.nombre = id.dato;
+        i.nombre = id.nombre;
         i.línea = id.línea;
     }
     else
@@ -617,7 +617,7 @@ private Operación operación()
                 {
                     auto n = tipo();
                     auto t = new Tipo();
-                    t.tipo = n.dato;
+                    t.tipo = n.tipo;
                     t.línea = n.línea;
                     o.ramas ~= t;
                 }
@@ -642,7 +642,7 @@ private Identificador identificador()
         if(símbolos[cursor].categoría == lexema_e.IDENTIFICADOR)
         {
             Identificador id = new Identificador();
-            id.dato = símbolos[cursor].símbolo;
+            id.nombre = símbolos[cursor].símbolo;
             id.línea = símbolos[cursor].línea;
             
             cursor++;
@@ -664,9 +664,9 @@ private LlamaFunción llama_función()
     {
         LlamaFunción  f  = new LlamaFunción();
 
-        if(Nodo t = tipo())
+        if(Tipo t = tipo())
         {
-            f.tipo = t.dato;
+            f.tipo = t.tipo;
         }
         else
         {
@@ -680,9 +680,9 @@ private LlamaFunción llama_función()
             return null;
         }
 
-        if(Nodo r = identificador())
+        if(Identificador r = identificador())
         {
-            f.nombre = r.dato;
+            f.nombre = r.nombre;
             f.línea = r.línea;
         }
         else
@@ -759,8 +759,13 @@ private Literal literal()
 {
     uint c = cursor;
 
-    if(Nodo t = tipo())
+    if(Tipo t = tipo())
     {
+        if((cast(Tipo)t).tipo == "nada")
+        {
+            return null;
+        }
+
         auto l = new Literal();
 
         if(Nodo signo = notación("+"))
@@ -774,7 +779,7 @@ private Literal literal()
                 
         if(Nodo n = número())
         {
-            l.tipo = t.dato;
+            l.tipo = t.tipo;
             l.dato ~= n.dato;
             l.línea = t.línea;
 
@@ -811,7 +816,7 @@ private Nodo número()
 
 
 //TIPO -- lexema_e.TIPO, dstring n|e|r+Nº, uint64_t línea
-private Nodo tipo()
+private Tipo tipo()
 {
     uint c = cursor;
 
@@ -819,13 +824,13 @@ private Nodo tipo()
     {
         if(símbolos[cursor].categoría == lexema_e.TIPO)
         {
-            Nodo n = new Nodo();
-            n.categoría = Categoría.TIPO;
-            n.dato = símbolos[cursor].símbolo;
-            n.línea = símbolos[cursor].línea;
+            Tipo t = new Tipo();
+            t.categoría = Categoría.TIPO;
+            t.tipo = símbolos[cursor].símbolo;
+            t.línea = símbolos[cursor].línea;
             
             cursor++;
-            return n;
+            return t;
         }
     }
 

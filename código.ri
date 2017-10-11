@@ -33,11 +33,14 @@ define e32 @inicio(r32 %pi)
 {
     %x = conv e32 18 a e6;
     %a = cmp ig e32 42, e32 42;
-    //%0 = llama e32 @adiós(%pi, %a);
+    llama e32 @adiós(%pi, %a);
+    llama nada @adiós(%pi, %a);
     %y = conv %x a e32;
     %1 = sum %y, @roto2;
     %2 = sum @xd, %1;
     %3 = conv %2 a r64;
-    %4 = sum %3, @hola;
-    ret %4;
+    %4 = mul %3, @hola;
+    %5 = conv @xd a r64;
+    %6 = div %4, %5;
+    ret %6;
 }

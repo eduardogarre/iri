@@ -285,7 +285,7 @@ Nodo interpreta_nodo(Nodo n)
                 auto l = cast(Identificador)n;
                 charlatán(to!dstring(l.categoría));
                 charlatán(" [id:");
-                charlatán(l.dato);
+                charlatán(l.nombre);
                 charlatán("] [línea:");
                 charlatán(to!dstring(l.línea));
                 charlatánln("]");
@@ -309,7 +309,10 @@ Nodo interpreta_nodo(Nodo n)
                     aborta("He obtenido un literal nulo");
                 }
 
-                tid.define_identificador(id.dato, a, lit);
+                tid.define_identificador(id.nombre, a, lit);
+
+                info(id.nombre ~ " <= ");
+                infoln(lit.tipo ~ ":" ~ lit.dato);
 
                 return null;
                 //break;
@@ -448,7 +451,7 @@ Literal lee_argumento(Nodo n)
     {
         auto id = cast(Identificador)n;
         // Accediendo a %pi...
-        Nodo l = (tid.lee_id(id.dato).valor);
+        Nodo l = (tid.lee_id(id.nombre).valor);
         if(l.categoría == Categoría.LITERAL)
         {
             lit = cast(Literal)l;
@@ -1540,13 +1543,11 @@ Literal op_conv(Operación op)
     {
         case 'n': // convertimos desde 'natural'
             tamaño_origen = to!uint32_t(origen.tipo[1..$]);
-            charlatán("nat:" ~ to!dstring(tamaño_origen));
 
             switch(destino.tipo[0])
             {
                 case 'n': // convertimos de natural a natural
                     tamaño_destino = to!uint32_t(destino.tipo[1..$]);
-                    charlatánln(" => nat:" ~ to!dstring(tamaño_destino));
 
                     // si el tamaño de destino es mayor o igual, no hay problema
                     if(tamaño_destino >= tamaño_origen)
@@ -1624,7 +1625,7 @@ Literal op_conv(Operación op)
 
                 case 'e': // convertimos de natural a entero
                     tamaño_destino = to!uint32_t(destino.tipo[1..$]);
-                    charlatánln(" => ent:" ~ to!dstring(tamaño_destino));
+                    
                     // los enteros necesitan un bit extra para guardar el signo
                     // por tanto, un natural puede convertirse a un entero sin
                     // problemas de desborde si el entero tiene más bits.
@@ -1707,7 +1708,6 @@ Literal op_conv(Operación op)
 
                 case 'r':
                     tamaño_destino = to!uint32_t(destino.tipo[1..$]);
-                    charlatánln(" => real:" ~ to!dstring(tamaño_destino));
 
                     // en los reales cuando se desborda se para en +/-infinito.
                     // El problema principal, no evitable, es la pérdida de
@@ -1741,13 +1741,11 @@ Literal op_conv(Operación op)
 
         case 'e':
             tamaño_origen = to!uint32_t(origen.tipo[1..$]);
-            charlatán("ent:" ~ to!dstring(tamaño_origen));
 
             switch(destino.tipo[0])
             {
                 case 'n': // convertimos de entero a natural
                     tamaño_destino = to!uint32_t(destino.tipo[1..$]);
-                    charlatánln(" => nat:" ~ to!dstring(tamaño_destino));
                     
                     if(to!int64_t(origen.dato) < 0)
                     {
@@ -1831,7 +1829,6 @@ Literal op_conv(Operación op)
 
                 case 'e':
                     tamaño_destino = to!uint32_t(destino.tipo[1..$]);
-                    charlatánln(" => ent:" ~ to!dstring(tamaño_destino));
 
                     // Disponemos de espacio
                     if(tamaño_destino >= tamaño_origen)
@@ -1922,7 +1919,6 @@ Literal op_conv(Operación op)
 
                 case 'r':
                     tamaño_destino = to!uint32_t(destino.tipo[1..$]);
-                    charlatánln(" => real:" ~ to!dstring(tamaño_destino));
 
                     // en los reales cuando se desborda se para en +/-infinito.
                     // El problema principal, no evitable, es la pérdida de
@@ -1956,13 +1952,11 @@ Literal op_conv(Operación op)
 
         case 'r':
             tamaño_origen = to!uint32_t(origen.tipo[1..$]);
-            charlatán("real:" ~ to!dstring(tamaño_origen));
 
             switch(destino.tipo[0])
             {
                 case 'n':
                     tamaño_destino = to!uint32_t(destino.tipo[1..$]);
-                    charlatánln(" => nat:" ~ to!dstring(tamaño_destino));
 
                     uint64_t valmaxnat;
 
@@ -1997,7 +1991,6 @@ Literal op_conv(Operación op)
 
                 case 'e':
                     tamaño_destino = to!uint32_t(destino.tipo[1..$]);
-                    charlatánln(" => ent:" ~ to!dstring(tamaño_destino));
                     
                     int64_t valmaxent;
                     int64_t valminent;
@@ -2037,9 +2030,10 @@ Literal op_conv(Operación op)
 
                 case 'r':
                     tamaño_destino = to!uint32_t(destino.tipo[1..$]);
-                    charlatánln(" => real:" ~ to!dstring(tamaño_destino));
+                    
                     double res = to!double(origen.dato);
                     resultado.dato = to!dstring(res);
+
                     break;
 
                 default:
@@ -2056,7 +2050,7 @@ Literal op_conv(Operación op)
 
     info("op: " ~ op.dato ~ " ");
     info(origen.tipo ~ " " ~ origen.dato);
-    info(" a " ~ (cast(Tipo)(op.ramas[1])).tipo);
+    info(" => " ~ (cast(Tipo)(op.ramas[1])).tipo);
 
     if(resultado is null)
     {
