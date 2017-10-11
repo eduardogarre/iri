@@ -611,6 +611,18 @@ private Operación operación()
                 break;
             }
 
+            if(símbolos[cursor].categoría == lexema_e.RESERVADA)
+            {
+                if(reservada("a") !is null)
+                {
+                    auto n = tipo();
+                    auto t = new Tipo();
+                    t.tipo = n.dato;
+                    t.línea = n.línea;
+                    o.ramas ~= t;
+                }
+            }
+
             return o;
         }
     }
@@ -742,18 +754,28 @@ private LlamaFunción llama_función()
     return null;
 }
 
-//LITERAL -- TIPO NÚMERO
+//LITERAL -- TIPO ['+' | '-'] NÚMERO
 private Literal literal()
 {
     uint c = cursor;
 
     if(Nodo t = tipo())
     {
+        auto l = new Literal();
+
+        if(Nodo signo = notación("+"))
+        {
+            // el literal es positivo
+        }
+        else if(Nodo signo = notación("-"))
+        {
+            l.dato = "-";
+        }
+                
         if(Nodo n = número())
         {
-            auto l = new Literal();
             l.tipo = t.dato;
-            l.dato = n.dato;
+            l.dato ~= n.dato;
             l.línea = t.línea;
 
             return l;

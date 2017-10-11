@@ -3,7 +3,9 @@ module interprete;
 import apoyo;
 import arbol;
 import std.conv;
+import std.math;
 import std.stdint;
+import std.stdio;
 
 // Esta tabla es la que se usará realmente para la ejecución/interpretación.
 
@@ -177,8 +179,6 @@ Bloque prepara_inicio()
     args[0].línea = def_inicio.línea;
     define_argumentos(def_inicio, args);
 
-    charlatánln("hola");
-
     //paso 2.2: obtén el bloque de @inicio(), para poder ejecutarlo.
     Bloque bloque = obtén_bloque(def_inicio);
 
@@ -303,6 +303,11 @@ Nodo interpreta_nodo(Nodo n)
                 auto id = cast(Identificador)a.ramas[0];
 
                 auto lit = cast(Literal)interpreta_nodo(a.ramas[1]);
+
+                if(lit is null)
+                {
+                    aborta("He obtenido un literal nulo");
+                }
 
                 tid.define_identificador(id.dato, a, lit);
 
@@ -483,6 +488,10 @@ Nodo ejecuta_operación(Operación op)
 
         case "cmp":
             return op_cmp(op);
+            //break;
+
+        case "conv":
+            return op_conv(op);
             //break;
 
         default:
@@ -1502,4 +1511,562 @@ Literal op_cmp(Operación op)
     resul.dato = txt;
 
     return resul;
+}
+
+Literal op_conv(Operación op)
+{
+    // dos tipos de conversiones:
+    // truncamientos y extensiones dentro del mismo tipo general:
+        // conv nX nY
+        // conv eX eY
+        // conv rX rY
+    // cambios de tipo:
+        // conv nX eY
+        // conv nX rY
+        // conv eX nY
+        // conv eX rY
+        // conv rX nY
+        // conv rX eY
+
+    Literal origen = lee_argumento(op.ramas[0]);
+    Tipo destino = new Tipo();
+    destino.tipo = (cast(Tipo)(op.ramas[1])).tipo;
+    Literal resultado = new Literal();
+    uint32_t tamaño_origen, tamaño_destino;
+
+    resultado.tipo = destino.tipo;
+
+    switch(origen.tipo[0])
+    {
+        case 'n': // convertimos desde 'natural'
+            tamaño_origen = to!uint32_t(origen.tipo[1..$]);
+            charlatán("nat:" ~ to!dstring(tamaño_origen));
+
+            switch(destino.tipo[0])
+            {
+                case 'n': // convertimos de natural a natural
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+                    charlatánln(" => nat:" ~ to!dstring(tamaño_destino));
+
+                    // si el tamaño de destino es mayor o igual, no hay problema
+                    if(tamaño_destino >= tamaño_origen)
+                    {
+                        if((tamaño_destino > 0) && (tamaño_destino <= 16))
+                        {
+                            uint16_t res = to!uint16_t(origen.dato);
+                            resultado.dato = to!dstring(res);
+                        }
+                        else if((tamaño_destino > 0) && (tamaño_destino <= 32))
+                        {
+                            uint32_t res = to!uint32_t(origen.dato);
+                            resultado.dato = to!dstring(res);
+                        }
+                        else if((tamaño_destino > 0) && (tamaño_destino <= 64))
+                        {
+                            uint64_t res = to!uint64_t(origen.dato);
+                            resultado.dato = to!dstring(res);
+                        }
+                        else
+                        {
+                            aborta("el tamaño del tipo máximo es 64 bits, y has"
+                            ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
+                        }
+                        
+                    }
+                    else // el tamaño de destino es menor. Compruebo desbordes
+                    {
+                        uint64_t valmaxnat;
+
+                        if(tamaño_destino < 1)
+                        {
+                            aborta("El tamaño del tipo de destino es erróneo");
+                        }
+                        else if(tamaño_destino == 64)
+                        {
+                            valmaxnat = uint.max;
+                        }
+                        else if(tamaño_destino < 64)
+                        {
+                             valmaxnat = pow(2, tamaño_destino) - 1;
+                        }
+
+                        if(to!uint64_t(origen.dato) > valmaxnat)
+                        {
+                            aborta("Has desbordado el tipo de dato. El valor "
+                            ~ "máximo del tipo destino es " ~
+                            to!dstring(valmaxnat));
+                        }
+                        else // el valor es menor que el valor máximo para el tipo
+                        {
+                            if((tamaño_destino > 0) && (tamaño_destino <= 16))
+                            {
+                                uint16_t res = to!uint16_t(origen.dato);
+                                resultado.dato = to!dstring(res);
+                            }
+                            else if((tamaño_destino > 0) && (tamaño_destino <= 32))
+                            {
+                                uint32_t res = to!uint32_t(origen.dato);
+                                resultado.dato = to!dstring(res);
+                            }
+                            else if((tamaño_destino > 0) && (tamaño_destino <= 64))
+                            {
+                                uint64_t res = to!uint64_t(origen.dato);
+                                resultado.dato = to!dstring(res);
+                            }
+                            else
+                            {
+                                aborta("el tamaño del tipo máximo es 64 bits, y has"
+                                ~ " pedido " ~ destino.tipo[1..$] ~ " bits");
+                            }
+                        }
+                    }
+                    break;
+
+                case 'e': // convertimos de natural a entero
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+                    charlatánln(" => ent:" ~ to!dstring(tamaño_destino));
+                    // los enteros necesitan un bit extra para guardar el signo
+                    // por tanto, un natural puede convertirse a un entero sin
+                    // problemas de desborde si el entero tiene más bits.
+                    if(tamaño_destino > tamaño_origen)
+                    {
+                        if((tamaño_destino > 1) && (tamaño_destino <= 16))
+                        {
+                            int16_t res = to!int16_t(origen.dato);
+                            resultado.dato = to!dstring(res);
+                        }
+                        else if((tamaño_destino > 1) && (tamaño_destino <= 32))
+                        {
+                            int32_t res = to!int32_t(origen.dato);
+                            resultado.dato = to!dstring(res);
+                        }
+                        else if((tamaño_destino > 1) && (tamaño_destino <= 64))
+                        {
+                            int64_t res = to!int64_t(origen.dato);
+                            resultado.dato = to!dstring(res);
+                        }
+                        else
+                        {
+                            aborta("el tamaño del tipo máximo es 64 bits, y has"
+                            ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
+                        }
+                        
+                    }
+                    // Pueden ocurrir desbordes, tanto hacia los números
+                    // positivos como hacia los negativos
+                    else if(tamaño_destino > 1)
+                    {
+                        int64_t valmaxent;
+                        int64_t valminent;
+                        
+                        if(tamaño_destino == 64)
+                        {
+                            valmaxent = int.max;
+                            valminent = int.min;
+                        }
+                        else if(tamaño_destino < 64)
+                        {
+                             valmaxent = pow(2, tamaño_destino-1) - 1;
+                             valminent = - pow(2, tamaño_destino-1);
+                        }
+
+                        if(  (to!int64_t(origen.dato) > valmaxent)
+                          || (to!int64_t(origen.dato) < valminent))
+                        {
+                            aborta("Has desbordado el tipo de dato. El valor "
+                            ~ "máximo del tipo destino es '+"
+                            ~ to!dstring(valmaxent) ~ "', y el valor mínimo es '-("
+                            ~ to!dstring(valmaxent) ~ "+1)'");
+                        }
+                        else // el valor es menor que el valor máximo para el tipo
+                        {
+                            if((tamaño_destino > 1) && (tamaño_destino <= 16))
+                            {
+                                int16_t res = to!int16_t(origen.dato);
+                                resultado.dato = to!dstring(res);
+                            }
+                            else if((tamaño_destino > 1) && (tamaño_destino <= 32))
+                            {
+                                int32_t res = to!int32_t(origen.dato);
+                                resultado.dato = to!dstring(res);
+                            }
+                            else if((tamaño_destino > 1) && (tamaño_destino <= 64))
+                            {
+                                int64_t res = to!int64_t(origen.dato);
+                                resultado.dato = to!dstring(res);
+                            }
+                        }
+                    }
+                    // El tamaño no está en el rango
+                    else
+                    {
+                        aborta("el rango de tamaño del tipo es 2-64 bits, y has"
+                        ~ " pedido " ~ destino.tipo[1..$] ~ " bits");
+                    }
+                    break;
+
+                case 'r':
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+                    charlatánln(" => real:" ~ to!dstring(tamaño_destino));
+
+                    // en los reales cuando se desborda se para en +/-infinito.
+                    // El problema principal, no evitable, es la pérdida de
+                    // precisión con números muy positivos o muy negativos.
+                    // La máxima precisión se encuentra en torno al cero.
+
+                    if((tamaño_destino > 0) && (tamaño_destino <= 32))
+                    {
+                        float res = to!float(origen.dato);
+                        resultado.dato = to!dstring(res);
+                    }
+                    else if((tamaño_destino > 0) && (tamaño_destino <= 64))
+                    {
+                        double res = to!double(origen.dato);
+                        resultado.dato = to!dstring(res);
+                    }
+                    else
+                    {
+                        aborta("el tamaño del tipo máximo es 64 bits, y has"
+                        ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
+                    }
+                    
+                    break;
+
+                default:
+                    aborta("tipo desconocido");
+                    break;
+            }
+
+            break;
+
+        case 'e':
+            tamaño_origen = to!uint32_t(origen.tipo[1..$]);
+            charlatán("ent:" ~ to!dstring(tamaño_origen));
+
+            switch(destino.tipo[0])
+            {
+                case 'n': // convertimos de entero a natural
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+                    charlatánln(" => nat:" ~ to!dstring(tamaño_destino));
+                    
+                    if(to!int64_t(origen.dato) < 0)
+                    {
+                        aborta("Intentas convertir en 'natural' un entero negativo");
+                    }
+
+                    // Hay espacio suficiente
+                    if(tamaño_destino > tamaño_origen)
+                    {
+                        if((tamaño_destino > 0) && (tamaño_destino <= 16))
+                        {
+                            uint16_t res = to!uint16_t(origen.dato);
+                            resultado.dato = to!dstring(res);
+                        }
+                        else if((tamaño_destino > 0) && (tamaño_destino <= 32))
+                        {
+                            uint32_t res = to!uint32_t(origen.dato);
+                            resultado.dato = to!dstring(res);
+                        }
+                        else if((tamaño_destino > 0) && (tamaño_destino <= 64))
+                        {
+                            uint64_t res = to!uint64_t(origen.dato);
+                            resultado.dato = to!dstring(res);
+                        }
+                        else
+                        {
+                            aborta("el tamaño del tipo máximo es 64 bits, y has"
+                            ~ " pedido " ~ destino.tipo[1..$] ~ " bits");
+                        }
+                    }
+                    // Puede que ocurran desbordes
+                    else // (tamaño_destino <= tamaño_origen)
+                    {
+                        uint64_t valmaxnat;
+
+                        if(tamaño_destino < 1)
+                        {
+                            aborta("El tamaño del tipo de destino es erróneo");
+                        }
+                        else if(tamaño_destino == 64)
+                        {
+                            valmaxnat = uint.max;
+                        }
+                        else if(tamaño_destino < 64)
+                        {
+                             valmaxnat = pow(2, tamaño_destino) - 1;
+                        }
+
+                        if(to!uint64_t(origen.dato) > valmaxnat)
+                        {
+                            aborta("Has desbordado el tipo de dato. El valor "
+                            ~ "máximo del tipo destino es " ~
+                            to!dstring(valmaxnat));
+                        }
+                        else // el valor es menor que el valor máximo para el tipo
+                        {
+                            if((tamaño_destino > 0) && (tamaño_destino <= 16))
+                            {
+                                uint16_t res = to!uint16_t(origen.dato);
+                                resultado.dato = to!dstring(res);
+                            }
+                            else if((tamaño_destino > 0) && (tamaño_destino <= 32))
+                            {
+                                uint32_t res = to!uint32_t(origen.dato);
+                                resultado.dato = to!dstring(res);
+                            }
+                            else if((tamaño_destino > 0) && (tamaño_destino <= 64))
+                            {
+                                uint64_t res = to!uint64_t(origen.dato);
+                                resultado.dato = to!dstring(res);
+                            }
+                            else
+                            {
+                                aborta("el tamaño del tipo máximo es 64 bits, y has"
+                                ~ " pedido " ~ destino.tipo[1..$] ~ " bits");
+                            }
+                        }
+                    }
+
+                    break;
+
+                case 'e':
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+                    charlatánln(" => ent:" ~ to!dstring(tamaño_destino));
+
+                    // Disponemos de espacio
+                    if(tamaño_destino >= tamaño_origen)
+                    {
+                        if((tamaño_destino > 1) && (tamaño_destino <= 16))
+                        {
+                            int16_t res = to!int16_t(origen.dato);
+                            resultado.dato = to!dstring(res);
+                        }
+                        else if((tamaño_destino > 1) && (tamaño_destino <= 32))
+                        {
+                            int32_t res = to!int32_t(origen.dato);
+                            resultado.dato = to!dstring(res);
+                        }
+                        else if((tamaño_destino > 1) && (tamaño_destino <= 64))
+                        {
+                            int64_t res = to!int64_t(origen.dato);
+                            resultado.dato = to!dstring(res);
+                        }
+                        else
+                        {
+                            aborta("el tamaño del tipo máximo es 64 bits, y has"
+                            ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
+                        }
+                        
+                    }
+                    // Pueden ocurrir desbordes, tanto hacia los números
+                    // positivos como hacia los negativos
+                    else if(tamaño_destino > 1)
+                    {
+                        int64_t valmaxent;
+                        int64_t valminent;
+                        
+                        if(tamaño_destino == 64)
+                        {
+                            valmaxent = int.max;
+                            valminent = int.min;
+                        }
+                        else if((tamaño_destino < 64) && (tamaño_destino > 1))
+                        {
+                             valmaxent = pow(2, tamaño_destino-1) - 1;
+                             valminent = cast(int64_t)(-1) * cast(int64_t)(pow(2, tamaño_destino-1));
+                        }
+                        else
+                        {
+                            aborta("El tamaño del tipo de destino se sale del rango");
+                        }
+
+                        if( to!int64_t(origen.dato) > valmaxent )
+                        {
+                            aborta("Has desbordado el tipo de dato. El valor "
+                            ~ "máximo del tipo destino es '+"
+                            ~ to!dstring(valmaxent) ~ "'");
+                        }
+                        else if( to!int64_t(origen.dato) < valminent )
+                        {
+                            aborta("Has desbordado el tipo de dato. El valor "
+                            ~ "mínimo es '-(" ~ to!dstring(valmaxent) ~ "+1)'");
+                        }
+                        // el valor es menor que el valor máximo para el tipo
+                        // y mayor que el valor mínimo del tipo
+                        else
+                        {
+                            if((tamaño_destino > 1) && (tamaño_destino <= 16))
+                            {
+                                int16_t res = to!int16_t(origen.dato);
+                                resultado.dato = to!dstring(res);
+                            }
+                            else if((tamaño_destino > 0) && (tamaño_destino <= 32))
+                            {
+                                int32_t res = to!int32_t(origen.dato);
+                                resultado.dato = to!dstring(res);
+                            }
+                            else if((tamaño_destino > 0) && (tamaño_destino <= 64))
+                            {
+                                int64_t res = to!int64_t(origen.dato);
+                                resultado.dato = to!dstring(res);
+                            }
+                        }
+                    }
+                    // El tamaño no está en el rango
+                    else
+                    {
+                        aborta("el rango de tamaño del tipo es 2-64 bits, y has"
+                        ~ " pedido " ~ destino.tipo[1..$] ~ " bits");
+                    }
+                    break;
+
+                case 'r':
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+                    charlatánln(" => real:" ~ to!dstring(tamaño_destino));
+
+                    // en los reales cuando se desborda se para en +/-infinito.
+                    // El problema principal, no evitable, es la pérdida de
+                    // precisión con números muy positivos o muy negativos.
+                    // La máxima precisión se encuentra en torno al cero.
+
+                    if((tamaño_destino > 1) && (tamaño_destino <= 32))
+                    {
+                        float res = to!float(origen.dato);
+                        resultado.dato = to!dstring(res);
+                    }
+                    else if((tamaño_destino > 1) && (tamaño_destino <= 64))
+                    {
+                        double res = to!double(origen.dato);
+                        resultado.dato = to!dstring(res);
+                    }
+                    else
+                    {
+                        aborta("el tamaño del tipo máximo es 64 bits, y has"
+                        ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
+                    }
+
+                    break;
+
+                default:
+                    aborta("tipo desconocido");
+                    break;
+            }
+            
+            break;
+
+        case 'r':
+            tamaño_origen = to!uint32_t(origen.tipo[1..$]);
+            charlatán("real:" ~ to!dstring(tamaño_origen));
+
+            switch(destino.tipo[0])
+            {
+                case 'n':
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+                    charlatánln(" => nat:" ~ to!dstring(tamaño_destino));
+
+                    uint64_t valmaxnat;
+
+                    if(tamaño_destino < 1)
+                    {
+                        aborta("El tamaño del tipo de destino es erróneo");
+                    }
+                    else if(tamaño_destino == 64)
+                    {
+                        valmaxnat = uint.max;
+                    }
+                    else if(tamaño_destino < 64)
+                    {
+                            valmaxnat = pow(2, tamaño_destino) - 1;
+                    }
+                    else
+                    {
+                        aborta("El tipo se sale de rango");
+                    }
+
+                    if(to!double(origen.dato) > to!double(valmaxnat))
+                    {
+                        aborta("El 'real' se sale del rango del 'natural'");
+                    }
+                    else
+                    {
+                        uint64_t res = to!uint64_t(origen.dato);
+                        resultado.dato = to!dstring(res);
+                    }
+                    
+                    break;
+
+                case 'e':
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+                    charlatánln(" => ent:" ~ to!dstring(tamaño_destino));
+                    
+                    int64_t valmaxent;
+                    int64_t valminent;
+
+                    if(tamaño_destino < 2)
+                    {
+                        aborta("El tamaño del tipo de destino es erróneo");
+                    }
+                    else if(tamaño_destino == 64)
+                    {
+                        valmaxent = int.max;
+                        valminent = int.min;
+                    }
+                    else if(tamaño_destino < 64)
+                    {
+                            valmaxent = pow(2, tamaño_destino-1) - 1;
+                            valminent = - pow(2, tamaño_destino-1);
+                    }
+                    else
+                    {
+                        aborta("El tipo se sale de rango");
+                    }
+
+                    if( (to!double(origen.dato) > to!double(valmaxent))
+                     || (to!double(origen.dato) < to!double(valminent))
+                    )
+                    {
+                        aborta("El 'real' se sale del rango del 'natural'");
+                    }
+                    else
+                    {
+                        int64_t res = to!int64_t(origen.dato);
+                        resultado.dato = to!dstring(res);
+                    }
+                    
+                    break;
+
+                case 'r':
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+                    charlatánln(" => real:" ~ to!dstring(tamaño_destino));
+                    double res = to!double(origen.dato);
+                    resultado.dato = to!dstring(res);
+                    break;
+
+                default:
+                    aborta("tipo desconocido");
+                    break;
+            }
+            
+            break;
+
+        default:
+            aborta("tipo desconocido");
+            break;
+    }
+
+    info("op: " ~ op.dato ~ " ");
+    info(origen.tipo ~ " " ~ origen.dato);
+    info(" a " ~ (cast(Tipo)(op.ramas[1])).tipo);
+
+    if(resultado is null)
+    {
+        infoln(" [null]");
+        return null;
+    }
+    else
+    {
+        infoln(" [" ~ resultado.tipo ~ ":" ~ resultado.dato ~ "]");
+
+        return resultado;
+    }
 }

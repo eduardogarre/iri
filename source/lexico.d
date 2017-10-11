@@ -296,6 +296,7 @@ private bool reservada()
          | (s == "externo")
          | (s == "constante")
          | (s == "módulo")
+         | (s == "a")
          | (s == "ig") // igual
          | (s == "dif") // diferente
          | (s == "ma") // mayor

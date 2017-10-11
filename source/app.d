@@ -13,7 +13,7 @@ dstring archivo = "código.ri";
 
 void main()
 {
-	CHARLATÁN = false;
+	CHARLATÁN = true;
 	INFO = true;
 
 	dstring código_ri = leearchivo(archivo);
