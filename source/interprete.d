@@ -10,7 +10,7 @@ import std.stdio;
 // Tabla de identificadores que se usa en la ejecución/interpretación.
 TablaIdentificadores tid;
 
-bool analiza(Nodo n)
+Literal analiza(Nodo n)
 {
     charlatánln("Fase de Interpretación.");
     obtén_identificadores_globales(n);
@@ -26,9 +26,62 @@ bool analiza(Nodo n)
 
     obtén_etiquetas(bloque);
 
-    interpreta(bloque);
+    Nodo retorno = interpreta(bloque);
 
-    return true;
+    if(!declFunc_retorno_correcto("inicio", retorno))
+    {
+        aborta("El tipo de retorno no coincide con la declaración de inicio()");
+    }
+
+    if(retorno is null)
+    {
+        return null;
+    }
+    else
+    {
+        return cast(Literal)retorno;
+    }
+}
+
+// el tipo del retorno coincide con la declaración de la función
+bool declFunc_retorno_correcto(dstring f, Nodo n)
+{
+    dstring tipo;
+
+    if(n is null)
+    {
+        // asumo que es el resultado de una op:ret sin argumento
+        // Compruebo que coincide con lo declarado previamente
+        tipo = "nada";
+    }
+    else if(n.categoría == Categoría.LITERAL)
+    {
+        Literal lit = cast(Literal)n;
+        tipo = lit.tipo;
+    }
+    else
+    {
+        // Error:
+        aborta("Me has dado algo diferente a 'null' o un literal");
+    }
+
+    if(tid.lee_id(f).nombre is null)
+    {
+        aborta("No has declarado la función '" ~ f ~ "()'.");
+    }
+
+    EntradaTablaIdentificadores eid = tid.lee_id(f);
+    // eid: dstring nombre, bool declarado, Nodo declaración, bool definido, Nodo definición;
+
+    if(!eid.definido)
+    {
+        aborta("No has definido la función '" ~ f ~ "()'.");
+    }
+
+    // Obtén el Nodo de la definición
+    DefineFunción def_func = cast(DefineFunción)eid.definición;
+
+    return def_func.retorno == tipo;
 }
 
 void obtén_etiquetas(Nodo n)
@@ -1285,13 +1338,19 @@ Literal op_llama(Operación op)
 
     Nodo n = interpreta(bloque);
 
-    if(n.categoría == Categoría.LITERAL)
+    if(!declFunc_retorno_correcto(f.nombre, n))
     {
-        auto resultado = cast(Literal)n;
-        return resultado;
+        aborta("El tipo de retorno no coincide con la declaración de inicio()");
     }
 
-    return null;
+    if(n is null)
+    {
+        return null;
+    }
+    else
+    {
+        return cast(Literal)n;
+    }
 }
 
 Literal op_cmp(Operación op)
@@ -1729,7 +1788,7 @@ Literal op_conv(Operación op)
                         else if(tamaño_destino < 64)
                         {
                              valmaxent = pow(2, tamaño_destino-1) - 1;
-                             valminent = - pow(2, tamaño_destino-1);
+                             valminent = - cast(int64_t)pow(2, tamaño_destino-1);
                         }
 
                         if(  (to!int64_t(origen.dato) > valmaxent)
@@ -2031,7 +2090,7 @@ Literal op_conv(Operación op)
                     }
                     else if(tamaño_destino < 64)
                     {
-                            valmaxnat = pow(2, tamaño_destino) - 1;
+                            valmaxnat = cast(int64_t)pow(2, tamaño_destino) - 1;
                     }
                     else
                     {
@@ -2044,7 +2103,7 @@ Literal op_conv(Operación op)
                     }
                     else
                     {
-                        uint64_t res = to!uint64_t(origen.dato);
+                        uint64_t res = to!uint64_t(to!double(origen.dato));
                         resultado.dato = to!dstring(res);
                     }
                     
@@ -2068,7 +2127,7 @@ Literal op_conv(Operación op)
                     else if(tamaño_destino < 64)
                     {
                             valmaxent = pow(2, tamaño_destino-1) - 1;
-                            valminent = - pow(2, tamaño_destino-1);
+                            valminent = - cast(int64_t)pow(2, tamaño_destino-1);
                     }
                     else
                     {
@@ -2079,11 +2138,14 @@ Literal op_conv(Operación op)
                      || (to!double(origen.dato) < to!double(valminent))
                     )
                     {
-                        aborta("El 'real' se sale del rango del 'natural'");
+                        writeln(origen.dato);
+                        writeln(valmaxent);
+                        writeln(valminent);
+                        aborta("El 'real' se sale del rango del 'entero'");
                     }
                     else
                     {
-                        int64_t res = to!int64_t(origen.dato);
+                        int64_t res = to!int64_t(to!double(origen.dato));
                         resultado.dato = to!dstring(res);
                     }
                     

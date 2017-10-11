@@ -44,5 +44,5 @@ void iri(dstring código)
 
 	charlatánln();
 
-	bool resultado = interprete.analiza(árbol_semántico);
+	Literal resultado = interprete.analiza(árbol_semántico);
 }
