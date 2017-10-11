@@ -18,7 +18,12 @@ bool analiza(Nodo n)
 
 	charlatánln();
 
-    Bloque bloque = prepara_inicio();
+    Literal[] args;
+    args ~= new Literal();
+    args[0].tipo = "r32";
+    args[0].dato = "3.14159";
+    
+    Bloque bloque = prepara_función("inicio", args);
 
     interpreta(bloque);
 
@@ -139,52 +144,53 @@ void obtén_identificadores_globales(Nodo n)
     }
 }
 
-Bloque prepara_inicio()
+Bloque prepara_función(dstring fid, Literal[] args)
 {
-    charlatánln("Ejecuta '@inicio()'.");
+    charlatánln("Ejecuta '" ~ fid ~ "()'.");
     
-    if(tid.lee_id("inicio").nombre != "inicio")
+    if(tid.lee_id(fid).nombre is null)
     {
-        aborta("No has declarado la función '@inicio()'");
+        aborta("No has declarado la función '" ~ fid ~ "()'.");
     }
 
-    EntradaTablaIdentificadores eid = tid.lee_id("inicio");
+    EntradaTablaIdentificadores eid = tid.lee_id(fid);
     // eid: dstring nombre, bool declarado, Nodo declaración, bool definido, Nodo definición;
 
     if(!eid.definido)
     {
-        aborta("No has definido la función '@inicio()'");
+        aborta("No has definido la función '" ~ fid ~ "()'.");
     }
 
-    // Obtén el Nodo de la definición de @inicio()
-    DefineFunción def_inicio = cast(DefineFunción)eid.definición;
+    // Obtén el Nodo de la definición
+    DefineFunción def_func = cast(DefineFunción)eid.definición;
 
-    // Crea y configura la tabla de identificadores de la función @inicio()
-    auto tid_inicio = new TablaIdentificadores(tid, def_inicio);
-    tid_inicio.dueño = def_inicio;
+    // Crea y configura la tabla de identificadores de la función
+    auto tid_func = new TablaIdentificadores(tid, def_func);
+    tid_func.dueño = def_func;
 
     // Establece la tabla de ids de @inicio() como la tid vigente.
-    tid = tid_inicio;
+    tid = tid_func;
 
     // Declara los argumentos de @inicio().
-    charlatánln("Declara los argumentos de @inicio().");
-    declara_argumentos(def_inicio);
+    charlatánln("Declara los argumentos de '" ~ fid ~ "()'.");
+    declara_argumentos(def_func);
 
-    // Define los argumentos de @inicio(): r32 pi 3.14159
-    charlatánln("Define los argumentos de @inicio(): r32 pi 3.14159");
-    Literal[] args;
-    args ~= new Literal();
-    args[0].tipo = "r32";
-    args[0].dato = "3.14159";
-    args[0].línea = def_inicio.línea;
-    define_argumentos(def_inicio, args);
+    // Define los argumentos de la función
+    charlatánln("Define los argumentos de '" ~ fid ~ "()'.");
+    
+    foreach(arg; args)
+    {
+        arg.línea = def_func.línea;
+    }
 
-    //paso 2.2: obtén el bloque de @inicio(), para poder ejecutarlo.
-    Bloque bloque = obtén_bloque(def_inicio);
+    define_argumentos(def_func, args);
+
+    //paso 2.2: obtén el bloque de la función, para poder ejecutarlo.
+    Bloque bloque = obtén_bloque(def_func);
 
     if(bloque is null)
     {
-        aborta("No puedo ejecutar el bloque de @inicio");
+        aborta("No puedo ejecutar el bloque");
     }
 
     return bloque;
@@ -261,7 +267,7 @@ Bloque obtén_bloque(Nodo nodo)
     return bloque;
 }
 
-void interpreta(Bloque bloque)
+Nodo interpreta(Bloque bloque)
 {
     Nodo resultado;
     //recorre las ramas del bloque de @inicio()
@@ -269,6 +275,14 @@ void interpreta(Bloque bloque)
     {
         resultado = interpreta_nodo(bloque.ramas[i]);
     }
+
+    // Fin de ejecución de la función:
+    // Hay que eliminar la tabla de identificadores actual
+    TablaIdentificadores tid_padre = tid.padre;
+    tid_padre.hijo = null;
+    tid = tid_padre;
+
+    return resultado;
 }
 
 Nodo interpreta_nodo(Nodo n)
@@ -1221,14 +1235,27 @@ Literal op_llama(Operación op)
     LlamaFunción f = cast(LlamaFunción)op.ramas[0];
 
     info("op: llama " ~ f.tipo ~ " " ~ f.nombre ~ "(");
+
+    Literal[] args;
     
     foreach(Nodo n; f.ramas)
     {
         Literal l = lee_argumento(n);
+        args ~= l;
         info(l.tipo ~ " " ~ l.dato ~ " ");
     }
 
     infoln(")");
+    
+    Bloque bloque = prepara_función(f.nombre, args);
+
+    Nodo n = interpreta(bloque);
+
+    if(n.categoría == Categoría.LITERAL)
+    {
+        auto resultado = cast(Literal)n;
+        return resultado;
+    }
 
     return null;
 }
