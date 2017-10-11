@@ -39,6 +39,11 @@ void imprime_árbol(Nodo n)
 
     if(n)
     {
+        if(n.etiqueta.length > 0)
+        {
+            infoln(n.etiqueta);
+        }
+
         for(int i = 1; i < profundidad_árbol_gramatical; i++)
         {
             charlatán("   ");
@@ -49,6 +54,16 @@ void imprime_árbol(Nodo n)
         
         switch(n.categoría)
         {
+            case Categoría.ETIQUETA:
+                auto e = cast(Etiqueta)n;
+                charlatán(to!dstring(e.categoría));
+                charlatán(" [");
+                charlatán(e.dato);
+                charlatán("] [línea:");
+                charlatán(to!dstring(e.línea));
+                charlatánln("]");
+                break;
+
             case Categoría.TIPO:
                 auto l = cast(Tipo)n;
                 charlatán(to!dstring(l.categoría));

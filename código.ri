@@ -32,8 +32,13 @@ define e32 @adiós(r64 %real, n1 %booleano)
 define e32 @inicio(r32 %pi)
 {
     %x = conv e32 18 a e6;
+
+    slt :lol;
+
     %a = cmp ig e32 42, e32 42;
     %w = llama e32 @adiós(%pi, %a);
+
+lol:
     %y = conv %x a e32;
     %1 = sum %y, @roto2;
     %2 = sum @xd, %1;
@@ -41,5 +46,6 @@ define e32 @inicio(r32 %pi)
     %4 = mul %3, @hola;
     %5 = conv @xd a r64;
     %6 = div %4, %5;
-    ret %w;
+
+    ret %6;
 }

@@ -45,6 +45,12 @@ public lexema[] analiza(dstring cód)
         }
         cursor = c;
 
+        if(etiqueta())
+        {
+            continue;
+        }
+        cursor = c;
+
         if(notación())
         {
             continue;
@@ -326,6 +332,48 @@ private bool reservada()
     }
 
     return resultado;
+}
+
+private bool etiqueta()
+{
+    int c = cursor;
+
+    if(_nombre())
+    {
+        if(código[cursor] == ':')
+        {
+            cursor++;
+            
+            lexema l;
+            l.categoría = lexema_e.ETIQUETA;
+            l.símbolo = código[c..cursor];
+            l.línea = línea;
+
+            análisis ~= l;
+            return true;
+        }
+    }
+
+    cursor = c;
+
+    if(código[cursor] == ':')
+    {
+        cursor++;
+        if(_nombre())
+        {
+            lexema l;
+            l.categoría = lexema_e.ETIQUETA;
+            l.símbolo = código[c..cursor];
+            l.línea = línea;
+
+            análisis ~= l;
+            return true;
+        }
+    }
+
+    cursor = c;
+    
+    return false;
 }
 
 private bool _nombre()

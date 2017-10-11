@@ -7,8 +7,7 @@ import std.math;
 import std.stdint;
 import std.stdio;
 
-// Esta tabla es la que se usará realmente para la ejecución/interpretación.
-
+// Tabla de identificadores que se usa en la ejecución/interpretación.
 TablaIdentificadores tid;
 
 bool analiza(Nodo n)
@@ -25,9 +24,32 @@ bool analiza(Nodo n)
     
     Bloque bloque = prepara_función("inicio", args);
 
+    obtén_etiquetas(bloque);
+
     interpreta(bloque);
 
     return true;
+}
+
+void obtén_etiquetas(Nodo n)
+{
+    if(n)
+    {
+        for(int i = 0; i < n.ramas.length; i++)
+        {
+            if(n.ramas[i].etiqueta.length > 0)
+            {
+                auto lit = new Literal();
+                lit.dato = to!dstring(i-1);
+                lit.tipo = "nada";
+
+                if(tid.define_identificador(n.ramas[i].etiqueta, null, lit))
+                {
+                    charlatánln("ETIQUETA: " ~ tid.lee_id(n.ramas[i].etiqueta).nombre);
+                }
+            }
+        }
+    }
 }
 
 void obtén_identificadores_globales(Nodo n)
@@ -274,6 +296,14 @@ Nodo interpreta(Bloque bloque)
     for(int i = 0; i<bloque.ramas.length; i++)
     {
         resultado = interpreta_nodo(bloque.ramas[i]);
+        
+        if(resultado !is null)
+        {
+            if(resultado.categoría == Categoría.ETIQUETA)
+            {
+                i = cast(int)(resultado.línea);
+            }
+        }
     }
 
     // Fin de ejecución de la función:
@@ -509,6 +539,10 @@ Nodo ejecuta_operación(Operación op)
 
         case "conv":
             return op_conv(op);
+            //break;
+
+        case "slt":
+            return op_slt(op);
             //break;
 
         default:
@@ -2090,4 +2124,35 @@ Literal op_conv(Operación op)
 
         return resultado;
     }
+}
+
+Etiqueta op_slt(Operación op)
+{
+    if(op.dato != "slt")
+    {
+        aborta("Esperaba que el código de la operación fuera 'slt'");
+        return null;
+    }
+
+    if(op.ramas.length == 1)
+    {
+        // ret tiene argumento
+        Etiqueta etiqueta = cast(Etiqueta)(op.ramas[0]);
+
+        if(tid.lee_id(etiqueta.dato).nombre)
+        {
+            dstring nombre = tid.lee_id(etiqueta.dato).nombre;
+
+            Literal l = cast(Literal)(tid.lee_id(etiqueta.dato).valor);
+            int contador = to!int(l.dato);
+            etiqueta.línea = contador;
+
+            infoln("op: slt " ~ nombre ~ to!dstring(contador));
+
+            return etiqueta;
+        }
+    }
+
+    aborta("Esperaba que 'ret' tuviera una etiqueta como argumento");
+    return null;
 }

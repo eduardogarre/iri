@@ -12,6 +12,8 @@ enum Categoría
     TEXTO,
     LITERAL,
     IDENTIFICADOR,
+
+    ETIQUETA,
     
     DECLARA_IDENTIFICADOR_GLOBAL,
     DEFINE_IDENTIFICADOR_GLOBAL,
@@ -40,10 +42,20 @@ class Nodo
     dstring     dato = "";
     Nodo[]      ramas;
     uint64_t    línea;
+    dstring     etiqueta;
 
     this()
     {
 
+    }
+}
+
+class Etiqueta : Nodo
+{
+    this()
+    {
+        super();
+        this.categoría = Categoría.ETIQUETA;
     }
 }
 

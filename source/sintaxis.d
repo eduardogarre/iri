@@ -317,9 +317,16 @@ private Nodo bloque()
 private Nodo afirmación()
 {
     uint c = cursor;
+
+    auto e = etiqueta();
     
     if(auto r = asignación())
     {
+        if(e !is null)
+        {
+            r.etiqueta = e.dato;
+        }
+        
         if(notación(";"))
         {
             return r;
@@ -327,6 +334,11 @@ private Nodo afirmación()
     }
     else if(auto r = operación())
     {
+        if(e !is null)
+        {
+            r.etiqueta = e.dato;
+        }
+        
         if(notación(";"))
         {
             return r;
@@ -334,6 +346,11 @@ private Nodo afirmación()
     }
     else if(auto r = define_identificador_local())
     {
+        if(e !is null)
+        {
+            r.etiqueta = e.dato;
+        }
+        
         if(notación(";"))
         {
             return r;
@@ -581,6 +598,10 @@ private Operación operación()
             {
                 o.ramas ~= l;
             }
+            else if(auto e = etiqueta())
+            {
+                o.ramas ~= e;
+            }
             else
             {
                 return o;
@@ -815,7 +836,7 @@ private Nodo número()
 }
 
 
-//TIPO -- lexema_e.TIPO, dstring n|e|r+Nº, uint64_t línea
+//TIPO -- lexema_e.TIPO, dstring nada|n|e|r+Nº, uint64_t línea
 private Tipo tipo()
 {
     uint c = cursor;
@@ -855,7 +876,7 @@ private Nodo nombre()
     {
         if(CHARLATÁN)
         {
-            writeln("not["d ~ símbolos[cursor].símbolo ~ "]"d);
+            //writeln("not["d ~ símbolos[cursor].símbolo ~ "]"d);
         }
 
         Nodo n = new Nodo();
@@ -866,6 +887,43 @@ private Nodo nombre()
         return n;
     }
 
+    return null;
+}
+
+private Etiqueta etiqueta()
+{
+    int c = cursor;
+    
+    if(símbolos[cursor].categoría == lexema_e.ETIQUETA)
+    {
+        if(CHARLATÁN)
+        {
+            //writeln("not["d ~ símbolos[cursor].símbolo ~ "]"d);
+        }
+
+        auto e = new Etiqueta();
+
+        // Convierto el texto de la etiqueta para que todas tengan
+        // la estructura ':etiqueta'
+
+        dstring txt = ":";
+
+        for(int i = 0; i<símbolos[cursor].símbolo.length; i++)
+        {
+            if(símbolos[cursor].símbolo[i] != ':')
+            {
+                txt ~= símbolos[cursor].símbolo[i];
+            }
+        }
+
+        e.dato = txt;
+        e.línea = símbolos[cursor].línea;
+        
+        cursor++;
+        return e;
+    }
+
+    cursor = c;
     return null;
 }
 
@@ -888,7 +946,7 @@ private Reservada reservada(dstring txt)
     {
         if(CHARLATÁN)
         {
-            writeln("not["d ~ txt ~ "]"d);
+            //writeln("not["d ~ txt ~ "]"d);
         }
 
         Reservada n = new Reservada();
@@ -919,11 +977,6 @@ private Nodo notación(dstring c)
 
     if((símbolos[cursor].categoría == lexema_e.NOTACIÓN) && (símbolos[cursor].símbolo == c))
     {
-        if(CHARLATÁN)
-        {
-            writeln("not["d ~ c ~ "]"d);
-        }
-
         Nodo n = new Nodo();
         n.línea = símbolos[cursor].línea;
 

@@ -21,6 +21,7 @@ struct lexema
 
 enum lexema_e
 {
+    ETIQUETA,
     RESERVADA,
     TIPO,
     OPERACIÓN,

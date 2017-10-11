@@ -28,7 +28,13 @@ void iri(dstring código)
 
 	charlatánln();
 
-	charlatán(to!dstring(resultado_lex));
+	foreach(lex; resultado_lex)
+	{
+		charlatánln(to!dstring(lex));
+	}
+
+	charlatánln();
+	charlatánln();
 
 	Nodo árbol_gramatical = sintaxis.analiza(resultado_lex);
 
