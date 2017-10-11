@@ -46,6 +46,8 @@ class TablaIdentificadores
     TablaIdentificadores padre;
     TablaIdentificadores hijo;
 
+    dstring _última_etiqueta;
+
     this(TablaIdentificadores padre, Nodo dueño)
     {
         this.padre = padre;
@@ -55,6 +57,16 @@ class TablaIdentificadores
         {
             this.padre.pon_hijo(this);
         }
+    }
+
+    void última_etiqueta(dstring última_etiqueta)
+    {
+        this._última_etiqueta = última_etiqueta;
+    }
+
+    dstring última_etiqueta()
+    {
+        return this._última_etiqueta;
     }
 
     void pon_hijo(TablaIdentificadores hijo)

@@ -88,6 +88,8 @@ void obtén_etiquetas(Nodo n)
 {
     if(n)
     {
+        tid.define_identificador(":", null, null);
+
         for(int i = 0; i < n.ramas.length; i++)
         {
             if(n.ramas[i].etiqueta.length > 0)
@@ -348,6 +350,17 @@ Nodo interpreta(Bloque bloque)
     //recorre las ramas del bloque de @inicio()
     for(int i = 0; i<bloque.ramas.length; i++)
     {
+
+        // Buscar nueva etiqueta, para guardarla como 'última etiqueta'
+        if(bloque.ramas[i].etiqueta.length > 0)
+        {
+            tid.última_etiqueta(bloque.ramas[i].etiqueta);
+            if(tid.última_etiqueta().length > 0)
+            {
+                infoln("ETIQUETA: " ~ tid.última_etiqueta());
+            }
+        }
+
         resultado = interpreta_nodo(bloque.ramas[i]);
         
         if(resultado !is null)
@@ -363,6 +376,7 @@ Nodo interpreta(Bloque bloque)
     // Hay que eliminar la tabla de identificadores actual
     TablaIdentificadores tid_padre = tid.padre;
     tid_padre.hijo = null;
+    tid = null;
     tid = tid_padre;
 
     return resultado;
@@ -607,6 +621,15 @@ Nodo ejecuta_operación(Operación op)
 
 Literal op_ret(Operación op)
 {
+    if(tid.última_etiqueta().length > 0)
+    {
+        infoln("ETIQUETA: " ~ tid.última_etiqueta());
+    }
+    else
+    {
+        infoln("No ha llegado a declararse ninguna etiqueta");
+    }
+
     if(op.dato != "ret")
     {
         aborta("Esperaba que el código de la operación fuera 'ret'");
