@@ -658,8 +658,6 @@ private Operación operación()
                         o.ramas ~= eti;
                     }
 
-                    writeln("PRUEBA");
-
                     if(!notación(","))
                     {
                         break;

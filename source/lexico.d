@@ -300,14 +300,14 @@ private bool reservada()
          | (s == "externo")
          | (s == "constante")
          | (s == "módulo")
-         | (s == "a")
+         | (s == "a") // op:conv %a a e32;
          | (s == "ig") // igual
          | (s == "dif") // diferente
          | (s == "ma") // mayor
          | (s == "me") // menor
          | (s == "mai") // mayor o igual
          | (s == "mei") // menor o igual
-         | (s == "x")
+         | (s == "x") // listas: [4 x n8]
          | (s == "y")
          | (s == "o")
          | (s == "no")

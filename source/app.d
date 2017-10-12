@@ -1,24 +1,67 @@
-import std.conv;
-import std.stdio;
-import std.string;
-
 import apoyo;
 import arbol;
+import docopt;
 static import interprete;
 static import lexico;
 static import semantico;
 static import sintaxis;
+import std.conv;
+import std.stdio;
+import std.string;
 
-dstring archivo = "código.ri";
+dstring archivo;
 
-void main()
+int main(string[] args)
 {
-	CHARLATÁN = true;
-	INFO = true;
+	auto doc = "iri - Interprete de Representacion Intermedia.
+
+Usage:
+   iri [-i | -c] <archivo>
+   iri (-v | --version)
+   iri (-a | --ayuda)
+
+Options:
+   -a --ayuda         Muestra esta pantalla.
+   -v --version       Muestra la version.
+   -i --info          Opcion 'habladora'.
+   -c --charlatan     Opcion 'verborreica', MUY habladora.
+
+Argumentos:
+   <archivo>          El archivo a interpretar.
+";
+
+	auto argumentos = docopt.docopt(doc, args[1..$], false, "iri 0.1a");
+
+	if(argumentos["--version"].isTrue())
+	{
+		return 0;
+	}
+
+	if(argumentos["--info"].isTrue())
+	{
+		INFO = true;
+	}
+
+	if(argumentos["--charlatan"].isTrue())
+	{
+		INFO = true;
+		CHARLATÁN = true;
+	}
+
+	if(argumentos["--ayuda"].isTrue())
+	{
+		writeln(doc);
+		return 0;
+	}
+
+	string a = argumentos["<archivo>"].value().toString;
+	archivo = to!dstring(a);
 
 	dstring código_ri = leearchivo(archivo);
 
 	iri(código_ri);
+
+	return 0;
 }
 
 void iri(dstring código)
