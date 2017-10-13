@@ -357,7 +357,7 @@ Nodo interpreta(Bloque bloque)
             tid.última_etiqueta(bloque.ramas[i].etiqueta);
             if(tid.última_etiqueta().length > 0)
             {
-                infoln("ETIQUETA: " ~ tid.última_etiqueta());
+                charlatánln("ETIQUETA: " ~ tid.última_etiqueta());
             }
         }
 
@@ -627,7 +627,7 @@ Literal op_ret(Operación op)
 {
     if(tid.última_etiqueta().length > 0)
     {
-        infoln("ETIQUETA: " ~ tid.última_etiqueta());
+        charlatánln("ETIQUETA: " ~ tid.última_etiqueta());
     }
     else
     {
@@ -640,16 +640,17 @@ Literal op_ret(Operación op)
         return null;
     }
 
-    if(op.ramas.length == 1)
+    if(op.ramas.length == 2)
     {
-        // ret tiene argumento
-        Literal lit = lee_argumento(op.ramas[0]);
-        infoln("op: ret " ~ lit.tipo ~ " " ~ lit.dato ~ " [" ~ lit.dato ~ "]");
+        // ret <tipo> (<literal>|<id>);
+        Tipo t = cast(Tipo)(op.ramas[0]);
+        Literal lit = lee_argumento(op.ramas[1]);
+        infoln("op: ret " ~ t.tipo ~ " " ~ lit.dato ~ " [" ~ lit.dato ~ "]");
         return lit;
     }
     else if(op.ramas.length == 0)
     {
-        // ret no tiene argumento
+        // ret;
         infoln("op: ret");
         return null;
     }
@@ -668,19 +669,20 @@ Literal op_sum(Operación op)
         return null;
     }
 
-    if(op.ramas.length != 2)
+    if(op.ramas.length != 3)
     {
-        aborta("Esperaba que la operación 'sum' tuviera 2 argumentos");
+        aborta("sum <tipo> <arg1>, <arg2>");
         return null;
     }
 
     Nodo n;
+    Tipo t = cast(Tipo)(op.ramas[0]);
     Literal lit0, lit1;
     
-    n = op.ramas[0];
+    n = op.ramas[1];
     lit0 = lee_argumento(n);
     
-    n = op.ramas[1];
+    n = op.ramas[2];
     lit1 = lee_argumento(n);
 
     if((lit0 is null) || (lit1 is null))
@@ -688,25 +690,19 @@ Literal op_sum(Operación op)
         return null;
     }
 
-    if(lit0.tipo != lit1.tipo)
-    {
-        aborta("Los tipos de la operación 'sum' debían ser iguales");
-        return null;
-    }
-
-    switch(lit0.tipo[0])
+    switch(t.tipo[0])
     {
         case 'e': //entero
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 2) || (tamaño > 64))
             {
@@ -724,7 +720,7 @@ Literal op_sum(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: sum " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e0)
@@ -738,16 +734,16 @@ Literal op_sum(Operación op)
             //break;
 
         case 'n': //natural
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 1) || (tamaño > 64))
             {
@@ -765,7 +761,7 @@ Literal op_sum(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: sum " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n0)
@@ -779,16 +775,16 @@ Literal op_sum(Operación op)
             //break;
 
         case 'r': //real
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 16) || (tamaño > 64))
             {
@@ -806,7 +802,7 @@ Literal op_sum(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: sum " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r0)
@@ -836,19 +832,20 @@ Literal op_res(Operación op)
         return null;
     }
 
-    if(op.ramas.length != 2)
+    if(op.ramas.length != 3)
     {
-        aborta("Esperaba que la operación 'res' tuviera 2 argumentos");
+        aborta("res <tipo> <arg1>, <arg2>");
         return null;
     }
 
     Nodo n;
+    Tipo t = cast(Tipo)(op.ramas[0]);
     Literal lit0, lit1;
     
-    n = op.ramas[0];
+    n = op.ramas[1];
     lit0 = lee_argumento(n);
     
-    n = op.ramas[1];
+    n = op.ramas[2];
     lit1 = lee_argumento(n);
 
     if((lit0 is null) || (lit1 is null))
@@ -856,25 +853,19 @@ Literal op_res(Operación op)
         return null;
     }
 
-    if(lit0.tipo != lit1.tipo)
-    {
-        aborta("Los tipos de la operación 'res' debían ser iguales");
-        return null;
-    }
-
-    switch(lit0.tipo[0])
+    switch(t.tipo[0])
     {
         case 'e': //entero
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 2) || (tamaño > 64))
             {
@@ -892,7 +883,7 @@ Literal op_res(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: res " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e0)
@@ -906,16 +897,16 @@ Literal op_res(Operación op)
             //break;
 
         case 'n': //natural
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 1) || (tamaño > 64))
             {
@@ -933,7 +924,7 @@ Literal op_res(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: res " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n0)
@@ -947,16 +938,16 @@ Literal op_res(Operación op)
             //break;
 
         case 'r': //real
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 16) || (tamaño > 64))
             {
@@ -974,7 +965,7 @@ Literal op_res(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: res " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r0)
@@ -1004,19 +995,20 @@ Literal op_mul(Operación op)
         return null;
     }
 
-    if(op.ramas.length != 2)
+    if(op.ramas.length != 3)
     {
-        aborta("Esperaba que la operación 'mul' tuviera 2 argumentos");
+        aborta("mul <tipo> <arg1>, <arg2>");
         return null;
     }
 
     Nodo n;
+    Tipo t = cast(Tipo)(op.ramas[0]);
     Literal lit0, lit1;
     
-    n = op.ramas[0];
+    n = op.ramas[1];
     lit0 = lee_argumento(n);
     
-    n = op.ramas[1];
+    n = op.ramas[2];
     lit1 = lee_argumento(n);
 
     if((lit0 is null) || (lit1 is null))
@@ -1024,25 +1016,19 @@ Literal op_mul(Operación op)
         return null;
     }
 
-    if(lit0.tipo != lit1.tipo)
-    {
-        aborta("Los tipos de la operación 'mul' debían ser iguales");
-        return null;
-    }
-
-    switch(lit0.tipo[0])
+    switch(t.tipo[0])
     {
         case 'e': //entero
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 2) || (tamaño > 64))
             {
@@ -1060,7 +1046,7 @@ Literal op_mul(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: mul " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e0)
@@ -1074,16 +1060,16 @@ Literal op_mul(Operación op)
             //break;
 
         case 'n': //natural
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 1) || (tamaño > 64))
             {
@@ -1101,7 +1087,7 @@ Literal op_mul(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: mul " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n0)
@@ -1115,16 +1101,16 @@ Literal op_mul(Operación op)
             //break;
 
         case 'r': //real
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 16) || (tamaño > 64))
             {
@@ -1142,7 +1128,7 @@ Literal op_mul(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: mul " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r0)
@@ -1172,19 +1158,20 @@ Literal op_div(Operación op)
         return null;
     }
 
-    if(op.ramas.length != 2)
+    if(op.ramas.length != 3)
     {
-        aborta("Esperaba que la operación 'div' tuviera 2 argumentos");
+        aborta("div <tipo> <arg1>, <arg2>");
         return null;
     }
 
     Nodo n;
+    Tipo t = cast(Tipo)(op.ramas[0]);
     Literal lit0, lit1;
     
-    n = op.ramas[0];
+    n = op.ramas[1];
     lit0 = lee_argumento(n);
     
-    n = op.ramas[1];
+    n = op.ramas[2];
     lit1 = lee_argumento(n);
 
     if((lit0 is null) || (lit1 is null))
@@ -1192,25 +1179,19 @@ Literal op_div(Operación op)
         return null;
     }
 
-    if(lit0.tipo != lit1.tipo)
-    {
-        aborta("Los tipos de la operación 'div' debían ser iguales");
-        return null;
-    }
-
-    switch(lit0.tipo[0])
+    switch(t.tipo[0])
     {
         case 'e': //entero
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 2) || (tamaño > 64))
             {
@@ -1228,7 +1209,7 @@ Literal op_div(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: div " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e0)
@@ -1242,16 +1223,16 @@ Literal op_div(Operación op)
             //break;
 
         case 'n': //natural
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 1) || (tamaño > 64))
             {
@@ -1269,7 +1250,7 @@ Literal op_div(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: div " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n0)
@@ -1283,16 +1264,16 @@ Literal op_div(Operación op)
             //break;
 
         case 'r': //real
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 16) || (tamaño > 64))
             {
@@ -1310,7 +1291,7 @@ Literal op_div(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: div " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r0)
@@ -1380,6 +1361,7 @@ Literal op_llama(Operación op)
     }
 }
 
+// op:cmp [OPCMP, TIPO, LITERAL|IDENTIFICADOR, LITERAL|IDENTIFICADOR]
 Literal op_cmp(Operación op)
 {
     if(op.dato != "cmp")
@@ -1388,9 +1370,9 @@ Literal op_cmp(Operación op)
         return null;
     }
 
-    if(op.ramas.length != 3)
+    if(op.ramas.length != 4)
     {
-        aborta("Esperaba que la operación 'cmp' tuviera 2 argumentos");
+        aborta("cmp <comparación> <tipo> (<literal>|<id>), (<literal>|<id>)");
         return null;
     }
 
@@ -1414,13 +1396,16 @@ Literal op_cmp(Operación op)
     }
 
     Nodo n;
+    Tipo t;
     Literal lit0, lit1;
     bool resultado;
-    
-    n = op.ramas[1];
-    lit0 = lee_argumento(n);
+
+    t = cast(Tipo)(op.ramas[1]);
     
     n = op.ramas[2];
+    lit0 = lee_argumento(n);
+    
+    n = op.ramas[3];
     lit1 = lee_argumento(n);
 
     if((lit0 is null) || (lit1 is null))
@@ -1428,26 +1413,19 @@ Literal op_cmp(Operación op)
         aborta("Los argumentos son incorrectos");
     }
 
-    if(lit0.tipo != lit1.tipo)
-    {
-        charlatánln("lit0.tipo: " ~ lit0.tipo);
-        charlatánln("lit1.tipo: " ~ lit1.tipo);
-        aborta("Los tipos de la operación 'cmp' debían ser iguales");
-    }
-
-    switch(lit0.tipo[0])
+    switch(t.tipo[0])
     {
         case 'e': //entero
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 2) || (tamaño > 64))
             {
@@ -1493,7 +1471,7 @@ Literal op_cmp(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: cmp " ~ comparación ~ " e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(var0)
@@ -1509,16 +1487,16 @@ Literal op_cmp(Operación op)
             break;
 
         case 'n': //natural
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 1) || (tamaño > 64))
             {
@@ -1564,7 +1542,7 @@ Literal op_cmp(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: cmp " ~ comparación ~ " n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(var0)
@@ -1580,16 +1558,16 @@ Literal op_cmp(Operación op)
             break;
 
         case 'r': //real
-            for(int i = 1; i < lit0.tipo.length; i++)
+            for(int i = 1; i < t.tipo.length; i++)
             {
-                if(!esdígito(lit0.tipo[i]))
+                if(!esdígito(t.tipo[i]))
                 {
                     aborta("Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
 
-            uint32_t tamaño = to!uint32_t(lit0.tipo[1..$]);
+            uint32_t tamaño = to!uint32_t(t.tipo[1..$]);
 
             if((tamaño < 16) || (tamaño > 64))
             {
@@ -1635,7 +1613,7 @@ Literal op_cmp(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = lit0.tipo;
+            l.tipo = t.tipo;
 
             dstring txt;
             txt = "op: cmp " ~ comparación ~ " r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(var0)
@@ -1679,19 +1657,19 @@ Literal op_conv(Operación op)
         // conv eX rY
         // conv rX nY
         // conv rX eY
-
-    Literal origen = lee_argumento(op.ramas[0]);
+    Tipo t = cast(Tipo)(op.ramas[0]);
+    Literal origen = lee_argumento(op.ramas[1]);
     Tipo destino = new Tipo();
-    destino.tipo = (cast(Tipo)(op.ramas[1])).tipo;
+    destino.tipo = (cast(Tipo)(op.ramas[2])).tipo;
     Literal resultado = new Literal();
     uint32_t tamaño_origen, tamaño_destino;
 
     resultado.tipo = destino.tipo;
 
-    switch(origen.tipo[0])
+    switch(t.tipo[0])
     {
         case 'n': // convertimos desde 'natural'
-            tamaño_origen = to!uint32_t(origen.tipo[1..$]);
+            tamaño_origen = to!uint32_t(t.tipo[1..$]);
 
             switch(destino.tipo[0])
             {
@@ -1889,7 +1867,7 @@ Literal op_conv(Operación op)
             break;
 
         case 'e':
-            tamaño_origen = to!uint32_t(origen.tipo[1..$]);
+            tamaño_origen = to!uint32_t(t.tipo[1..$]);
 
             switch(destino.tipo[0])
             {
@@ -2100,7 +2078,7 @@ Literal op_conv(Operación op)
             break;
 
         case 'r':
-            tamaño_origen = to!uint32_t(origen.tipo[1..$]);
+            tamaño_origen = to!uint32_t(t.tipo[1..$]);
 
             switch(destino.tipo[0])
             {
@@ -2201,8 +2179,8 @@ Literal op_conv(Operación op)
     }
 
     info("op: " ~ op.dato ~ " ");
-    info(origen.tipo ~ " " ~ origen.dato);
-    info(" => " ~ (cast(Tipo)(op.ramas[1])).tipo);
+    info(t.tipo ~ " " ~ origen.dato);
+    info(" => " ~ (cast(Tipo)(op.ramas[2])).tipo);
 
     if(resultado is null)
     {
@@ -2225,9 +2203,10 @@ Etiqueta op_slt(Operación op)
         return null;
     }
 
+    // Salto incondicional
+    // slt :<etiqueta>
     if(op.ramas.length == 1)
     {
-        // Salto incondicional
         Etiqueta etiqueta = cast(Etiqueta)(op.ramas[0]);
 
         if(tid.lee_id(etiqueta.dato).nombre)
@@ -2242,22 +2221,39 @@ Etiqueta op_slt(Operación op)
 
             return etiqueta;
         }
+        else
+        {
+            aborta("La etiqueta no existe");
+        }
     }
-    else if(op.ramas.length == 2)
+    // Salto condicional
+    // slt n1 (<id>|<literal>) :<etiqueta>
+    else if(op.ramas.length == 3)
     {
-        // Salto condicional
-        Literal lit = lee_argumento(op.ramas[0]);
+        Tipo t = cast(Tipo)(op.ramas[0]);
         bool condición = false;
 
-        if(lit.tipo == "n1")
+        if(t is null)
         {
-            condición = (lit.dato == "1");
+            aborta("Tipo 'null'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
+            return null;
         }
+        else if(t.tipo != "n1")
+        {
+            aborta("Tipo incorrecto. Esperaba 'n1'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
+            return null;
+        }
+        else
+        {
+            condición = (t.tipo == "1");
+        }
+        
+        Literal lit = lee_argumento(op.ramas[1]);
         
         if(condición)
         {
             // Se cumple la condición
-            Etiqueta etiqueta = cast(Etiqueta)(op.ramas[1]);
+            Etiqueta etiqueta = cast(Etiqueta)(op.ramas[2]);
 
             if(tid.lee_id(etiqueta.dato).nombre)
             {
@@ -2272,6 +2268,10 @@ Etiqueta op_slt(Operación op)
 
                 return etiqueta;
             }
+            else
+            {
+                aborta("La etiqueta no existe");
+            }
         }
         else
         {
@@ -2280,13 +2280,16 @@ Etiqueta op_slt(Operación op)
         }
     }
 
-    aborta("Esperaba que 'ret' tuviera uno o dos argumentos");
+    aborta("slt [n1 (<id>|<literal>)] :<etiqueta>");
     return null;
 }
 
 Literal op_phi(Operación op)
 {
     dstring etiqueta;
+    Tipo t;
+    Literal lit;
+
     if(tid.última_etiqueta().length > 0)
     {
         etiqueta = tid.última_etiqueta();
@@ -2303,10 +2306,16 @@ Literal op_phi(Operación op)
         return null;
     }
 
-    if((op.ramas.length > 1) && ((op.ramas.length % 2) == 0))
+    t = cast(Tipo)(op.ramas[0]);
+    if(t is null)
+    {
+        aborta("Esperaba Tipo.\nphi <tipo> '[' <id>|<literal>, :<etiqueta> ']',... ");
+    }
+
+    if((op.ramas.length > 2) && ((op.ramas.length % 2) == 1))
     {
         // phi tiene un número par de argumentos
-        for(int i = 1; i < (op.ramas.length); i+2)
+        for(int i = 2; i < (op.ramas.length); i+2)
         {
             Nodo n = op.ramas[i];
             if(n.categoría != Categoría.ETIQUETA)
@@ -2318,8 +2327,15 @@ Literal op_phi(Operación op)
                 auto e = cast(Etiqueta)n;
                 if(e.dato == etiqueta)
                 {
-                    return cast(Literal)op.ramas[i - 1];
+                    lit = cast(Literal)op.ramas[i - 1];
+
+                    lit.tipo = t.tipo;
+
+                    return lit;
                 }
+
+                aborta("Esperaba Etiqueta.\nphi <tipo> '[' <id>|<literal>, :<etiqueta> ']',... ");
+                return null;
             }
         }
 
@@ -2327,6 +2343,6 @@ Literal op_phi(Operación op)
         return null;
     }
     
-    aborta("Esperaba que 'phi' tuviera un número par de argumentos");
+    aborta("Esperaba que 'phi' tuviera un número impar de argumentos, y al menos 3");
     return null;
 }
