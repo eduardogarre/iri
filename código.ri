@@ -6,6 +6,8 @@ También usado para pruebas.
 Por ahora, la dirección de este archivo está grabada directamente en el código.
 */
 
+@txt = privado n32 'h';
+
 declara e32 @sal(e32 %hola, r18 %lol);
 
 @hola = público r64 3.141592;

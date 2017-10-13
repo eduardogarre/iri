@@ -27,6 +27,7 @@ enum lexema_e
     OPERACIÓN,
     IDENTIFICADOR,
     NÚMERO,
+    CARÁCTER,
     TEXTO,
     REGISTRO,
     NOTACIÓN,

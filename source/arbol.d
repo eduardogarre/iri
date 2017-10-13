@@ -9,6 +9,7 @@ enum Categoría
     RESERVADA,
     TIPO,
     NÚMERO,
+    CARÁCTER,
     TEXTO,
     LITERAL,
     IDENTIFICADOR,

@@ -470,11 +470,10 @@ private DefineIdentificadorGlobal define_identificador_global()
         return null;
     }
 
-    if(auto n = literal())
+    if(auto l = literal())
     {
-        auto l = new Literal();
-        l.dato = n.dato;
-        l.tipo = t.tipo;
+        // comprobar tipos
+        // l.tipo = t.tipo;
         i.ramas ~= l;
     }
     else
@@ -692,10 +691,8 @@ private Operación op_aritmética()
             {
                 o.ramas ~= i;
             }
-            else if(Nodo n = literal())
+            else if(Nodo l = literal())
             {
-                auto l = new Literal();
-                l.dato = n.dato;
                 o.ramas ~= l;
             }
             else // Error.
@@ -717,10 +714,8 @@ private Operación op_aritmética()
             {
                 o.ramas ~= i;
             }
-            else if(Nodo n = literal())
+            else if(Nodo l = literal())
             {
-                auto l = new Literal();
-                l.dato = n.dato;
                 o.ramas ~= l;
             }
             else // Error.
@@ -780,10 +775,8 @@ private Operación op_conv()
             {
                 o.ramas ~= i;
             }
-            else if(Nodo n = literal())
+            else if(Nodo l = literal())
             {
-                auto l = new Literal();
-                l.dato = n.dato;
                 o.ramas ~= l;
             }
             else // Error.
@@ -859,10 +852,8 @@ private Operación op_ret()
                     o.ramas ~= i;
                 }
                 // ret TIPO LITERAL;
-                else if(Nodo n = literal())
+                else if(Nodo l = literal())
                 {
-                    auto l = new Literal();
-                    l.dato = n.dato;
                     o.ramas ~= l;
                 }
                 else // Error.
@@ -962,10 +953,8 @@ private Operación op_cmp()
             {
                 o.ramas ~= i;
             }
-            else if(Nodo n = literal())
+            else if(Nodo l = literal())
             {
-                auto l = new Literal();
-                l.dato = n.dato;
                 o.ramas ~= l;
             }
             else // Error.
@@ -988,10 +977,8 @@ private Operación op_cmp()
             {
                 o.ramas ~= i;
             }
-            else if(Nodo n = literal())
+            else if(Nodo l = literal())
             {
-                auto l = new Literal();
-                l.dato = n.dato;
                 o.ramas ~= l;
             }
             else // Error.
@@ -1149,10 +1136,8 @@ private Operación op_phi()
             {
                 o.ramas ~= i;
             }
-            else if(Nodo n = literal())
+            else if(Nodo l = literal())
             {
-                auto l = new Literal();
-                l.dato = n.dato;
                 o.ramas ~= l;
             }
             else // Error.
@@ -1208,10 +1193,8 @@ private Operación op_phi()
                 {
                     o.ramas ~= i;
                 }
-                else if(Nodo n = literal())
+                else if(Nodo l = literal())
                 {
-                    auto l = new Literal();
-                    l.dato = n.dato;
                     o.ramas ~= l;
                 }
                 else // Error.
@@ -1445,7 +1428,16 @@ private Literal literal()
 
     if(Nodo n = número())
     {
-        l.dato ~= n.dato;
+        l.dato = n.dato;
+        l.tipo = "número";
+        l.línea = n.línea;
+
+        return l;
+    }
+    else if(Nodo n = carácter())
+    {
+        l.dato = n.dato;
+        l.tipo = "carácter";
         l.línea = n.línea;
 
         return l;
@@ -1477,6 +1469,31 @@ private Nodo número()
         if(símbolos[cursor].categoría == lexema_e.NÚMERO)
         {
             n.categoría = Categoría.NÚMERO;
+            n.dato = símbolos[cursor].símbolo;
+            n.línea = símbolos[cursor].línea;
+
+            cursor++;
+            return n;
+        }
+    }
+
+    cursor = c;
+    return null;
+}
+
+
+//CARÁCTER -- lexema_e.CARÁCTER
+private Nodo carácter()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        Nodo n = new Nodo();
+
+        if(símbolos[cursor].categoría == lexema_e.CARÁCTER)
+        {
+            n.categoría = Categoría.CARÁCTER;
             n.dato = símbolos[cursor].símbolo;
             n.línea = símbolos[cursor].línea;
 
