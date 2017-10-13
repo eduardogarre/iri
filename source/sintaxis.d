@@ -470,7 +470,7 @@ private DefineIdentificadorGlobal define_identificador_global()
         return null;
     }
 
-    if(auto n = número())
+    if(auto n = literal())
     {
         auto l = new Literal();
         l.dato = n.dato;
@@ -692,7 +692,7 @@ private Operación op_aritmética()
             {
                 o.ramas ~= i;
             }
-            else if(Nodo n = número())
+            else if(Nodo n = literal())
             {
                 auto l = new Literal();
                 l.dato = n.dato;
@@ -717,7 +717,7 @@ private Operación op_aritmética()
             {
                 o.ramas ~= i;
             }
-            else if(Nodo n = número())
+            else if(Nodo n = literal())
             {
                 auto l = new Literal();
                 l.dato = n.dato;
@@ -780,7 +780,7 @@ private Operación op_conv()
             {
                 o.ramas ~= i;
             }
-            else if(Nodo n = número())
+            else if(Nodo n = literal())
             {
                 auto l = new Literal();
                 l.dato = n.dato;
@@ -859,7 +859,7 @@ private Operación op_ret()
                     o.ramas ~= i;
                 }
                 // ret TIPO LITERAL;
-                else if(Nodo n = número())
+                else if(Nodo n = literal())
                 {
                     auto l = new Literal();
                     l.dato = n.dato;
@@ -962,7 +962,7 @@ private Operación op_cmp()
             {
                 o.ramas ~= i;
             }
-            else if(Nodo n = número())
+            else if(Nodo n = literal())
             {
                 auto l = new Literal();
                 l.dato = n.dato;
@@ -988,7 +988,7 @@ private Operación op_cmp()
             {
                 o.ramas ~= i;
             }
-            else if(Nodo n = número())
+            else if(Nodo n = literal())
             {
                 auto l = new Literal();
                 l.dato = n.dato;
@@ -1050,7 +1050,7 @@ private Operación op_slt()
                 {
                     o.ramas ~= i;
                 }
-                else if(Nodo n = número())
+                else if(Nodo n = literal())
                 {
                     auto l = new Literal();
                     l.dato = n.dato;
@@ -1149,7 +1149,7 @@ private Operación op_phi()
             {
                 o.ramas ~= i;
             }
-            else if(Nodo n = número())
+            else if(Nodo n = literal())
             {
                 auto l = new Literal();
                 l.dato = n.dato;
@@ -1208,7 +1208,7 @@ private Operación op_phi()
                 {
                     o.ramas ~= i;
                 }
-                else if(Nodo n = número())
+                else if(Nodo n = literal())
                 {
                     auto l = new Literal();
                     l.dato = n.dato;
@@ -1436,29 +1436,21 @@ private Identificador identificador()
     return null;
 }
 
-//LITERAL -- TIPO NÚMERO
+//LITERAL -- NÚMERO
 private Literal literal()
 {
     uint c = cursor;
 
-    if(Tipo t = tipo())
+    Literal l = new Literal();
+
+    if(Nodo n = número())
     {
-        if((cast(Tipo)t).tipo == "nada")
-        {
-            return null;
-        }
+        l.dato ~= n.dato;
+        l.línea = n.línea;
 
-        auto l = new Literal();
-                
-        if(Nodo n = número())
-        {
-            l.tipo = t.tipo;
-            l.dato ~= n.dato;
-            l.línea = t.línea;
-
-            return l;
-        }
+        return l;
     }
+        
     cursor = c;
     return null;
 }
