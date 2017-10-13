@@ -45,7 +45,7 @@ lol:
     %1 = sum e32 %y, @roto2;
     %2 = sum e32 @xd, %1;
     %3 = conv e32 %2 a r64;
-    %4 = mul e32 %3, @hola;
+    %4 = mul r64 %3, @hola;
     %5 = conv e32 @xd a r64;
     %6 = div r64 %4, %5;
 

@@ -662,7 +662,6 @@ private Operación op_aritmética()
         {
             
             Operación o = new Operación();
-            Tipo t;
 
             o.dato = símbolos[cursor].símbolo;
             o.línea = símbolos[cursor].línea;
@@ -678,9 +677,9 @@ private Operación op_aritmética()
 
             cursor++;
 
-            if(auto ti = tipo())
+            if(auto t = tipo())
             {
-                t = ti;
+                o.ramas ~= t;
             }
             else // Error.
             {
@@ -697,7 +696,6 @@ private Operación op_aritmética()
             {
                 auto l = new Literal();
                 l.dato = n.dato;
-                l.tipo = t.tipo;
                 o.ramas ~= l;
             }
             else // Error.
@@ -723,7 +721,6 @@ private Operación op_aritmética()
             {
                 auto l = new Literal();
                 l.dato = n.dato;
-                l.tipo = t.tipo;
                 o.ramas ~= l;
             }
             else // Error.
@@ -757,7 +754,6 @@ private Operación op_conv()
         {
             
             Operación o = new Operación();
-            Tipo t;
 
             o.dato = símbolos[cursor].símbolo;
             o.línea = símbolos[cursor].línea;
@@ -769,9 +765,9 @@ private Operación op_conv()
 
             cursor++;
 
-            if(auto ti = tipo())
+            if(auto t = tipo())
             {
-                t = ti;
+                o.ramas ~= t;
             }
             else // Error.
             {
@@ -788,7 +784,6 @@ private Operación op_conv()
             {
                 auto l = new Literal();
                 l.dato = n.dato;
-                l.tipo = t.tipo;
                 o.ramas ~= l;
             }
             else // Error.
@@ -843,7 +838,6 @@ private Operación op_ret()
         {
             
             Operación o = new Operación();
-            Tipo t;
 
             o.dato = símbolos[cursor].símbolo;
             o.línea = símbolos[cursor].línea;
@@ -855,9 +849,9 @@ private Operación op_ret()
 
             cursor++;
 
-            if(auto ti = tipo())
+            if(auto t = tipo())
             {
-                t = ti;
+                o.ramas ~= t;
 
                 // ret TIPO ID;
                 if(Identificador i = identificador())
@@ -869,7 +863,6 @@ private Operación op_ret()
                 {
                     auto l = new Literal();
                     l.dato = n.dato;
-                    l.tipo = t.tipo;
                     o.ramas ~= l;
                 }
                 else // Error.
@@ -956,6 +949,7 @@ private Operación op_cmp()
             if(auto ti = tipo())
             {
                 t = ti;
+                o.ramas ~= t;
             }
             else // Error.
             {
@@ -972,7 +966,6 @@ private Operación op_cmp()
             {
                 auto l = new Literal();
                 l.dato = n.dato;
-                l.tipo = t.tipo;
                 o.ramas ~= l;
             }
             else // Error.
@@ -999,7 +992,6 @@ private Operación op_cmp()
             {
                 auto l = new Literal();
                 l.dato = n.dato;
-                l.tipo = t.tipo;
                 o.ramas ~= l;
             }
             else // Error.
@@ -1032,7 +1024,6 @@ private Operación op_slt()
         if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
         {
             Operación o = new Operación();
-            Tipo t;
 
             o.dato = símbolos[cursor].símbolo;
             o.línea = símbolos[cursor].línea;
@@ -1050,9 +1041,10 @@ private Operación op_slt()
                 o.ramas ~= e;
                 return o;
             }
-            else if(auto ti = tipo())
+
+            if(auto t = tipo())
             {
-                t = ti;
+                o.ramas ~= t;
 
                 if(Identificador i = identificador())
                 {
@@ -1067,14 +1059,14 @@ private Operación op_slt()
                 }
                 else // Error.
                 {
-                    aborta("La estructura de la operación 'cmp' no es correcta. "
+                    aborta("La estructura de la operación 'slt' no es correcta. "
                     ~ "Esperaba 'Literal' o 'Identificador'");
                     return null;
                 }
 
                 if(!notación(","))
                 {
-                    aborta("La estructura de la operación 'cmp' no es correcta. "
+                    aborta("La estructura de la operación 'slt' no es correcta. "
                     ~ "Esperaba ','");
                     
                     cursor = c;
@@ -1093,10 +1085,16 @@ private Operación op_slt()
                 }
                 else // Error.
                 {
-                    aborta("La estructura de la operación 'cmp' no es correcta. "
+                    aborta("La estructura de la operación 'slt' no es correcta. "
                     ~ "Esperaba 'Etiqueta'");
                     return null;
                 }
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación 'slt' no es correcta. "
+                ~ "Esperaba 'Tipo'");
+                return null;
             }
         }
     }
@@ -1117,7 +1115,6 @@ private Operación op_phi()
         {
             
             Operación o = new Operación();
-            Tipo t;
 
             o.dato = símbolos[cursor].símbolo;
             o.línea = símbolos[cursor].línea;
@@ -1129,9 +1126,9 @@ private Operación op_phi()
 
             cursor++;
 
-            if(auto ti = tipo())
+            if(auto t = tipo())
             {
-                t = ti;
+                o.ramas ~= t;
             }
             else // Error.
             {
@@ -1156,7 +1153,6 @@ private Operación op_phi()
             {
                 auto l = new Literal();
                 l.dato = n.dato;
-                l.tipo = t.tipo;
                 o.ramas ~= l;
             }
             else // Error.
@@ -1216,7 +1212,6 @@ private Operación op_phi()
                 {
                     auto l = new Literal();
                     l.dato = n.dato;
-                    l.tipo = t.tipo;
                     o.ramas ~= l;
                 }
                 else // Error.
