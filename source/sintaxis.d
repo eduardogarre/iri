@@ -67,7 +67,8 @@ private Módulo módulo()
 
     if(!fda())
     {
-        aborta("Esperaba llegar al final del archivo");
+        aborta("Esperaba llegar al final del archivo, pero me encuentro en ["
+        ~ símbolos[cursor].símbolo ~ "]");
     }
 
     return o;
@@ -296,7 +297,7 @@ private Nodo bloque()
         Nodo r;
         do {
             r = afirmación();
-            if(r)
+            if(r !is null)
             {
                 b.ramas ~= r;
             }
@@ -386,9 +387,13 @@ private DeclaraIdentificadorGlobal declara_identificador_global()
         return null;
     }
 
-    if(auto n = reservada("global"))
+    if(auto n = reservada("privado"))
     {
-        e.ámbito = "global";
+        e.ámbito = "privado";
+    }
+    else if(auto n = reservada("público"))
+    {
+        e.ámbito = "público";
     }
     else if(auto n = reservada("externo"))
     {
@@ -413,12 +418,13 @@ private DeclaraIdentificadorGlobal declara_identificador_global()
 }
 
 
-//DEF_ID_GLOB := ID = (global | constante) LITERAL
+//DEF_ID_GLOB := ID = (privado | público) LITERAL
 private DefineIdentificadorGlobal define_identificador_global()
 {
     uint c = cursor;
     
     auto i = new DefineIdentificadorGlobal();
+    auto t = new Tipo;
 
     if(auto id = identificador())
     {
@@ -437,13 +443,26 @@ private DefineIdentificadorGlobal define_identificador_global()
         return null;
     }
 
-    if(auto n = reservada("global"))
+    if(auto n = reservada("privado"))
     {
-        i.ámbito = "global";
+        i.ámbito = "privado";
     }
-    else if(auto n = reservada("constante"))
+    else if(auto n = reservada("público"))
     {
-        i.ámbito = "constante";
+        i.ámbito = "público";
+    }
+    else if(auto n = reservada("externo"))
+    {
+        i.ámbito = "externo";
+    }
+    else
+    {
+        i.ámbito = "";
+    }
+
+    if(auto ti = tipo())
+    {
+        t.tipo = ti.tipo;
     }
     else
     {
@@ -451,8 +470,11 @@ private DefineIdentificadorGlobal define_identificador_global()
         return null;
     }
 
-    if(auto l = literal())
+    if(auto n = número())
     {
+        auto l = new Literal();
+        l.dato = n.dato;
+        l.tipo = t.tipo;
         i.ramas ~= l;
     }
     else
@@ -563,156 +585,64 @@ private Asignación asignación()
 }
 
 
-//OPERACIÓN -- COD_OP  [ (ID | LITERAL) [, (ID | LITERAL) ]* ]
+//OPERACIÓN -- OP_ARITM|RET|CONV|CMP|SLT|PHI|LLAMA|RSRVA|GUARDA|LEE
 private Operación operación()
 {
     uint c = cursor;
 
     if(cursor < símbolos.length)
     {
+        // El lexema es de una operación
         if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
         {
-            Operación o = new Operación();
-            o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            Operación o;
 
-            cursor++;
-
-            if(símbolos[cursor].categoría == lexema_e.RESERVADA)
-            {
-                lexema l = símbolos[cursor];
-
-                Nodo r = reservada(l.símbolo);
-                o.ramas ~= r;
-            }
-
-            if(LlamaFunción f = llama_función())
-            {
-                o.ramas ~= f;
-            }
-            else if(Identificador i = identificador())
-            {
-                o.ramas ~= i;
-            }
-            else if(Literal l = literal())
-            {
-                o.ramas ~= l;
-            }
-            else if(auto e = etiqueta())
-            {
-                o.ramas ~= e;
-            }
-            else if(auto t = tipo())
-            {
-                int c1 = cursor;
-                // para el nodo phi
-                // %id = phi <tipo> [valor, etiqueta], ...
-
-                while(true)
-                {
-                    if(!notación("["))
-                    {
-                        // esperaba una dupla
-                        cursor = c1;
-                        break;
-                    }
-                    
-                    Literal lit;
-                    Etiqueta eti;
-
-
-
-                    if(auto num = número())
-                    {
-                        lit = new Literal();
-                        lit.dato = num.dato;
-                        lit.tipo = t.tipo;
-                        lit.línea = t.línea;
-                    }
-
-                    if(!notación(","))
-                    {
-                        // esperaba una coma
-                        cursor = c1;
-                        break;
-                    }
-
-                    if(auto e = etiqueta())
-                    {
-                        eti = e;
-                    }
-                    else
-                    {
-                        cursor = c1;
-                        break;
-                    }
-
-                    if(!notación("]"))
-                    {
-                        cursor = c1;
-                        break;
-                    }
-                    else
-                    {
-                        o.ramas ~= lit;
-                        o.ramas ~= eti;
-                    }
-
-                    if(!notación(","))
-                    {
-                        break;
-                    }
-                }
-
-                return o;
-            }
-            else
+            o = op_aritmética();
+            if(o !is null)
             {
                 return o;
             }
 
-            while(true)
+            o = op_ret();
+            if(o !is null)
             {
-                uint c1 = cursor;
-
-                if(!notación(","))
-                {
-                    cursor = c1;
-                    break;
-                }
-
-                if(Identificador i = identificador())
-                {
-                    o.ramas ~= i;
-                    continue;
-                }
-                else if(Literal l = literal())
-                {
-                    o.ramas ~= l;
-                    continue;
-                }
-                else if(auto e = etiqueta())
-                {
-                    o.ramas ~= e;
-                }
-                else cursor = c1;
-
-                break;
+                return o;
             }
 
-            if(símbolos[cursor].categoría == lexema_e.RESERVADA)
+            o = op_conv();
+            if(o !is null)
             {
-                if(reservada("a") !is null)
-                {
-                    auto n = tipo();
-                    auto t = new Tipo();
-                    t.tipo = n.tipo;
-                    t.línea = n.línea;
-                    o.ramas ~= t;
-                }
+                return o;
             }
 
-            return o;
+            o = op_cmp();
+            if(o !is null)
+            {
+                return o;
+            }
+
+            o = op_slt();
+            if(o !is null)
+            {
+                return o;
+            }
+
+            o = op_phi();
+            if(o !is null)
+            {
+                return o;
+            }
+
+            o = op_llama();
+            if(o !is null)
+            {
+                return o;
+            }
+
+            // Si llegamos hasta aquí, nos encontramos ante un lexema de
+            // una operación que no hemos sabido identificar.
+
+            aborta("No reconozco el op '" ~ símbolos[cursor].símbolo ~ "'");
         }
     }
 
@@ -721,21 +651,666 @@ private Operación operación()
 }
 
 
-//IDENTIFICADOR -- (REGISTRO | IDLOCAL | IDGLOBAL)
-private Identificador identificador()
+//OPERACIÓN -- (sum|res|mul|div) TIPO (ID | LITERAL), (ID | LITERAL)
+private Operación op_aritmética()
 {
     uint c = cursor;
 
     if(cursor < símbolos.length)
     {
-        if(símbolos[cursor].categoría == lexema_e.IDENTIFICADOR)
+        if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
         {
-            Identificador id = new Identificador();
-            id.nombre = símbolos[cursor].símbolo;
-            id.línea = símbolos[cursor].línea;
             
+            Operación o = new Operación();
+            Tipo t;
+
+            o.dato = símbolos[cursor].símbolo;
+            o.línea = símbolos[cursor].línea;
+
+            if( (o.dato != "sum")
+             && (o.dato != "res")
+             && (o.dato != "mul")
+             && (o.dato != "div")
+            )
+            {
+                return null;
+            }
+
             cursor++;
-            return id;
+
+            if(auto ti = tipo())
+            {
+                t = ti;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Tipo'");
+                return null;
+            }
+
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo n = número())
+            {
+                auto l = new Literal();
+                l.dato = n.dato;
+                l.tipo = t.tipo;
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Identificador' o 'Literal'");
+                return null;
+            }
+
+            if(!notación(","))
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba ','");
+                cursor = c;
+                return null;
+            }
+
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo n = número())
+            {
+                auto l = new Literal();
+                l.dato = n.dato;
+                l.tipo = t.tipo;
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Identificador' o 'Literal'");
+                return null;
+            }
+
+            if(notación(";"))
+            {
+                cursor--;
+                return o;
+            }
+        }
+    }
+
+    cursor = c;
+    return null;
+}
+
+
+//OPERACIÓN -- conv TIPO1 (ID | LITERAL) a TIPO2
+private Operación op_conv()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
+        {
+            
+            Operación o = new Operación();
+            Tipo t;
+
+            o.dato = símbolos[cursor].símbolo;
+            o.línea = símbolos[cursor].línea;
+
+            if(o.dato != "conv")
+            {
+                return null;
+            }
+
+            cursor++;
+
+            if(auto ti = tipo())
+            {
+                t = ti;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Tipo'");
+                return null;
+            }
+
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo n = número())
+            {
+                auto l = new Literal();
+                l.dato = n.dato;
+                l.tipo = t.tipo;
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Identificador' o 'Literal'");
+                return null;
+            }
+
+            if(!reservada("a"))
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'a'");
+                cursor = c;
+                return null;
+            }
+
+            
+
+            if(auto ti = tipo())
+            {
+                o.ramas ~= ti;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Tipo'");
+                return null;
+            }
+
+            if(notación(";"))
+            {
+                cursor--;
+                return o;
+            }
+        }
+    }
+
+    cursor = c;
+    return null;
+}
+
+
+//OPERACIÓN -- ret [TIPO (ID | LITERAL)]
+private Operación op_ret()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
+        {
+            
+            Operación o = new Operación();
+            Tipo t;
+
+            o.dato = símbolos[cursor].símbolo;
+            o.línea = símbolos[cursor].línea;
+
+            if(o.dato != "ret")
+            {
+                return null;
+            }
+
+            cursor++;
+
+            if(auto ti = tipo())
+            {
+                t = ti;
+
+                // ret TIPO ID;
+                if(Identificador i = identificador())
+                {
+                    o.ramas ~= i;
+                }
+                // ret TIPO LITERAL;
+                else if(Nodo n = número())
+                {
+                    auto l = new Literal();
+                    l.dato = n.dato;
+                    l.tipo = t.tipo;
+                    o.ramas ~= l;
+                }
+                else // Error.
+                {
+                    aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                    ~ "correcta. Esperaba 'Identificador' o 'Literal'");
+                    return null;
+                }
+                
+                if(notación(";"))// ret;
+                {
+                    cursor--;
+                    return o;
+                }
+            }
+            else if(notación(";"))// ret;
+            {
+                cursor--;
+                return o;
+            }
+        }
+    }
+
+    cursor = c;
+    return null;
+}
+
+
+//OPERACIÓN -- cmp COMPARACIÓN TIPO (ID | LITERAL), (ID | LITERAL)
+private Operación op_cmp()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
+        {
+            Operación o = new Operación();
+            Tipo t;
+
+            o.dato = símbolos[cursor].símbolo;
+            o.línea = símbolos[cursor].línea;
+
+            // comprueba que el cod_op es 'cmp'
+            if(o.dato != "cmp")
+            {
+                return null;
+            }
+
+            cursor++;
+
+            // comprueba que se indica qué comparación hay que realizar
+            if(auto r = reservada("ig")) // igualdad
+            {
+                o.ramas ~= r;
+            }
+            else if(auto r = reservada("dsig")) // desigualdad
+            {
+                o.ramas ~= r;
+            }
+            else if(auto r = reservada("ma")) // mayor que
+            {
+                o.ramas ~= r;
+            }
+            else if(auto r = reservada("me")) // menor que
+            {
+                o.ramas ~= r;
+            }
+            else if(auto r = reservada("maig")) // mayor o igual que
+            {
+                o.ramas ~= r;
+            }
+            else if(auto r = reservada("meig")) // menor o igual
+            {
+                o.ramas ~= r;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación 'cmp' no es correcta. "
+                ~ "Esperaba 'Comparación'");
+                return null;
+            }
+
+            if(auto ti = tipo())
+            {
+                t = ti;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación 'cmp' no es correcta. "
+                ~ "Esperaba 'Tipo'");
+                return null;
+            }
+
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo n = número())
+            {
+                auto l = new Literal();
+                l.dato = n.dato;
+                l.tipo = t.tipo;
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación 'cmp' no es correcta. "
+                ~ "Esperaba 'Literal' o 'Identificador'");
+                return null;
+            }
+
+            if(!notación(","))
+            {
+                aborta("La estructura de la operación 'cmp' no es correcta. "
+                ~ "Esperaba ','");
+                
+                cursor = c;
+                return null;
+            }
+
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo n = número())
+            {
+                auto l = new Literal();
+                l.dato = n.dato;
+                l.tipo = t.tipo;
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación 'cmp' no es correcta. "
+                ~ "Esperaba 'Literal' o 'Identificador'");
+                return null;
+            }
+
+            if(notación(";"))
+            {
+                cursor--;
+                return o;
+            }
+        }
+    }
+
+    cursor = c;
+    return null;
+}
+
+
+//OPERACIÓN -- slt [TIPO (ID | LITERAL),] ETIQUETA
+private Operación op_slt()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
+        {
+            Operación o = new Operación();
+            Tipo t;
+
+            o.dato = símbolos[cursor].símbolo;
+            o.línea = símbolos[cursor].línea;
+
+            // comprueba que el cod_op es 'slt'
+            if(o.dato != "slt")
+            {
+                return null;
+            }
+
+            cursor++;
+
+            if(auto e = etiqueta())
+            {
+                o.ramas ~= e;
+                return o;
+            }
+            else if(auto ti = tipo())
+            {
+                t = ti;
+
+                if(Identificador i = identificador())
+                {
+                    o.ramas ~= i;
+                }
+                else if(Nodo n = número())
+                {
+                    auto l = new Literal();
+                    l.dato = n.dato;
+                    l.tipo = t.tipo;
+                    o.ramas ~= l;
+                }
+                else // Error.
+                {
+                    aborta("La estructura de la operación 'cmp' no es correcta. "
+                    ~ "Esperaba 'Literal' o 'Identificador'");
+                    return null;
+                }
+
+                if(!notación(","))
+                {
+                    aborta("La estructura de la operación 'cmp' no es correcta. "
+                    ~ "Esperaba ','");
+                    
+                    cursor = c;
+                    return null;
+                }
+
+                if(auto e = etiqueta())
+                {
+                    o.ramas ~= e;
+
+                    if(notación(";"))
+                    {
+                        cursor--;
+                        return o;
+                    }
+                }
+                else // Error.
+                {
+                    aborta("La estructura de la operación 'cmp' no es correcta. "
+                    ~ "Esperaba 'Etiqueta'");
+                    return null;
+                }
+            }
+        }
+    }
+
+    cursor = c;
+    return null;
+}
+
+
+//OPERACIÓN -- phi TIPO '['(ID | LITERAL), ETIQUETA']', [ '['(ID | LITERAL), ETIQUETA']' ]
+private Operación op_phi()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
+        {
+            
+            Operación o = new Operación();
+            Tipo t;
+
+            o.dato = símbolos[cursor].símbolo;
+            o.línea = símbolos[cursor].línea;
+
+            if(o.dato != "phi")
+            {
+                return null;
+            }
+
+            cursor++;
+
+            if(auto ti = tipo())
+            {
+                t = ti;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Tipo'");
+                return null;
+            }
+
+            if(!notación("["))
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba ^[Literal, Etiqueta], o bien "
+                ~ "^[Identificador, Etiqueta]");
+                return null;
+            }
+            
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo n = número())
+            {
+                auto l = new Literal();
+                l.dato = n.dato;
+                l.tipo = t.tipo;
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
+                return null;
+            }
+
+            if(!notación(","))
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba [Literal^, Etiqueta], o bien "
+                ~ "[Identificador^, Etiqueta]");
+                return null;
+            }
+            
+            if(auto e = etiqueta())
+            {
+                o.ramas ~= e;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Etiqueta'");
+                return null;
+            }
+
+            if(!notación("]"))
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba ^[Literal, Etiqueta], o bien "
+                ~ "^[Identificador, Etiqueta]");
+                return null;
+            }
+
+            while(true)
+            {
+                if(!notación(","))
+                {
+                    break;
+                }
+
+                if(!notación("["))
+                {
+                    aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                    ~ "correcta. Esperaba ^[Literal, Etiqueta], o bien "
+                    ~ "^[Identificador, Etiqueta]");
+                    return null;
+                }
+                
+                if(Identificador i = identificador())
+                {
+                    o.ramas ~= i;
+                }
+                else if(Nodo n = número())
+                {
+                    auto l = new Literal();
+                    l.dato = n.dato;
+                    l.tipo = t.tipo;
+                    o.ramas ~= l;
+                }
+                else // Error.
+                {
+                    aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                    ~ "correcta. Esperaba 'Identificador' o 'Literal'");
+                    return null;
+                }
+
+                if(!notación(","))
+                {
+                    aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                    ~ "correcta. Esperaba [Literal^, Etiqueta], o bien "
+                    ~ "[Identificador^, Etiqueta]");
+                    return null;
+                }
+            
+                if(auto e = etiqueta())
+                {
+                    o.ramas ~= e;
+                }
+                else // Error.
+                {
+                    aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                    ~ "correcta. Esperaba 'Identificador' o 'Literal'");
+                    return null;
+                }
+
+                if(!notación("]"))
+                {
+                    aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                    ~ "correcta. Esperaba [Literal, Etiqueta^], o bien "
+                    ~ "[Identificador, Etiqueta^]");
+                    return null;
+                }
+            }
+
+            if(notación(";"))// ret;
+            {
+                cursor--;
+                return o;
+            }
+        }
+    }
+
+    cursor = c;
+    return null;
+}
+
+
+//OPERACIÓN -- phi TIPO '['(ID | LITERAL), ETIQUETA']', [ '['(ID | LITERAL), ETIQUETA']' ]
+private Operación op_llama()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
+        {
+            
+            Operación o = new Operación();
+            Tipo t;
+
+            o.dato = símbolos[cursor].símbolo;
+            o.línea = símbolos[cursor].línea;
+
+            if(o.dato != "llama")
+            {
+                return null;
+            }
+
+            cursor++;
+
+            if(LlamaFunción f = llama_función())
+            {
+                o.ramas ~= f;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba '@función()'");
+                return null;
+            }
+
+            if(notación(";"))// ret;
+            {
+                cursor--;
+                return o;
+            }
+            else
+            {
+                aborta("Debería haber llegado al final de la operación '"
+                ~ o.dato ~ "', sin embargo, no he encontrado un ';'");
+            }
         }
     }
 
@@ -843,7 +1418,30 @@ private LlamaFunción llama_función()
     return null;
 }
 
-//LITERAL -- TIPO ['+' | '-'] NÚMERO
+
+//IDENTIFICADOR -- (REGISTRO | IDLOCAL | IDGLOBAL)
+private Identificador identificador()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        if(símbolos[cursor].categoría == lexema_e.IDENTIFICADOR)
+        {
+            Identificador id = new Identificador();
+            id.nombre = símbolos[cursor].símbolo;
+            id.línea = símbolos[cursor].línea;
+            
+            cursor++;
+            return id;
+        }
+    }
+
+    cursor = c;
+    return null;
+}
+
+//LITERAL -- TIPO NÚMERO
 private Literal literal()
 {
     uint c = cursor;
@@ -856,15 +1454,6 @@ private Literal literal()
         }
 
         auto l = new Literal();
-
-        if(Nodo signo = notación("+"))
-        {
-            // el literal es positivo
-        }
-        else if(Nodo signo = notación("-"))
-        {
-            l.dato = "-";
-        }
                 
         if(Nodo n = número())
         {
@@ -887,9 +1476,19 @@ private Nodo número()
 
     if(cursor < símbolos.length)
     {
+        Nodo n = new Nodo();
+
+        if(Nodo signo = notación("+"))
+        {
+            // el literal es positivo
+        }
+        else if(Nodo signo = notación("-"))
+        {
+            n.dato = "-";
+        }
+
         if(símbolos[cursor].categoría == lexema_e.NÚMERO)
         {
-            Nodo n = new Nodo();
             n.categoría = Categoría.NÚMERO;
             n.dato = símbolos[cursor].símbolo;
             n.línea = símbolos[cursor].línea;

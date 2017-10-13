@@ -293,20 +293,19 @@ private bool reservada()
 
         if((s == "cierto")
          | (s == "falso")
-         | (s == "global")
-         | (s == "local")
+         | (s == "público")
+         | (s == "privado")
          | (s == "declara")
          | (s == "define")
          | (s == "externo")
-         | (s == "constante")
          | (s == "módulo")
          | (s == "a") // op:conv %a a e32;
          | (s == "ig") // igual
-         | (s == "dif") // diferente
+         | (s == "dsig") // desigualdad
          | (s == "ma") // mayor
          | (s == "me") // menor
-         | (s == "mai") // mayor o igual
-         | (s == "mei") // menor o igual
+         | (s == "maig") // mayor o igual
+         | (s == "meig") // menor o igual
          | (s == "x") // listas: [4 x n8]
          | (s == "y")
          | (s == "o")

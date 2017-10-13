@@ -1401,11 +1401,11 @@ Literal op_cmp(Operación op)
     dstring s = comparación;
 
     if(   (s == "ig") // igual
-        | (s == "dif") // diferente
+        | (s == "dsig") // diferente
         | (s == "ma") // mayor
         | (s == "me") // menor
-        | (s == "mai") // mayor o igual
-        | (s == "mei") // menor o igual
+        | (s == "maig") // mayor o igual
+        | (s == "meig") // menor o igual
         )
     {}
     else
@@ -1430,6 +1430,8 @@ Literal op_cmp(Operación op)
 
     if(lit0.tipo != lit1.tipo)
     {
+        charlatánln("lit0.tipo: " ~ lit0.tipo);
+        charlatánln("lit1.tipo: " ~ lit1.tipo);
         aborta("Los tipos de la operación 'cmp' debían ser iguales");
     }
 
