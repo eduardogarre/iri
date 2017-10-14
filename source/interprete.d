@@ -13,6 +13,7 @@ TablaIdentificadores tid;
 Literal analiza(Nodo n)
 {
     charlatánln("Fase de Interpretación.");
+    
     obtén_identificadores_globales(n);
 
 	charlatánln();
@@ -149,9 +150,22 @@ void obtén_identificadores_globales(Nodo n)
 
                 Literal lit = cast(Literal)(did.ramas[0]);
 
-                if(tid.define_identificador(did.nombre, did, lit))
+                if((lit.tipo == "carácter") && (lit.dato.length == 1))
                 {
-                    charlatánln("define " ~ tid.lee_id(did.nombre).nombre);
+                    uint32_t dato = unsigned(lit.dato[0]);
+                    lit.dato = to!dstring(dato);
+                    
+                    if(tid.define_identificador(did.nombre, did, lit))
+                    {
+                        charlatánln("define " ~ tid.lee_id(did.nombre).nombre);
+                    }
+                }
+                else
+                {
+                    if(tid.define_identificador(did.nombre, did, lit))
+                    {
+                        charlatánln("define " ~ tid.lee_id(did.nombre).nombre);
+                    }
                 }
 
                 break;

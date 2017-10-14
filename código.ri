@@ -52,6 +52,11 @@ lol:
     %6 = div r64 %4, %5;
 
     %7 = conv r64 %6 a e32;
+    %8 = conv e32 %7 a n32;
 
-    ret e32 %7;
+    %9 = sum n32 @txt, %8;
+
+    %10 = conv n32 %9 a e32;
+
+    ret e32 %10;
 }
