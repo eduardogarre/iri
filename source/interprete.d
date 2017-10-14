@@ -667,6 +667,10 @@ Nodo ejecuta_operación(Operación op)
             return op_rsrva(op);
             //break;
 
+        case "lee":
+            return op_lee(op);
+            //break;
+
         default:
             break;
     }
@@ -2419,7 +2423,6 @@ Literal op_rsrva(Operación op)
         return null;
     }
 
-    // slt <tipo>
     if(op.ramas.length == 1)
     {
         Tipo t = cast(Tipo)(op.ramas[0]);
@@ -2429,9 +2432,39 @@ Literal op_rsrva(Operación op)
         Literal l = new Literal();
         l.dato = to!dstring(cast(uint64_t)(ptr));
 
+        infoln("op: rsrva " ~ t.tipo ~ " [" ~ l.dato ~ "]");
+
         return l;
     }
 
     aborta("rsrva <tipo>");
+    return null;
+}
+
+Literal op_lee(Operación op)
+{
+    if(op.dato != "lee")
+    {
+        aborta("Esperaba que el código de la operación fuera 'lee'");
+        return null;
+    }
+
+    if(op.ramas.length == 3)
+    {
+        Tipo t1 = cast(Tipo)(op.ramas[0]);
+        Tipo t2 = cast(Tipo)(op.ramas[1]);
+        Literal lit = lee_argumento(op.ramas[2]);
+
+        Literal * l = cast(Literal *)(to!uint64_t(lit.dato));
+
+        semantico.imprime_árbol(*l);
+
+        infoln("op: lee " ~ t1.tipo ~ ", " ~ t2.tipo ~ "* " ~ lit.dato
+               ~ " [" ~ (*l).tipo ~ ":" ~ (*l).dato ~ "]");
+        
+        return *l;
+    }
+
+    aborta("lee <tipo>, <tipo> * ( <id>|<literal> )");
     return null;
 }
