@@ -650,6 +650,12 @@ private Operación operación()
                 return o;
             }
 
+            o = op_guarda();
+            if(o !is null)
+            {
+                return o;
+            }
+
             // Si llegamos hasta aquí, nos encontramos ante un lexema de
             // una operación que no hemos sabido identificar.
 
@@ -1428,6 +1434,106 @@ private Operación op_lee()
                 return null;
             }
                 
+            if(notación(";"))
+            {
+                cursor--;
+                return o;
+            }
+        }
+    }
+
+    cursor = c;
+    return null;
+}
+
+
+//OPERACIÓN -- guarda TIPO (DATO|IDENTIFICADOR), TIPO* (DATO|IDENTIFICADOR)
+private Operación op_guarda()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
+        {
+            Operación o = new Operación();
+
+            o.dato = símbolos[cursor].símbolo;
+            o.línea = símbolos[cursor].línea;
+
+            if(o.dato != "guarda")
+            {
+                return null;
+            }
+
+            cursor++;
+
+            if(auto t = tipo())
+            {
+                o.ramas ~= t;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Tipo1'");
+                return null;
+            }
+            
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo l = literal())
+            {
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
+                return null;
+            }
+
+            if(!notación(",")) // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba ','");
+                return null;
+            }
+
+            if(auto t = tipo())
+            {
+                o.ramas ~= t;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Tipo2'");
+                return null;
+            }
+
+            if(!notación("*")) // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba '*'");
+                return null;
+            }
+            
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo l = literal())
+            {
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
+                return null;
+            }
+            
             if(notación(";"))
             {
                 cursor--;

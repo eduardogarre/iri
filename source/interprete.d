@@ -671,6 +671,10 @@ Nodo ejecuta_operación(Operación op)
             return op_lee(op);
             //break;
 
+        case "guarda":
+            return op_guarda(op);
+            //break;
+
         default:
             break;
     }
@@ -2466,5 +2470,36 @@ Literal op_lee(Operación op)
     }
 
     aborta("lee <tipo>, <tipo> * ( <id>|<literal> )");
+    return null;
+}
+
+Literal op_guarda(Operación op)
+{
+    if(op.dato != "guarda")
+    {
+        aborta("Esperaba que el código de la operación fuera 'guarda'");
+        return null;
+    }
+
+    if(op.ramas.length == 4)
+    {
+        Tipo t1 = cast(Tipo)(op.ramas[0]);
+        Tipo t2 = cast(Tipo)(op.ramas[2]);
+        Literal lit0 = lee_argumento(op.ramas[1]);
+        Literal lit1 = lee_argumento(op.ramas[3]);
+
+        Literal * ptr = cast(Literal *)(to!uint64_t(lit1.dato));
+        (*ptr).dato = lit0.dato;
+        (*ptr).tipo = t1.tipo;
+
+        semantico.imprime_árbol(*ptr);
+
+        infoln("op: guarda " ~ t1.tipo ~ " " ~ lit0.dato ~ ", " ~ t2.tipo ~ "* "
+               ~ lit1.dato);
+        
+        return null;
+    }
+
+    aborta("lee <tipo> '(' <id>|<literal> ')', <tipo>* '(' <id>|<literal> ')'");
     return null;
 }
