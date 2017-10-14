@@ -638,6 +638,12 @@ private Operación operación()
                 return o;
             }
 
+            o = op_rsrva();
+            if(o !is null)
+            {
+                return o;
+            }
+
             // Si llegamos hasta aquí, nos encontramos ante un lexema de
             // una operación que no hemos sabido identificar.
 
@@ -1288,6 +1294,52 @@ private Operación op_llama()
             {
                 aborta("Debería haber llegado al final de la operación '"
                 ~ o.dato ~ "', sin embargo, no he encontrado un ';'");
+            }
+        }
+    }
+
+    cursor = c;
+    return null;
+}
+
+
+//OPERACIÓN -- rsrva TIPO
+private Operación op_rsrva()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
+        {
+            
+            Operación o = new Operación();
+
+            o.dato = símbolos[cursor].símbolo;
+            o.línea = símbolos[cursor].línea;
+
+            if(o.dato != "rsrva")
+            {
+                return null;
+            }
+
+            cursor++;
+
+            if(auto t = tipo())
+            {
+                o.ramas ~= t;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Tipo'");
+                return null;
+            }
+                
+            if(notación(";"))// ret;
+            {
+                cursor--;
+                return o;
             }
         }
     }

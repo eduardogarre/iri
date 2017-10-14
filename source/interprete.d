@@ -663,6 +663,10 @@ Nodo ejecuta_operación(Operación op)
             return op_phi(op);
             //break;
 
+        case "rsrva":
+            return op_rsrva(op);
+            //break;
+
         default:
             break;
     }
@@ -1376,6 +1380,7 @@ Literal op_llama(Operación op)
 
     LlamaFunción f = cast(LlamaFunción)op.ramas[0];
 
+    infoln();
     info("op: llama " ~ f.tipo ~ " " ~ f.nombre ~ "(");
 
     Literal[] args;
@@ -2204,9 +2209,9 @@ Literal op_conv(Operación op)
                      || (to!double(origen.dato) < to!double(valminent))
                     )
                     {
-                        writeln(origen.dato);
-                        writeln(valmaxent);
-                        writeln(valminent);
+                        charlatánln(origen.dato);
+                        charlatánln(to!dstring(valmaxent));
+                        charlatánln(to!dstring(valminent));
                         aborta("El 'real' se sale del rango del 'entero'");
                     }
                     else
@@ -2403,5 +2408,30 @@ Literal op_phi(Operación op)
     }
     
     aborta("Esperaba que 'phi' tuviera un número impar de argumentos, y al menos 3");
+    return null;
+}
+
+Literal op_rsrva(Operación op)
+{
+    if(op.dato != "rsrva")
+    {
+        aborta("Esperaba que el código de la operación fuera 'rsrva'");
+        return null;
+    }
+
+    // slt <tipo>
+    if(op.ramas.length == 1)
+    {
+        Tipo t = cast(Tipo)(op.ramas[0]);
+
+        Literal * ptr = tid.crea_ptr_local(t);
+        
+        Literal l = new Literal();
+        l.dato = to!dstring(cast(uint64_t)(ptr));
+
+        return l;
+    }
+
+    aborta("rsrva <tipo>");
     return null;
 }

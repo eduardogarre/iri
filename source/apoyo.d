@@ -2,6 +2,7 @@ module apoyo;
 
 import arbol;
 import core.stdc.stdlib; // exit();
+import std.conv;
 import std.file; // File(), exists(), f.eof(), f.close()
 import std.stdint; // uint64_t y demás tipos
 import std.stdio; // write(), writeln()
@@ -158,6 +159,29 @@ class TablaIdentificadores
         tabla[id] = eid;
 
         return true;
+    }
+
+    Literal* crea_ptr_local(Tipo t)
+    {
+        uint64_t idx = 0;
+
+        while((to!dstring(idx) in tabla) !is null)
+        {
+            idx++;
+        }
+
+        dstring id = to!dstring(idx);
+
+        EntradaTablaIdentificadores eid;
+
+        eid.valor = new Literal;
+        eid.valor.tipo = t.tipo;
+
+        tabla[id] = eid;
+
+        Literal* ptr = &(tabla[id].valor);
+
+        return ptr; // Literal*
     }
 
     bool define_identificador(dstring identificador, Nodo definición, Literal valor)

@@ -35,6 +35,8 @@ define e32 @inicio(r32 %pi)
 {
     %x = conv e32 @mi.prueba<hola>#adios.xyz#entero#real a e6;
 
+    %ptr = rsrva e32;
+
     %a = cmp ig e32 42, 41;
     slt n1 %a, :lol;
 
