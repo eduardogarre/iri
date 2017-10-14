@@ -616,6 +616,10 @@ private bool texto()
                 {
                     texto ~= '\n';
                 }
+                else if(mismocarácter(código[cursor],'r'))
+                {
+                    texto ~= '\r';
+                }
                 else if(mismocarácter(código[cursor],'\''))
                 {
                     texto ~= '\'';
@@ -676,6 +680,10 @@ private bool carácter()
             if(mismocarácter(código[cursor],'n'))
             {
                 car = to!dstring('\n');
+            }
+            else if(mismocarácter(código[cursor],'r'))
+            {
+                car = to!dstring('\r');
             }
             else if(mismocarácter(código[cursor],'\''))
             {

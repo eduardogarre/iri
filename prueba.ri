@@ -1,0 +1,13 @@
+//Código de ejemplo
+módulo código;
+
+define e32 @inicio(r32 %pi)
+{
+    llama nada @#poncar('h');
+    llama nada @#poncar('o');
+    llama nada @#poncar('l');
+    llama nada @#poncar('a');
+    llama nada @#poncar('\r');
+    llama nada @#poncar('\n');
+    ret;
+}

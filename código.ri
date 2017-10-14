@@ -40,6 +40,12 @@ define e32 @inicio(r32 %pi)
 
     %w = llama e32 @adiós(%pi, %a);
 
+    llama nada @#poncar('h');
+    llama nada @#poncar('o');
+    llama nada @#poncar('l');
+    llama nada @#poncar('a');
+    llama nada @#poncar('\n');
+
 lol:
 
     %y = conv e6 %x a e32;

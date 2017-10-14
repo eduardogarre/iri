@@ -44,6 +44,16 @@ Literal analiza(Nodo n)
     }
 }
 
+Nodo iri_poncar(Literal[] ls)
+{
+    for(int i = 0; i<ls.length; i++)
+    {
+        dchar c = cast(dchar)(ls[i].dato[0]);
+        write(c);
+    }
+    return null;
+}
+
 // el tipo del retorno coincide con la declaración de la función
 bool declFunc_retorno_correcto(dstring f, Nodo n)
 {
@@ -1355,6 +1365,17 @@ Literal op_llama(Operación op)
     }
 
     infoln(")");
+
+    if(f.nombre[1] == '#')
+    {
+        dstring nombre = f.nombre[2..$];
+        charlatánln(f.nombre ~ "() -> Llamas a función interna iri_" ~ nombre ~ "()");
+        
+        if(nombre == "poncar")
+        {
+            return cast(Literal)iri_poncar(args);
+        }
+    }
     
     Bloque bloque = prepara_función(f.nombre, args);
 
