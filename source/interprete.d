@@ -2,6 +2,7 @@ module interprete;
 
 import apoyo;
 import arbol;
+static import semantico;
 import std.conv;
 import std.math;
 import std.stdint;
@@ -23,13 +24,13 @@ Literal analiza(Nodo n)
     args[0].tipo = "r32";
     args[0].dato = "3.14159";
     
-    Bloque bloque = prepara_función("inicio", args);
+    Bloque bloque = prepara_función("@inicio", args);
 
     obtén_etiquetas(bloque);
 
     Nodo retorno = interpreta(bloque);
 
-    if(!declFunc_retorno_correcto("inicio", retorno))
+    if(!declFunc_retorno_correcto("@inicio", retorno))
     {
         aborta("El tipo de retorno no coincide con la declaración de inicio()");
     }
@@ -400,10 +401,32 @@ Nodo interpreta(Bloque bloque)
     // Hay que eliminar la tabla de identificadores actual
     TablaIdentificadores tid_padre = tid.padre;
     tid_padre.hijo = null;
+
+    vuelca_tid(tid);
+
     tid = null;
     tid = tid_padre;
 
     return resultado;
+}
+
+void vuelca_tid(TablaIdentificadores tid)
+{
+    charlatánln("Vuelco la tabla de identificadores actual");
+    auto diccionario = tid.dame_tabla();
+
+    foreach(entrada; diccionario)
+    {
+        charlatánln(entrada.nombre);
+
+        charlatánln(":DEFINICIÓN");
+        semantico.imprime_árbol(entrada.definición);
+
+        charlatánln(":VALOR");
+        semantico.imprime_árbol(entrada.valor);
+
+        charlatánln();
+    }
 }
 
 Nodo interpreta_nodo(Nodo n)
@@ -1369,6 +1392,7 @@ Literal op_llama(Operación op)
     if(f.nombre[1] == '#')
     {
         dstring nombre = f.nombre[2..$];
+        charlatánln();
         charlatánln(f.nombre ~ "() -> Llamas a función interna iri_" ~ nombre ~ "()");
         
         if(nombre == "poncar")
