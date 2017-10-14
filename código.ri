@@ -6,6 +6,8 @@ También usado para pruebas.
 Por ahora, la dirección de este archivo está grabada directamente en el código.
 */
 
+@txt = privado n32 'h';
+
 declara e32 @sal(e32 %hola, r18 %lol);
 
 @hola = público r64 3.141592;
@@ -38,6 +40,12 @@ define e32 @inicio(r32 %pi)
 
     %w = llama e32 @adiós(%pi, %a);
 
+    llama nada @#poncar('h');
+    llama nada @#poncar('o');
+    llama nada @#poncar('l');
+    llama nada @#poncar('a');
+    llama nada @#poncar('\n');
+
 lol:
 
     %y = conv e6 %x a e32;
@@ -50,6 +58,11 @@ lol:
     %6 = div r64 %4, %5;
 
     %7 = conv r64 %6 a e32;
+    %8 = conv e32 %7 a n32;
 
-    ret e32 %7;
+    %9 = sum n32 @txt, %8;
+
+    %10 = conv n32 %9 a e32;
+
+    ret e32 %10;
 }

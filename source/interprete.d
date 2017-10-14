@@ -2,6 +2,7 @@ module interprete;
 
 import apoyo;
 import arbol;
+static import semantico;
 import std.conv;
 import std.math;
 import std.stdint;
@@ -13,6 +14,7 @@ TablaIdentificadores tid;
 Literal analiza(Nodo n)
 {
     charlatánln("Fase de Interpretación.");
+    
     obtén_identificadores_globales(n);
 
 	charlatánln();
@@ -22,13 +24,13 @@ Literal analiza(Nodo n)
     args[0].tipo = "r32";
     args[0].dato = "3.14159";
     
-    Bloque bloque = prepara_función("inicio", args);
+    Bloque bloque = prepara_función("@inicio", args);
 
     obtén_etiquetas(bloque);
 
     Nodo retorno = interpreta(bloque);
 
-    if(!declFunc_retorno_correcto("inicio", retorno))
+    if(!declFunc_retorno_correcto("@inicio", retorno))
     {
         aborta("El tipo de retorno no coincide con la declaración de inicio()");
     }
@@ -41,6 +43,16 @@ Literal analiza(Nodo n)
     {
         return cast(Literal)retorno;
     }
+}
+
+Nodo iri_poncar(Literal[] ls)
+{
+    for(int i = 0; i<ls.length; i++)
+    {
+        dchar c = cast(dchar)(ls[i].dato[0]);
+        write(c);
+    }
+    return null;
 }
 
 // el tipo del retorno coincide con la declaración de la función
@@ -149,9 +161,22 @@ void obtén_identificadores_globales(Nodo n)
 
                 Literal lit = cast(Literal)(did.ramas[0]);
 
-                if(tid.define_identificador(did.nombre, did, lit))
+                if((lit.tipo == "carácter") && (lit.dato.length == 1))
                 {
-                    charlatánln("define " ~ tid.lee_id(did.nombre).nombre);
+                    uint32_t dato = unsigned(lit.dato[0]);
+                    lit.dato = to!dstring(dato);
+                    
+                    if(tid.define_identificador(did.nombre, did, lit))
+                    {
+                        charlatánln("define " ~ tid.lee_id(did.nombre).nombre);
+                    }
+                }
+                else
+                {
+                    if(tid.define_identificador(did.nombre, did, lit))
+                    {
+                        charlatánln("define " ~ tid.lee_id(did.nombre).nombre);
+                    }
                 }
 
                 break;
@@ -376,10 +401,32 @@ Nodo interpreta(Bloque bloque)
     // Hay que eliminar la tabla de identificadores actual
     TablaIdentificadores tid_padre = tid.padre;
     tid_padre.hijo = null;
+
+    vuelca_tid(tid);
+
     tid = null;
     tid = tid_padre;
 
     return resultado;
+}
+
+void vuelca_tid(TablaIdentificadores tid)
+{
+    charlatánln("Vuelco la tabla de identificadores actual");
+    auto diccionario = tid.dame_tabla();
+
+    foreach(entrada; diccionario)
+    {
+        charlatánln(entrada.nombre);
+
+        charlatánln(":DEFINICIÓN");
+        semantico.imprime_árbol(entrada.definición);
+
+        charlatánln(":VALOR");
+        semantico.imprime_árbol(entrada.valor);
+
+        charlatánln();
+    }
 }
 
 Nodo interpreta_nodo(Nodo n)
@@ -1341,6 +1388,18 @@ Literal op_llama(Operación op)
     }
 
     infoln(")");
+
+    if(f.nombre[1] == '#')
+    {
+        dstring nombre = f.nombre[2..$];
+        charlatánln();
+        charlatánln(f.nombre ~ "() -> Llamas a función interna iri_" ~ nombre ~ "()");
+        
+        if(nombre == "poncar")
+        {
+            return cast(Literal)iri_poncar(args);
+        }
+    }
     
     Bloque bloque = prepara_función(f.nombre, args);
 

@@ -69,6 +69,12 @@ public lexema[] analiza(dstring cód)
         }
         cursor = c;
 
+        if(carácter())
+        {
+            continue;
+        }
+        cursor = c;
+
         if(texto())
         {
             continue;
@@ -610,6 +616,10 @@ private bool texto()
                 {
                     texto ~= '\n';
                 }
+                else if(mismocarácter(código[cursor],'r'))
+                {
+                    texto ~= '\r';
+                }
                 else if(mismocarácter(código[cursor],'\''))
                 {
                     texto ~= '\'';
@@ -639,6 +649,74 @@ private bool texto()
         {
             cursor = c;
             esperaba("un cierre de comilla doble [\"] en la linea " ~ to!dstring(línea));
+        }
+
+        cursor++;
+
+        análisis ~= l;
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+private bool carácter()
+{
+    if(mismocarácter(código[cursor],'\''))
+    {
+        cursor++;
+        uint c = cursor;
+
+        dstring car;
+
+        lexema l;
+
+        if(mismocarácter(código[cursor],'\\'))
+        {
+            cursor++;
+            if(mismocarácter(código[cursor],'n'))
+            {
+                car = to!dstring('\n');
+            }
+            else if(mismocarácter(código[cursor],'r'))
+            {
+                car = to!dstring('\r');
+            }
+            else if(mismocarácter(código[cursor],'\''))
+            {
+                car = to!dstring('\'');
+            }
+            else if(mismocarácter(código[cursor],'\"'))
+            {
+                car = to!dstring('\"');
+            }
+            else if(mismocarácter(código[cursor],'\\'))
+            {
+                car = to!dstring('\\');
+            }
+            else
+            {
+                aborta("No reconozco la secuencia de escape");
+            }
+        }
+        else
+        {
+            car = to!dstring(código[cursor]);
+        }
+        
+        cursor++;
+
+        l.categoría = lexema_e.CARÁCTER;
+        l.símbolo   = car;
+        l.línea     = línea;
+
+        if(!mismocarácter(código[cursor],'\''))
+        {
+            cursor = c;
+            esperaba("un cierre de comilla simple [\'] en la linea " ~ to!dstring(línea));
         }
 
         cursor++;

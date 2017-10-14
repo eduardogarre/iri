@@ -27,6 +27,7 @@ enum lexema_e
     OPERACIÓN,
     IDENTIFICADOR,
     NÚMERO,
+    CARÁCTER,
     TEXTO,
     REGISTRO,
     NOTACIÓN,
@@ -89,6 +90,11 @@ class TablaIdentificadores
 
     EntradaTablaIdentificadores[dstring] tabla;
 
+    EntradaTablaIdentificadores[dstring] dame_tabla()
+    {
+        return this.tabla;
+    }
+
     EntradaTablaIdentificadores lee_id(dstring identificador)
     {
 
@@ -96,7 +102,7 @@ class TablaIdentificadores
 
         if((identificador[0] == '@') || (identificador[0] == '%'))
         {
-            id = identificador[1..$];
+            id = identificador; // identificador[1..$];
         }
 
         auto tmp = id in tabla;
@@ -133,7 +139,7 @@ class TablaIdentificadores
 
         if((identificador[0] == '@') || (identificador[0] == '%'))
         {
-            id = identificador[1..$];
+            id = identificador; // identificador[1..$];
         }
 
         if(id in tabla)
@@ -166,7 +172,7 @@ class TablaIdentificadores
 
         if((identificador[0] == '@') || (identificador[0] == '%'))
         {
-            id = identificador[1..$];
+            id = identificador; // identificador[1..$];
         }
 
         EntradaTablaIdentificadores eid;
