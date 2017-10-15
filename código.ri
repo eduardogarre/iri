@@ -3,8 +3,9 @@ módulo código;
 
 /*
 También usado para pruebas.
-Por ahora, la dirección de este archivo está grabada directamente en el código.
 */
+
+@lista = [4 x e32] [42, 288, 0, -50];
 
 @txt = privado n32 'h';
 
@@ -68,5 +69,5 @@ lol:
 
     %10 = conv n32 %9 a e32;
 
-    ret [4 x e32] [42, 18, 0, 288];
+    ret e32 %10;
 }

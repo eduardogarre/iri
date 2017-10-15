@@ -93,6 +93,21 @@ class Literal : Nodo
         super();
         this.categoría = Categoría.LITERAL;
     }
+
+    Literal dup()
+    {
+        Literal l = new Literal();
+        
+        l.dato = this.dato;
+        l.tipo = this.tipo;
+        l.lista = this.lista;
+        l.estructura = this.estructura;
+        l.ramas = this.ramas.dup();
+        l.línea = this.línea;
+        l.etiqueta = this.etiqueta;
+
+        return l;
+    }
 }
 
 class Identificador : Nodo

@@ -1,9 +1,11 @@
 module sintaxis;
 
-import std.stdio;
-
 import apoyo;
 import arbol;
+import std.conv;
+import std.stdint;
+import std.stdio;
+
 
 private uint cursor = 0;
 private lexema[] símbolos;
@@ -651,6 +653,18 @@ private Operación operación()
             }
 
             o = op_guarda();
+            if(o !is null)
+            {
+                return o;
+            }
+
+            o = op_leeval();
+            if(o !is null)
+            {
+                return o;
+            }
+
+            o = op_ponval();
             if(o !is null)
             {
                 return o;
@@ -1547,6 +1561,214 @@ private Operación op_guarda()
 }
 
 
+//OPERACIÓN -- %x = leeval <tipo_lista> <literal_lista>, <índice>
+private Operación op_leeval()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
+        {
+            Operación o = new Operación();
+
+            o.dato = símbolos[cursor].símbolo;
+            o.línea = símbolos[cursor].línea;
+
+            if(o.dato != "leeval")
+            {
+                return null;
+            }
+
+            cursor++;
+
+            Tipo t = tipo();
+            if((t !is null) && (t.lista))
+            {
+                o.ramas ~= t;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Tipo' conteniendo 'Lista'");
+                return null;
+            }
+            
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo l = literal())
+            {
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
+                return null;
+            }
+
+            if(!notación(",")) // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba ','");
+                return null;
+            }
+            
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo l = literal())
+            {
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Indice'");
+                return null;
+            }
+            
+            if(notación(";"))
+            {
+                cursor--;
+                return o;
+            }
+        }
+    }
+
+    cursor = c;
+    return null;
+}
+
+
+//OPERACIÓN -- %x = ponval <tipo_lista> <literal_lista>, <tipo> <literal>, <índice>
+private Operación op_ponval()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        if(símbolos[cursor].categoría == lexema_e.OPERACIÓN)
+        {
+            Operación o = new Operación();
+
+            o.dato = símbolos[cursor].símbolo;
+            o.línea = símbolos[cursor].línea;
+
+            if(o.dato != "ponval")
+            {
+                return null;
+            }
+
+            cursor++;
+
+            
+            if(Tipo t = tipo())
+            {
+                if(t.lista)
+                {
+                    o.ramas ~= t;
+                }
+                else
+                {
+                    aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                    ~ "correcta. Esperaba 'Tipo' conteniendo 'Lista'");
+                    return null;
+                }
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Tipo' conteniendo 'Lista'");
+                return null;
+            }
+            
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo l = literal())
+            {
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
+                return null;
+            }
+
+            if(!notación(",")) // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba ','");
+                return null;
+            }
+
+            if(Tipo t = tipo())
+            {
+                o.ramas ~= t;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Tipo'");
+                return null;
+            }
+            
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo l = literal())
+            {
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
+                return null;
+            }
+
+            if(!notación(",")) // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba ','");
+                return null;
+            }
+            
+            if(Identificador i = identificador())
+            {
+                o.ramas ~= i;
+            }
+            else if(Nodo l = literal())
+            {
+                o.ramas ~= l;
+            }
+            else // Error.
+            {
+                aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
+                ~ "correcta. Esperaba 'Indice'");
+                return null;
+            }
+            
+            if(notación(";"))
+            {
+                cursor--;
+                return o;
+            }
+        }
+    }
+
+    cursor = c;
+    return null;
+}
+
+
 //LLAMA_FUNCIÓN -- TIPO IDENTIFICADOR '(' [ (LITERAL | IDENTIFICADOR) [, (LITERAL | IDENTIFICADOR) ]* ] ')'
 private LlamaFunción llama_función()
 {
@@ -1686,8 +1908,14 @@ private Literal literal()
     }
     else if(Nodo n = carácter())
     {
-        l.dato = n.dato;
-        l.tipo = "carácter";
+        uint32_t dato = unsigned(n.dato[0]);
+        if(n.dato == "\0")
+        {
+            dato = 0;
+        }
+
+        l.dato = to!dstring(dato);
+        l.tipo = "";
         l.línea = n.línea;
 
         return l;
@@ -1781,8 +2009,15 @@ private Literal lista()
         {
             l.ramas ~= i;
         }
-        else if(Nodo lit = literal())
+        else if(Literal lit = literal())
         {
+            if((lit.tipo == "carácter") && (lit.dato.length == 1))
+            {
+                uint32_t dato = unsigned(lit.dato[0]);
+                lit.dato = to!dstring(dato);
+            }
+            lit.tipo = "";
+            
             l.ramas ~= lit;
         }
         else // Error.
@@ -1802,8 +2037,15 @@ private Literal lista()
             {
                 l.ramas ~= i;
             }
-            else if(Nodo lit = literal())
+            else if(Literal lit = literal())
             {
+                if((lit.tipo == "carácter") && (lit.dato.length == 1))
+                {
+                    uint32_t dato = unsigned(lit.dato[0]);
+                    lit.dato = to!dstring(dato);
+                }
+                lit.tipo = "";
+            
                 l.ramas ~= lit;
             }
             else // Error.

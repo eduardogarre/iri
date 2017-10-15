@@ -632,6 +632,10 @@ private bool texto()
                 {
                     texto ~= '\\';
                 }
+                else if(mismocarácter(código[cursor],'0'))
+                {
+                    texto ~= '\0';
+                }
             }
             else
             {
@@ -696,6 +700,10 @@ private bool carácter()
             else if(mismocarácter(código[cursor],'\\'))
             {
                 car = to!dstring('\\');
+            }
+            else if(mismocarácter(código[cursor],'0'))
+            {
+                car = to!dstring('\0');
             }
             else
             {
@@ -921,6 +929,8 @@ private bool operación()
          | (s == "ret")
          | (s == "conv")
          | (s == "phi")
+         | (s == "leeval")
+         | (s == "ponval")
          )
         {
             resultado = true;

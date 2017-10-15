@@ -30,6 +30,8 @@ Literal analiza(Nodo n)
 
     Nodo retorno = interpreta(bloque);
 
+    semantico.imprime_árbol(retorno);
+
     if(!declFunc_retorno_correcto("@inicio", retorno))
     {
         aborta("El tipo de retorno no coincide con la declaración de inicio()");
@@ -45,11 +47,12 @@ Literal analiza(Nodo n)
     }
 }
 
-Nodo iri_poncar(Literal[] ls)
+Literal iri_poncar(Literal[] ls)
 {
     for(int i = 0; i<ls.length; i++)
     {
-        dchar c = cast(dchar)(ls[i].dato[0]);
+        uint32_t valor = to!uint32_t(ls[i].dato);
+        dchar c = cast(dchar)(valor);
         write(c);
     }
     return null;
@@ -375,7 +378,8 @@ Nodo interpreta(Bloque bloque)
     //recorre las ramas del bloque de @inicio()
     for(int i = 0; i<bloque.ramas.length; i++)
     {
-
+        infoln("Contador op: " ~ to!dstring(i));
+        infoln();
         // Buscar nueva etiqueta, para guardarla como 'última etiqueta'
         if(bloque.ramas[i].etiqueta.length > 0)
         {
@@ -675,6 +679,14 @@ Nodo ejecuta_operación(Operación op)
             return op_guarda(op);
             //break;
 
+        case "leeval":
+            return op_leeval(op);
+            //break;
+
+        case "ponval":
+            return op_ponval(op);
+            //break;
+
         default:
             break;
     }
@@ -704,7 +716,8 @@ Literal op_ret(Operación op)
         // ret <tipo> (<literal>|<id>);
         Tipo t = cast(Tipo)(op.ramas[0]);
         Literal lit = lee_argumento(op.ramas[1]);
-        infoln("op: ret " ~ t.tipo ~ " " ~ lit.dato ~ " [" ~ lit.dato ~ "]");
+        lit.tipo = t.tipo;
+        infoln("op: ret " ~ lit.tipo ~ " " ~ lit.dato ~ " [" ~ lit.dato ~ "]");
         return lit;
     }
     else if(op.ramas.length == 0)
@@ -1393,11 +1406,33 @@ Literal op_llama(Operación op)
 
     Literal[] args;
     
+    int i = 0;
     foreach(Nodo n; f.ramas)
     {
+        if(i>0)
+        {
+            info(", ");
+        }
         Literal l = lee_argumento(n);
         args ~= l;
-        info(l.tipo ~ " " ~ l.dato ~ " ");
+        
+        dstring dato = l.dato;
+        if(dato == "\n")
+        {
+            dato = "\\n";
+        }
+        else if(dato == "\r")
+        {
+            dato = "\\r";
+        }
+        else if(dato == "\t")
+        {
+            dato = "\\t";
+        }
+
+        info(l.tipo ~ ":" ~ dato);
+
+        i++;
     }
 
     infoln(")");
@@ -1410,7 +1445,7 @@ Literal op_llama(Operación op)
         
         if(nombre == "poncar")
         {
-            return cast(Literal)iri_poncar(args);
+            return iri_poncar(args);
         }
     }
     
@@ -1484,6 +1519,9 @@ Literal op_cmp(Operación op)
     {
         aborta("Los argumentos son incorrectos");
     }
+    
+    semantico.imprime_árbol(lit0);
+    semantico.imprime_árbol(lit1);
 
     switch(t.tipo[0])
     {
@@ -1515,30 +1553,30 @@ Literal op_cmp(Operación op)
                 // igual que...
                 resultado = var0 == var1;
             }
-            else if(comparación == "dif")
+            else if(comparación == "dsig")
             {
                 // diferente a...
-                resultado = var0 != var1;
+                resultado = (var0 != var1);
             }
             else if(comparación ==  "ma")
             {
                 // mayor que...
-                resultado = var0 > var1;
+                resultado = (var0 > var1);
             }
             else if(comparación ==  "me")
             {
                 // menor que...
-                resultado = var0 < var1;
+                resultado = (var0 < var1);
             }
             else if(comparación ==  "mai")
             {
                 // mayor o igual que...
-                resultado = var0 >= var1;
+                resultado = (var0 >= var1);
             }
             else if(comparación ==  "mei")
             {
                 // menor o igual que...
-                resultado = var0 <= var1;
+                resultado = (var0 <= var1);
             }
 
             auto l = new Literal();
@@ -1586,7 +1624,7 @@ Literal op_cmp(Operación op)
                 // igual que...
                 resultado = var0 == var1;
             }
-            else if(comparación == "dif")
+            else if(comparación == "dsig")
             {
                 // diferente a...
                 resultado = var0 != var1;
@@ -1657,7 +1695,7 @@ Literal op_cmp(Operación op)
                 // igual que...
                 resultado = var0 == var1;
             }
-            else if(comparación == "dif")
+            else if(comparación == "dsig")
             {
                 // diferente a...
                 resultado = var0 != var1;
@@ -1698,8 +1736,9 @@ Literal op_cmp(Operación op)
 
             infoln(txt);
             break;
-
+        
         default:
+            aborta("op:cmp no reconozco ningún tipo");
             break;
     }
 
@@ -2315,12 +2354,10 @@ Etiqueta op_slt(Operación op)
             aborta("Tipo incorrecto. Esperaba 'n1'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
             return null;
         }
-        else
-        {
-            condición = (t.tipo == "1");
-        }
         
         Literal lit = lee_argumento(op.ramas[1]);
+
+        condición = (lit.dato == "1");
         
         if(condición)
         {
@@ -2501,5 +2538,82 @@ Literal op_guarda(Operación op)
     }
 
     aborta("lee <tipo> '(' <id>|<literal> ')', <tipo>* '(' <id>|<literal> ')'");
+    return null;
+}
+
+Literal op_leeval(Operación op)
+{
+    if(op.dato != "leeval")
+    {
+        aborta("Esperaba que el código de la operación fuera 'leeval'");
+        return null;
+    }
+
+    if(op.ramas.length == 3)
+    {
+        Tipo t = cast(Tipo)(op.ramas[0]);
+        Literal lit0 = lee_argumento(op.ramas[1]);
+        Literal lit1 = lee_argumento(op.ramas[2]);
+
+        if(!t.lista || !lit0.lista)
+        {
+            aborta("'leeval' trabaja con Listas");
+            return null;
+        }
+
+        uint índice = to!uint(lit1.dato);
+
+        Literal res = cast(Literal)(lit0.ramas[índice]);
+
+        Literal resultado = res.dup();
+
+        infoln("op: leeval [" ~ to!dstring(t.elementos) ~ " x " ~ t.tipo
+               ~ "] [lista] [" ~ resultado.tipo ~ ":" ~ resultado.dato ~ "]");
+        
+        return resultado;
+    }
+
+    aborta("leeval <tipo_lista> <literal>, <índice>");
+    return null;
+}
+
+Literal op_ponval(Operación op)
+{
+    if(op.dato != "ponval")
+    {
+        aborta("Esperaba que el código de la operación fuera 'ponval'");
+        return null;
+    }
+
+    if(op.ramas.length == 5)
+    {
+        Tipo t1 = cast(Tipo)(op.ramas[0]);
+        Tipo t2 = cast(Tipo)(op.ramas[2]);
+        Literal lit1 = lee_argumento(op.ramas[1]);
+        Literal lit2 = lee_argumento(op.ramas[3]);
+        Literal lit3 = lee_argumento(op.ramas[4]);
+
+        if(!t1.lista || !lit1.lista)
+        {
+            aborta("'ponval' trabaja con Listas");
+            return null;
+        }
+
+        uint índice = to!uint(lit3.dato);
+
+        Literal res = cast(Literal)(lit1.ramas[índice]);
+
+        Literal resultado = lit1.dup();
+
+        resultado.ramas[índice] = lit2.dup();
+
+        infoln("op: ponval [" ~ to!dstring(t1.elementos) ~ " x " ~ t1.tipo
+               ~ "] [lista] [" ~ lit2.tipo ~ ":" ~ lit2.dato ~ "] [" 
+               ~ lit3.dato ~ "] => [lista]");
+        
+        return resultado;
+    }
+
+    aborta("ponval <tipo_lista> <literal_lista>, <tipo> <literal>, <índice>");
     return null;
 }

@@ -206,12 +206,22 @@ class TablaIdentificadores
             // El identificador ya está en uso.
             if(tabla[id].definido)
             {
-                aborta("Ya habías definido el identificador '" ~ id ~ "'");
-
-                return false;
+                if(id[0] == '%')
+                {
+                    dstring n = (id[1..$]);
+                    foreach(c; n)
+                    {
+                        if(!esdígito(c))
+                        {
+                            aborta("Ya habías definido el identificador '" ~ id ~ "'");
+                        }
+                    }
+                }
+                else
+                {
+                    aborta("Ya habías definido el identificador '" ~ id ~ "'");
+                }
             }
-
-            eid = tabla[id];
         }
 
         eid.nombre = id;
