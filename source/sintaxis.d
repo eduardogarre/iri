@@ -1692,6 +1692,10 @@ private Literal literal()
 
         return l;
     }
+    else if(Literal lit = lista())
+    {
+        return lit;
+    }
         
     cursor = c;
     return null;
@@ -1757,6 +1761,72 @@ private Nodo carácter()
 }
 
 
+//LISTA -- Literal de una lista
+private Literal lista()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        Literal l = new Literal();
+        l.lista = true;
+
+        if(!notación("["))
+        {
+            cursor = c;
+            return null;
+        }
+    
+        if(Identificador i = identificador())
+        {
+            l.ramas ~= i;
+        }
+        else if(Nodo lit = literal())
+        {
+            l.ramas ~= lit;
+        }
+        else // Error.
+        {
+            aborta("Literal de Lista: Esperaba 'Identificador' o 'Literal'");
+            return null;
+        }
+
+        while(true)
+        {
+            if(!notación(","))
+            {
+                break;
+            }
+
+            if(Identificador i = identificador())
+            {
+                l.ramas ~= i;
+            }
+            else if(Nodo lit = literal())
+            {
+                l.ramas ~= lit;
+            }
+            else // Error.
+            {
+                aborta("Literal de Lista: Esperaba 'Identificador' o 'Literal'");
+                return null;
+            }
+        }
+
+        if(!notación("]"))
+        {
+            aborta("Literal de Lista: Esperaba ']'");
+            return null;
+        }
+
+        return l;
+    }
+
+    cursor = c;
+    return null;
+}
+
+
 //TIPO -- lexema_e.TIPO, dstring nada|n|e|r+Nº, uint64_t línea
 private Tipo tipo()
 {
@@ -1772,6 +1842,50 @@ private Tipo tipo()
             t.línea = símbolos[cursor].línea;
             
             cursor++;
+            return t;
+        }
+        else if(notación("[")) // lista
+        {
+            Tipo t = new Tipo();
+            t.lista = true;
+
+            if(auto elementos = número())
+            {
+                t.elementos = elementos.dato;
+                t.línea = elementos.línea;
+            }
+            else
+            {
+                aborta("Esperaba Número: [N x Tipo]");
+                cursor = c;
+                return null;
+            }
+
+            if(reservada("x") is null)
+            {
+                aborta("Esperaba 'x': [N x Tipo]");
+                cursor = c;
+                return null;
+            }
+            
+            if(Tipo ti = tipo())
+            {
+                t.tipo = ti.tipo;
+            }
+            else
+            {
+                aborta("Esperaba Tipo: [N x Tipo]");
+                cursor = c;
+                return null;
+            }
+
+            if(!notación("]"))
+            {
+                aborta("Esperaba ']': [N x Tipo]");
+                cursor = c;
+                return null;
+            }
+
             return t;
         }
     }

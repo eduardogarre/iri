@@ -10,7 +10,6 @@ enum Categoría
     TIPO,
     NÚMERO,
     CARÁCTER,
-    TEXTO,
     LITERAL,
     IDENTIFICADOR,
 
@@ -71,7 +70,10 @@ class Reservada : Nodo
 
 class Tipo : Nodo
 {
+    bool lista;
+    bool estructura;
     dstring tipo;
+    dstring elementos;
 
     this()
     {
@@ -83,6 +85,8 @@ class Tipo : Nodo
 class Literal : Nodo
 {
     dstring tipo;
+    bool lista;
+    bool estructura;
 
     this()
     {

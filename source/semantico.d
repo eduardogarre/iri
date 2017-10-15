@@ -65,12 +65,24 @@ void imprime_árbol(Nodo n)
                 break;
 
             case Categoría.TIPO:
-                auto l = cast(Tipo)n;
-                charlatán(to!dstring(l.categoría));
-                charlatán(" [tipo:");
-                charlatán(l.tipo);
-                charlatán("] [línea:");
-                charlatán(to!dstring(l.línea));
+                auto t = cast(Tipo)n;
+                charlatán(to!dstring(t.categoría));
+                if(t.lista)
+                {
+                    charlatán(" [" ~ to!dstring(t.elementos) ~ " x " ~ t.tipo);
+                    charlatán("]");
+                }
+                else if(t.estructura)
+                {
+                    charlatán(" {}");
+                }
+                else
+                {
+                    charlatán(" [tipo:" ~ t.tipo);
+                    charlatán("]");
+                }
+                charlatán(" [línea:");
+                charlatán(to!dstring(t.línea));
                 charlatánln("]");
                 break;
 
@@ -87,11 +99,18 @@ void imprime_árbol(Nodo n)
             case Categoría.LITERAL:
                 auto l = cast(Literal)n;
                 charlatán(to!dstring(l.categoría));
-                charlatán(" [tipo:");
-                charlatán(l.tipo);
-                charlatán("] [dato:");
-                charlatán(l.dato);
-                charlatán("] [línea:");
+                if(l.lista)
+                {
+                    charlatán(" [lista]");
+                }
+                else
+                {
+                    charlatán(" [tipo:");
+                    charlatán(l.tipo);
+                    charlatán("] [dato:");
+                    charlatán(l.dato ~ "]");
+                }
+                charlatán(" [línea:");
                 charlatán(to!dstring(l.línea));
                 charlatánln("]");
                 break;
