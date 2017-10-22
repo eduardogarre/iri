@@ -24,7 +24,7 @@ Nodo analiza(Nodo n)
 
 	charlatánln();
 
-    paso1_obtén_identificadores_globales(n);
+    paso_obtén_identificadores_globales(n);
 
     charlatánln();
 
@@ -272,7 +272,7 @@ void imprime_árbol(Nodo n)
     profundidad_árbol_gramatical--;
 }
 
-void paso1_obtén_identificadores_globales(Nodo n)
+void paso_obtén_identificadores_globales(Nodo n)
 {
     if(n)
     {
@@ -381,7 +381,7 @@ void paso1_obtén_identificadores_globales(Nodo n)
         int i;
         for(i = 0; i < n.ramas.length; i++)
         {
-            paso1_obtén_identificadores_globales(n.ramas[i]);
+            paso_obtén_identificadores_globales(n.ramas[i]);
         }
     }
 }

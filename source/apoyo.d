@@ -211,15 +211,12 @@ class TablaIdentificadores
                     dstring n = (id[1..$]);
                     foreach(c; n)
                     {
-                        if(!esdígito(c))
-                        {
-                            aborta("Ya habías definido el identificador '" ~ id ~ "'");
-                        }
+                        aviso("Ya habías definido el identificador '" ~ id ~ "'");
                     }
                 }
                 else
                 {
-                    aborta("Ya habías definido el identificador '" ~ id ~ "'");
+                    aviso("Ya habías definido el identificador '" ~ id ~ "'");
                 }
             }
         }
@@ -296,6 +293,14 @@ void charlatán(dstring txt)
 void error(dstring s)
 {
     stdout.writeln("ERROR: "d, s, ".");
+}
+
+void aviso(dstring s)
+{
+    if(INFO)
+    {
+        stdout.writeln("AVISO: "d, s, ".");
+    }
 }
 
 void aborta(dstring s)

@@ -26,8 +26,6 @@ Literal analiza(Nodo n)
     
     Bloque bloque = prepara_función("@inicio", args);
 
-    obtén_etiquetas(bloque);
-
     Nodo retorno = interpreta(bloque);
 
     semantico.imprime_árbol(retorno);
@@ -297,6 +295,8 @@ Bloque prepara_función(dstring fid, Literal[] args)
     {
         aborta("No puedo ejecutar el bloque");
     }
+
+    obtén_etiquetas(bloque);
 
     return bloque;
 }

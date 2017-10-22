@@ -3,17 +3,32 @@ módulo código;
 
 @hola = [6 x e32] ['h', 'o', 'l', 'a', ',', ' ', 'm', 'u', 'n', 'd', 'o', '.', '\n', '\0'];
 
-define e32 @inicio(r32 %pi)
+define e32 @escribe([1 x e32] %txt)
 {
-    %2 = sum e32 0, 0;
-    %hola = ponval [6 x e32] @hola, e32 'H', 0;
+    // preparo el contador
+    %0 = sum e32 0, 0;
 
 bucle:
-    %0 = leeval [6 x e32] %hola, %2;
-    %2 = sum e32 %2, 1;
-    llama nada @#poncar(%0);
-    %1 = cmp dsig e32 %0, '\0';
-    slt n1 %1, :bucle;
+    // obtengo el carácter de %txt, en la posición designada por %0
+    %1 = leeval [6 x e32] %txt, %0;
 
+    // incremento el contador
+    %0 = sum e32 %0, 1;
+
+    // escribo el carácter
+    llama nada @#poncar(%1);
+
+    // compruebo si el carácter es igual a '\0'
+    %2 = cmp dsig e32 %1, '\0';
+
+    // si la comprobación es cierta, salto a la etiqueta :bucle.
+    slt n1 %2, :bucle;
+
+    ret e32 0;
+}
+
+define e32 @inicio(r32 %pi)
+{
+    llama e32 @escribe(@hola);
     ret e32 0;
 }
