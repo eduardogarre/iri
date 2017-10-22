@@ -466,6 +466,11 @@ private DefineIdentificadorGlobal define_identificador_global()
     {
         t.tipo = ti.tipo;
     }
+    else if(auto l = texto())
+    {
+        i.ramas ~= l;
+        return i;
+    }
     else
     {
         cursor = c;
@@ -1982,6 +1987,45 @@ private Nodo carácter()
             cursor++;
             return n;
         }
+    }
+
+    cursor = c;
+    return null;
+}
+
+
+//TEXTO -- "..."
+private Literal texto()
+{
+    int c = cursor;
+    
+    if(símbolos[cursor].categoría == lexema_e.TEXTO)
+    {
+        Literal l = new Literal();
+        l.lista = true;
+
+        foreach(car; símbolos[cursor].símbolo)
+        {
+            Literal lit = new Literal();
+
+            uint32_t dato = unsigned(car);
+            lit.dato = to!dstring(dato);
+
+            l.ramas ~= lit;
+        }
+
+        // añado el fin de cadena '\0'
+        
+        Literal lit = new Literal();
+
+        uint32_t dato = unsigned('\0');
+        lit.dato = to!dstring(dato);
+
+        l.ramas ~= lit;
+
+        cursor++;
+
+        return l;
     }
 
     cursor = c;
