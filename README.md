@@ -89,63 +89,81 @@ define <tipo_ret> @función(<tipo1> <arg1>, <tipo2> <arg2>...)
 ```
 
 ## Referencia de las instrucciones
-#### ret
- - `ret [<tipo> <valor>];`
+### ret
+`ret [<tipo> <valor>];`
+
 La instrucción `ret` devuelve el control de la ejecución, desde la función actual, a la función que llamó a ésta. Hay 2 versiones de la instrucción `ret`: una versión que primero devuelve un valor y después devuelve el control de la ejecución, y otra versión que solo devuelve el control de ejecución.
-###### ejemplos:
+
+##### ejemplos:
 ```
 ret e32 0;
 ret;
 ret [12 x n32] "hola, mundo.";
 ```
 
-#### sum
- - `%resultado = sum <tipo> <valor1>, <valor2>;`
+
+### sum
+`%resultado = sum <tipo> <valor1>, <valor2>;`
+
 La instrucción `sum` guarda en `%resultado` la suma de los argumentos.
-###### ejemplos:
+
+##### ejemplos:
 ```
 %a = sum n32 1, 10; // %a:n32 = 11
 %b = sum r32 3.14, 1e3; // %a:r32 = 1003.14
 ```
 
-#### res
- - `%resultado = res <tipo> <valor1>, <valor2>;`
+
+### res
+`%resultado = res <tipo> <valor1>, <valor2>;`
+
 La instrucción `res` guarda en `%resultado` la resta de `<valor1>` menos `<valor2>`.
-###### ejemplos:
+
+##### ejemplos:
 ```
 %a = res n32 10, 1; // %a:n32 = 9
 %b = sum r32 3.14, 1e-1; // %a:r32 = 3.04
 ```
 
-#### mul
- - `%resultado = mul <tipo> <valor1>, <valor2>;`
+
+### mul
+`%resultado = mul <tipo> <valor1>, <valor2>;`
+
 La instrucción `mul` guarda en `%resultado` la multiplicación de los argumentos.
-###### ejemplos:
+
+##### ejemplos:
 ```
 %a = mul n32 1, 10; // %a:n32 = 1
 %b = mul r32 3.14, 1e3; // %a:r32 = 3140
 ```
 
-#### div
- - `%resultado = div <tipo> <valor1>, <valor2>;`
+### div
+`%resultado = div <tipo> <valor1>, <valor2>;`
+
 La instrucción `div` guarda en `%resultado` la división de los argumentos.
-###### ejemplos:
+
+##### ejemplos:
 ```
 %a = div n32 10, 2; // %a:n32 = 5
 %b = div r32 1e3, 3; // %a:r32 = 3.3333e2
 ```
 
-#### llama
- - `[%resultado =] llama <tipo> @<función>(<args>...);`
+
+### llama
+`[%resultado =] llama <tipo> @<función>(<args>...);`
+
 La instrucción `llama` pasa el control de la ejecución a otra función, proporcionándole los argumentos indicados.
-###### ejemplos:
+
+##### ejemplos:
 ```
 llama nada @escribe(@txt); // ejecuta la función @escribe()
 %a = llama r32 @mates.pot(4, 8); // ejecuta la función @mates.pot(), y guarda el resultado en %a
 ```
 
-#### cmp
- - `%resultado = cmp <opcomp> <tipo> <valor1>, <valor2>;`
+
+### cmp
+`%resultado = cmp <opcomp> <tipo> <valor1>, <valor2>;`
+
 La instrucción `cmp` compara los valores usando una de las siguientes operaciones de comparación:
  - `ig` igualdad
  - `dsig` desigualdad
@@ -153,36 +171,46 @@ La instrucción `cmp` compara los valores usando una de las siguientes operacion
  - `me` menor que
  - `maig` mayor o igual que
  - `meig` menor o igual que
-###### ejemplo:
+
+##### ejemplo:
 ```
 %0 = sum n32 0, 1; // %0 = n32:1
 %a = cmp ig n32 %0, 1; // %a = n1:1, %a = cierto
 ```
 
-#### conv
- - `%resultado = conv <tipo_orig> <valor> a <tipo_dest>;`
+
+### conv
+`%resultado = conv <tipo_orig> <valor> a <tipo_dest>;`
+
 La instrucción `conv` convierte `<valor>`, de tipo `<tipo_orig>`, al tipo destino `<tipo_dest>`.
-###### ejemplos:
+
+##### ejemplos:
 ```
 %res = conv n32 42 a e32; // %res = e32:42
 ```
 
-#### slt
+
+### slt
  - `slt :etiqueta;`
  - `slt n1 <valor>, :etiqueta;`
+
 La instrucción `slt` salta a la dirección de `:etiqueta` solo en el caso de `n1 <valor> == cierto`.
 Si no se proporciona `n1 <valor>`, se salta incondicionalmente a la dirección de `:etiqueta`.
-###### ejemplos:
+
+##### ejemplos:
 ```
 slt :etiqueta; // salta a la dirección de :etiqueta
 %0 = cmp ig e32 0, 0; // %0 = n1:cierto
 slt n1 %0, :etiqueta; // salta a :etiqueta, puesto que %0 == n1:cierto
 ```
 
-#### phi
- - `%res = phi <tipo> [<valor1>, :etiqueta1], [<valor2>, :etiqueta2]...`
+
+### phi
+`%res = phi <tipo> [<valor1>, :etiqueta1], [<valor2>, :etiqueta2]...`
+
 Esta instrucción implementa el nodo `phi` de la Asignación Única Estática. Selecciona el `<valor1>`, `<valor1>` ó sucesivos en función de si el flujo de ejecución procede de la `:etiqueta1`, `:etiqueta2` ó sucesivas. Una vez seleccionado el `<valor>`, lo guarda en `%res`
-###### ejemplo:
+
+##### ejemplo:
 ```
 etiq:
     %y = conv e6 %x a e32;
@@ -190,16 +218,22 @@ etiq:
     %p = phi e32 [18, :etiq], [42, :adiós]; // %p = e32:18
 ```
 
-#### rsrva
+
+### rsrva
 Pdte
-#### lee
+
+### lee
 Pdte
-#### guarda
+
+### guarda
 Pdte
-#### leeval
+
+### leeval
 Pdte
-#### ponval
+
+### ponval
 Pdte
+
 
 ## Funciones internas del intérprete
 #### @#poncar(n32 %carácter);
