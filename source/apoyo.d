@@ -306,7 +306,7 @@ void aviso(dstring s)
 void aborta(dstring s)
 {
     error(s);
-    exit(0);
+    exit(-1);
 }
 
 void esperaba(dstring s)
