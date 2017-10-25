@@ -1,0 +1,36 @@
+Derecho de autor © 2017, Eduardo Garre Muñoz, eduardo.garre@outlook.com
+
+Autorizo, de forma gratuita, a cualquier persona que obtenga una copia de este
+programa y de los archivos de documentación asociados (el "Programa"), a
+disponer del Programa de acuerdo a los siguientes términos:
+
+  - Podrá usar, reproducir y exhibir el Programa de forma no exclusiva,
+    transferible, en uno o más equipos independientemente de sus características
+    técnicas, en red o no, total o parcialmente, privada o públicamente, por uno
+    o más usuarios, para satisfacer las necesidades del usuario y/o de terceros,
+    con finalidad privada, comercial, o con cualquier otro propósito.
+
+  - Podrá realizar una o más copias de la totalidad o una parte del Programa,
+    con cualquier propósito incluyendo pero no limitándose a la realización de
+    copias de seguridad.
+
+  - Podrá modificar el Programa, también el código fuente si se dispone de
+    éste, y realizar ingeniería inversa de todo o una parte del Programa, con
+    cualquier propósito incluyendo pero no limitándose a la obtención de
+    interoperabilidad, la corrección de errores, la combinación con otras obras
+    y/o programas, la extensión o la adaptación.
+
+  - Podrá distribuir una o más copias del Programa, con o sin modificaciones, a
+    cambio o no de una remuneración, de forma temporal o indefinida.
+
+Concedo esta autorización con la condición de que tanto el anuncio de derecho de
+autor escrito arriba, como esta autorización deberán incluirse en todas las
+copias del Programa.
+
+EL PROGRAMA SE PROPORCIONA SIN GARANTÍAS DE NINGÚN TIPO, EXPRESAS O IMPLÍCITAS,
+INCLUYENDO PERO NO LIMITÁNDOSE A LAS GARANTÍAS DE SANEAMIENTO, BUEN
+FUNCIONAMIENTO, MERCANTIBILIDAD, IDONEIDAD, Y NO-INFRACCIÓN. EN NINGÚN CASO LOS
+AUTORES O TITULARES DEL DERECHO DE AUTOR SERÁN RESPONSABLES DE NINGUNA
+RECLAMACIÓN, DAÑOS U OTRAS RESPONSABILIDADES, YA SEA EN UNA ACCIÓN DE CONTRATO,
+AGRAVIO O CUALQUIER OTRO MOTIVO, QUE SURJA DE O EN CONEXIÓN CON EL PROGRAMA O EL
+USO U OTRO TIPO DE ACCIONES EN EL PROGRAMA.

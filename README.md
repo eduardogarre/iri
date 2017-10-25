@@ -236,7 +236,11 @@ Pdte
 
 
 ## Funciones internas del intérprete
-#### @#poncar(n32 %carácter);
+### @#poncar(n32 %carácter);
 Imprime un carácter
-###### Aviso
+##### Aviso
 Disponible únicamente si ejecutas el programa RI con el intérprete.
+
+## Licencia
+Publicado bajo la Licencia de Programación Libre 0.1 ("LPL 0.1").
+https://github.com/Hispanica/licencias
