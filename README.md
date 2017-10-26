@@ -80,8 +80,8 @@ En cuanto al ámbito, en RIE los identificadores se dividen en 2 clases:
 
 ## Palabras reservadas
 Las palabras reservadas de RIE son muy intuitivas. Hay claves para las operaciones (`sum`, `res`, `mul`, `llama`, `cmp`, `ret`, etc...), para los tipos básicos (`nada`, `n64`, `e32`, `r32`, etc...), y otras (`define`, `declara`, `módulo`, etc...). Todas estas palabras no pueden colisionar con los identificadores porque ninguna comienza por los prefijos `%` ó `@`. Las palabras reservadas se pueden agrupar por categorías: 
- - Operaciones: `ret`, `sum`, `res`, `mul`, `div`, `cmp`, `slt`, `phi`, `conv`, `llama`, `rsrva`, `lee`, `guarda`, `leeval`, `ponval`.
- - Comparaciones: `ig`, `dsig`, `ma`, `me`, `maig`, `meig`, `y`, `o`, `no`, `oex`.
+ - Instrucciones: `ret`, `sum`, `res`, `mul`, `div`, `cmp`, `slt`, `phi`, `conv`, `llama`, `rsrva`, `lee`, `guarda`, `leeval`, `ponval`.
+ - Comparadores: `ig`, `dsig`, `ma`, `me`, `maig`, `meig`, `y`, `o`, `no`, `oex`.
  - Tipos: `nada`, `n1-64`, `e2-64`, `r16|32|64`. 
  - Otras: `módulo`, `define`, `declara`, `tipo`, `global`, `local`, `x`, `a`.
 
