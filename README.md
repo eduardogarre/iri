@@ -1,36 +1,23 @@
-# RI - Representación Intermedia, en español
+# **RIE - Representación Intermedia, en Español**
 
-RI es un lenguaje de Representación Intermedia creado con el objetivo de ser capaz de representar lenguajes de alto nivel con sintaxis en español.
+RIE es un lenguaje de Representación Intermedia creado con el objetivo de ser capaz de representar lenguajes de alto nivel con sintaxis en español.
 
-RI pretende ser ligero usando abstracciones de bajo nivel, pero también intenta ser expresivo, tipado y extensible. El objetivo de RI es ser una RI universal: un lenguaje de Representación Intermedia que pueda ser usado, potencialmente, por todos los lenguajes de alto nivel. Además RI es un lenguaje tipado, con el objetivo de permitir la posibilidad de realizar análisis y optimizaciones muy extensas.
+RIE pretende ser ligero, por lo que usa abstracciones de bajo nivel, sin renunciar a ser expresivo, tipado y extensible. El objetivo de RIE es ser un lenguaje de representación intermedia universal: que pudiera ser usado como representación intermedia, potencialmente, por cualquier lenguaje de alto nivel.
 
-#### Identificadores
-Hay 2 clases de identificadores en RI:
-  - Los identificadores globales (ya sean funciones o variables) empiezan por el carácter '@'
-    Por ejemplo: `@función()`, `@variable`
-  - Los identificadores locales (registros, tipos, variables) empiezan con el carácter '%'
-    Por ejemplo: `%variable_local`, `%42`, `%mi_tipo`
-En general, el formato del identificador es el siguiente: [%@][a-zA-Z.\_\#][a-zA-Z.\_\#<>0-9]*.
-Por ejemplo:
-`@hola`, `%adiós`, `%2048`, `@nrm.es.escribe`, `@#poncar`, `%var<mitipo>#función#mitipo2#mitipo3`, etc.
+Además, puesto que RIE es un lenguaje tipado y con la propiedad de la asignación única estática, permite más opciones en las fases de análisis, optimización e interpretación/producción de código, generando programas potencialmente más eficientes.
 
-Los identificadores empiezan con un prefijo por dos motivos: para evitar que los identificadores de los lenguajes de alto nivel colisionen con las palabras reservadas de RI, y para permitir el uso de identificadores sin nombre (registros) mediante números precedidos de '%', p.ej `%0`, `%42`, `%288`.
+Aquí tienes un ejemplo en RIE, para multiplicar la variable `%var` por `8`:
+`%resultado = mul e32 %var, 8;`
 
-Las palabras reservadas de RI son muy intuitivas. Hay claves para las operaciones (`sum`, `res`, `mul`, `llama`, `cmp`, `ret`, etc...), para los tipos básicos (`nada`, `n64`, `e32`, `r32`, etc...), y otras (`define`, `declara`, `módulo`, etc...). Todas estas palabras no pueden colisionar con los identificadores porque ninguna comienza por los prefijos `%` ó `@`.
-
-Aquí tienes un ejemplo en RI, para multiplicar la variable %X por `8`:
-`%resultado = mul e32 %X, 8;`
-
-
-#### Estructura general
-Los programas de RI se dividen en módulos, siendo cada módulo el resultado de la traducción de una unidad de un lenguaje de más alto nivel.
-En general, cada módulo se compone de listas de valores globales: funciones y variables globales. Aquí tienes un ejemplo del módulo 'hola':
+## Estructura general
+Los programas de RIE se dividen en módulos, siendo cada módulo el resultado de la traducción de una unidad de un lenguaje de más alto nivel.
+En general, cada módulo se compone de listas de declaraciones y definiciones globales: funciones y variables. Aquí tienes un ejemplo del módulo `hola`, en el archivo `hola.ri`, que imprime el texto `hola, mundo.`:
 
 ```
 //Código de ejemplo
 módulo hola;
 
-
+// define la función @escribe(), que recibe como argumento una lista de caracteres.
 define nada @escribe([0 x n32] %txt)
 {
     // preparo el contador
@@ -56,8 +43,10 @@ bucle:
     ret;
 }
 
+// Defino la variable global %txt, que contiene el texto
 @txt = "hola, mundo.";
 
+// La función @inicio() es el punto de inicio de la ejecución del programa
 define e32 @inicio(r32 %pi)
 {
     llama nada @escribe(@txt);
@@ -65,30 +54,62 @@ define e32 @inicio(r32 %pi)
 }
 ```
 
-Este ejemplo se compone de la variable global `@txt` y las definiciones de las funciones `@escribe()` e `@inicio()`.
+En primer lugar, la línea #2 establece el nombre del módulo:
+> `módulo hola;`
 
-#### Tipos
-El sistema de tipos de RI se compone de tipos básicos y compuestos.
+A continuación se suceden 3 definiciones, de la función `@escribe()` en la línea #5, de la variable global `@txt` en la línea #30, y de la función `@inicio()` en la línea #32.
+
+## Identificadores
+En general, el formato del identificador, global o local, es el siguiente:
+> `[%@][a-zA-Z.\_\#][a-zA-Z.\_\#<>0-9]*`
+
+Algunos ejemplos de identificadores válidos serían: `@hola`, `%adiós`, `%2048`, `@nrm.es.escribe`, `@#poncar`, `%var<mitipo>`, `@función#mitipo2#mitipo3`, etc...
+
+Los identificadores empiezan con un prefijo por dos motivos:
+ - Evitar que los identificadores de los lenguajes de alto nivel colisionen con las palabras reservadas de RIE
+ - Permitir el uso de identificadores sin nombre (registros) mediante números precedidos de `%`, p.ej `%0`, `%42`, `%288`.
+
+##### Ámbito de los identificadores
+En cuanto al ámbito, en RIE los identificadores se dividen en 2 clases:
+
+**Globales:** Funciones o variables. Empiezan por el carácter '@'
+> Por ejemplo: `@función()`, `@var_global`
+
+**Locales:** Registros, tipos o variables. Empiezan con el carácter '%'
+> Por ejemplo: `%var_local`, `%42`, `%mi_tipo`
+
+## Palabras reservadas
+Las palabras reservadas de RIE son muy intuitivas. Hay claves para las operaciones (`sum`, `res`, `mul`, `llama`, `cmp`, `ret`, etc...), para los tipos básicos (`nada`, `n64`, `e32`, `r32`, etc...), y otras (`define`, `declara`, `módulo`, etc...). Todas estas palabras no pueden colisionar con los identificadores porque ninguna comienza por los prefijos `%` ó `@`. Las palabras reservadas se pueden agrupar por categorías: 
+ - Operaciones: `ret`, `sum`, `res`, `mul`, `div`, `cmp`, `slt`, `phi`, `conv`, `llama`, `rsrva`, `lee`, `guarda`, `leeval`, `ponval`.
+ - Comparaciones: `ig`, `dsig`, `ma`, `me`, `maig`, `meig`, `y`, `o`, `no`, `oex`.
+ - Tipos: `nada`, `n1-64`, `e2-64`, `r16|32|64`. 
+ - Otras: `módulo`, `define`, `declara`, `tipo`, `global`, `local`, `x`, `a`.
+
+## Tipos
+El sistema de tipos de RIE se compone de tipos básicos y compuestos.
 
 Los tipos básicos son los enteros, los naturales y los reales, además del tipo especial `nada`. A la hora de usar los tipos, siempre debemos definir el espacio que asignaremos al tipo, de la siguiente forma: los enteros en el rango e2-64 (p.ej `e32` es un entero de 32 dígitos), los naturales en el rango n1-64 (siendo `n1` un tipo booleano, y `n16` un natural de 16dig sin signo), y los reales únicamente r16|32|64 (son válidos `r16`, `r32` y `r64`).
 
 Los tipos compuestos son las listas y las estructuras. Las listas se definen como `[<tamaño> x <tipo>]`, p.ej `[12 x n32]`.
 
-#### Funciones
+## Funciones
 Las funciones se definen usando la palabra reservada `define`, y se declaran con la palabra reservada `declara`.
 La estructura de una declaración de función es la siguiente:
 ```
 declara <tipo_ret> @función(<tipo1> <arg1>, <tipo2> <arg2>...);
 ```
-Y la definición de una función se estructura de la siguiente forma:
+Siendo `<tipo_ret>` el tipo del valor devuelto, y los pares `<tipo#> <arg#>` los argumentos que recibe la función.
+
+La definición de una función se estructura de la siguiente forma:
 ```
 define <tipo_ret> @función(<tipo1> <arg1>, <tipo2> <arg2>...)
 {
     ...
 }
 ```
+En la definición, además de cambiar la palabra reservada se añade un bloque con el contenido de la función. El bloque se compondrá de asignaciones a identificadores locales (registros, variables locales o tipos), instrucciones y etiquetas. Todas las funciones deben terminar con una de las versiones de la instrucción `ret`.
 
-## Referencia de las instrucciones
+## Listado de instrucciones
 ### ret
 `ret [<tipo> <valor>];`
 
@@ -105,7 +126,7 @@ ret [12 x n32] "hola, mundo.";
 ### sum
 `%resultado = sum <tipo> <valor1>, <valor2>;`
 
-La instrucción `sum` guarda en `%resultado` la suma de los argumentos.
+La instrucción `sum` guarda en `%resultado` la suma de los argumentos `<valor1>` y `<valor2>`.
 
 ##### ejemplos:
 ```
@@ -129,7 +150,7 @@ La instrucción `res` guarda en `%resultado` la resta de `<valor1>` menos `<valo
 ### mul
 `%resultado = mul <tipo> <valor1>, <valor2>;`
 
-La instrucción `mul` guarda en `%resultado` la multiplicación de los argumentos.
+La instrucción `mul` guarda en `%resultado` la multiplicación de los argumentos `<valor1>` por `<valor2>`.
 
 ##### ejemplos:
 ```
@@ -140,7 +161,7 @@ La instrucción `mul` guarda en `%resultado` la multiplicación de los argumento
 ### div
 `%resultado = div <tipo> <valor1>, <valor2>;`
 
-La instrucción `div` guarda en `%resultado` la división de los argumentos.
+La instrucción `div` guarda en `%resultado` la división de los argumentos `<valor1>` entre `<valor2>`.
 
 ##### ejemplos:
 ```
@@ -156,8 +177,12 @@ La instrucción `llama` pasa el control de la ejecución a otra función, propor
 
 ##### ejemplos:
 ```
-llama nada @escribe(@txt); // ejecuta la función @escribe()
-%a = llama r32 @mates.pot(4, 8); // ejecuta la función @mates.pot(), y guarda el resultado en %a
+// ejecuta la función @escribe()
+llama nada @escribe(@txt);
+
+// ejecuta la función @mates.pot()
+// guarda el resultado (un real de 32 dígitos) en %a
+%a = llama r32 @mates.pot(4, 8); 
 ```
 
 
@@ -200,6 +225,7 @@ Si no se proporciona `n1 <valor>`, se salta incondicionalmente a la dirección d
 ##### ejemplos:
 ```
 slt :etiqueta; // salta a la dirección de :etiqueta
+...
 %0 = cmp ig e32 0, 0; // %0 = n1:cierto
 slt n1 %0, :etiqueta; // salta a :etiqueta, puesto que %0 == n1:cierto
 ```
@@ -220,26 +246,58 @@ etiq:
 
 
 ### rsrva
-Pdte
+`%res = rsrva <tipo>`
+Reserva espacio en la pila actual para guardar una variable de tipo `<tipo>`, y guarda en `%res` la dirección.
 
-### lee
-Pdte
+##### ejemplo:
+```
+%ptr = rsrva e32;
+```
 
 ### guarda
-Pdte
+`guarda <tipo> <id>, <tipo_ptr>* <puntero>;`
+Guarda el contenido de `<id>` en la dirección de memoria indicada por `<puntero>`.
+
+##### ejemplo:
+```
+guarda e32 42, e32* %ptr;
+```
+
+### lee
+`%res = lee <tipo>, <tipo_ptr>* <puntero>;`
+Lee el contenido de la dirección de memoria indicada por `<puntero>`, y lo escribe en la variable `%res`.
+
+##### ejemplo:
+```
+%res = lee e32, e32* %ptr;
+```
 
 ### leeval
-Pdte
+`%res = leeval <tipo_lista> <identificador>, <índice>;`
+En la lista indicada por `<identificador>`, de tipo `<tipo_lista>`, lee el elemento de la posición `<índice>`, y lo escribe en la variable `%res`.
+
+##### ejemplo:
+```
+%res = leeval [6 x n32] %txt, %0;
+```
 
 ### ponval
-Pdte
+`%res = ponval <tipo_lista> <literal_lista>, <tipo> <literal>, <índice>`
+En la lista indicada por `<literal_lista>`, en la posición indicada por `<índice>`, guarda el literal indicado por `<tipo> <literal>`. Devuelve la nueva lista resultante, guardándola en `%res`.
+
+##### ejemplo:
+```
+@txt = "hola, mundo.";
+...
+`%res = ponval [12 x n32] @txt, n32 'H', 0`; // %res = "Hola, mundo."
+```
 
 
 ## Funciones internas del intérprete
-### @#poncar(n32 %carácter);
+#### @#poncar(n32 %carácter);
 Imprime un carácter
 ##### Aviso
-Disponible únicamente si ejecutas el programa RI con el intérprete.
+Disponible únicamente si ejecutas el programa RIE con el intérprete `iri`.
 
 ## Licencia
 Publicado bajo la Licencia de Programación Libre 0.1 ("LPL 0.1").
