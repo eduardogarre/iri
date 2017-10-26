@@ -61,7 +61,7 @@ A continuación se suceden 3 definiciones, de la función `@escribe()` en la lí
 
 ## Identificadores
 En general, el formato del identificador, global o local, es el siguiente:
-> `[%@][a-zA-Z.\_\#][a-zA-Z.\_\#<>0-9]*`
+> `[%@][a-zA-Z._#][a-zA-Z._#<>0-9]*`
 
 Algunos ejemplos de identificadores válidos serían: `@hola`, `%adiós`, `%2048`, `@nrm.es.escribe`, `@#poncar`, `%var<mitipo>`, `@función#mitipo2#mitipo3`, etc...
 
