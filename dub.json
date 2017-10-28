@@ -3,6 +3,8 @@
 	"authors": [
 		"Eduardo"
 	],
+	"mainSourceFile": "source/iri.d",
+	"targetType": "executable",
 	"description": "Interprete de Representacion Intermedia",
 	"copyright": "Copyright © 2017, Eduardo",
 	"license": "proprietary",
