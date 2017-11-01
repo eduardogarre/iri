@@ -2555,9 +2555,9 @@ Literal op_leeval(Operación op)
         Literal lit0 = lee_argumento(op.ramas[1]);
         Literal lit1 = lee_argumento(op.ramas[2]);
 
-        if(!t.lista || !lit0.lista)
+        if(!t.vector || !lit0.vector)
         {
-            aborta("'leeval' trabaja con Listas");
+            aborta("'leeval' trabaja con Vectores");
             return null;
         }
 
@@ -2568,12 +2568,12 @@ Literal op_leeval(Operación op)
         Literal resultado = res.dup();
 
         infoln("op: leeval [" ~ to!dstring(t.elementos) ~ " x " ~ t.tipo
-               ~ "] [lista] [" ~ resultado.tipo ~ ":" ~ resultado.dato ~ "]");
+               ~ "] [vector] [" ~ resultado.tipo ~ ":" ~ resultado.dato ~ "]");
         
         return resultado;
     }
 
-    aborta("leeval <tipo_lista> <literal>, <índice>");
+    aborta("leeval <tipo_vector> <literal>, <índice>");
     return null;
 }
 
@@ -2593,9 +2593,9 @@ Literal op_ponval(Operación op)
         Literal lit2 = lee_argumento(op.ramas[3]);
         Literal lit3 = lee_argumento(op.ramas[4]);
 
-        if(!t1.lista || !lit1.lista)
+        if(!t1.vector || !lit1.vector)
         {
-            aborta("'ponval' trabaja con Listas");
+            aborta("'ponval' trabaja con Vectores");
             return null;
         }
 
@@ -2608,12 +2608,12 @@ Literal op_ponval(Operación op)
         resultado.ramas[índice] = lit2.dup();
 
         infoln("op: ponval [" ~ to!dstring(t1.elementos) ~ " x " ~ t1.tipo
-               ~ "] [lista] [" ~ lit2.tipo ~ ":" ~ lit2.dato ~ "] [" 
-               ~ lit3.dato ~ "] => [lista]");
+               ~ "] [vector] [" ~ lit2.tipo ~ ":" ~ lit2.dato ~ "] [" 
+               ~ lit3.dato ~ "] => [vector]");
         
         return resultado;
     }
 
-    aborta("ponval <tipo_lista> <literal_lista>, <tipo> <literal>, <índice>");
+    aborta("ponval <tipo_vector> <literal_vector>, <tipo> <literal>, <índice>");
     return null;
 }

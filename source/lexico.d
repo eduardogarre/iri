@@ -312,7 +312,7 @@ private bool reservada()
          | (s == "me") // menor
          | (s == "maig") // mayor o igual
          | (s == "meig") // menor o igual
-         | (s == "x") // listas: [4 x n8]
+         | (s == "x") // vectores: [4 x n8]
          | (s == "y")
          | (s == "o")
          | (s == "no")

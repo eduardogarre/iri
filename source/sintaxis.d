@@ -1566,7 +1566,7 @@ private Operación op_guarda()
 }
 
 
-//OPERACIÓN -- %x = leeval <tipo_lista> <literal_lista>, <índice>
+//OPERACIÓN -- %x = leeval <tipo_vector> <literal_vector>, <índice>
 private Operación op_leeval()
 {
     uint c = cursor;
@@ -1588,14 +1588,14 @@ private Operación op_leeval()
             cursor++;
 
             Tipo t = tipo();
-            if((t !is null) && (t.lista))
+            if((t !is null) && (t.vector))
             {
                 o.ramas ~= t;
             }
             else // Error.
             {
                 aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
-                ~ "correcta. Esperaba 'Tipo' conteniendo 'Lista'");
+                ~ "correcta. Esperaba 'Tipo' conteniendo 'Vector'");
                 return null;
             }
             
@@ -1649,7 +1649,7 @@ private Operación op_leeval()
 }
 
 
-//OPERACIÓN -- %x = ponval <tipo_lista> <literal_lista>, <tipo> <literal>, <índice>
+//OPERACIÓN -- %x = ponval <tipo_vector> <literal_vector>, <tipo> <literal>, <índice>
 private Operación op_ponval()
 {
     uint c = cursor;
@@ -1673,21 +1673,21 @@ private Operación op_ponval()
             
             if(Tipo t = tipo())
             {
-                if(t.lista)
+                if(t.vector)
                 {
                     o.ramas ~= t;
                 }
                 else
                 {
                     aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
-                    ~ "correcta. Esperaba 'Tipo' conteniendo 'Lista'");
+                    ~ "correcta. Esperaba 'Tipo' conteniendo 'Vector'");
                     return null;
                 }
             }
             else // Error.
             {
                 aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
-                ~ "correcta. Esperaba 'Tipo' conteniendo 'Lista'");
+                ~ "correcta. Esperaba 'Tipo' conteniendo 'Vector'");
                 return null;
             }
             
@@ -1925,7 +1925,7 @@ private Literal literal()
 
         return l;
     }
-    else if(Literal lit = lista())
+    else if(Literal lit = vector())
     {
         return lit;
     }
@@ -2002,7 +2002,7 @@ private Literal texto()
     if(símbolos[cursor].categoría == lexema_e.TEXTO)
     {
         Literal l = new Literal();
-        l.lista = true;
+        l.vector = true;
 
         foreach(car; símbolos[cursor].símbolo)
         {
@@ -2033,15 +2033,15 @@ private Literal texto()
 }
 
 
-//LISTA -- Literal de una lista
-private Literal lista()
+//VECTOR -- Literal de un vector
+private Literal vector()
 {
     uint c = cursor;
 
     if(cursor < símbolos.length)
     {
         Literal l = new Literal();
-        l.lista = true;
+        l.vector = true;
 
         if(!notación("["))
         {
@@ -2066,7 +2066,7 @@ private Literal lista()
         }
         else // Error.
         {
-            aborta("Literal de Lista: Esperaba 'Identificador' o 'Literal'");
+            aborta("Literal de Vector: Esperaba 'Identificador' o 'Literal'");
             return null;
         }
 
@@ -2094,14 +2094,14 @@ private Literal lista()
             }
             else // Error.
             {
-                aborta("Literal de Lista: Esperaba 'Identificador' o 'Literal'");
+                aborta("Literal de Vector: Esperaba 'Identificador' o 'Literal'");
                 return null;
             }
         }
 
         if(!notación("]"))
         {
-            aborta("Literal de Lista: Esperaba ']'");
+            aborta("Literal de Vector: Esperaba ']'");
             return null;
         }
 
@@ -2130,10 +2130,10 @@ private Tipo tipo()
             cursor++;
             return t;
         }
-        else if(notación("[")) // lista
+        else if(notación("[")) // vector
         {
             Tipo t = new Tipo();
-            t.lista = true;
+            t.vector = true;
 
             if(auto elementos = número())
             {

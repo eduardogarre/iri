@@ -70,7 +70,7 @@ class Reservada : Nodo
 
 class Tipo : Nodo
 {
-    bool lista;
+    bool vector;
     bool estructura;
     dstring tipo;
     dstring elementos;
@@ -85,7 +85,7 @@ class Tipo : Nodo
 class Literal : Nodo
 {
     dstring tipo;
-    bool lista;
+    bool vector;
     bool estructura;
 
     this()
@@ -100,7 +100,7 @@ class Literal : Nodo
         
         l.dato = this.dato;
         l.tipo = this.tipo;
-        l.lista = this.lista;
+        l.vector = this.vector;
         l.estructura = this.estructura;
         l.ramas = this.ramas.dup();
         l.línea = this.línea;

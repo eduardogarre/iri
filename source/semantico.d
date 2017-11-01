@@ -67,7 +67,7 @@ void imprime_árbol(Nodo n)
             case Categoría.TIPO:
                 auto t = cast(Tipo)n;
                 charlatán(to!dstring(t.categoría));
-                if(t.lista)
+                if(t.vector)
                 {
                     charlatán(" [" ~ to!dstring(t.elementos) ~ " x " ~ t.tipo);
                     charlatán("]");
@@ -99,9 +99,9 @@ void imprime_árbol(Nodo n)
             case Categoría.LITERAL:
                 auto l = cast(Literal)n;
                 charlatán(to!dstring(l.categoría));
-                if(l.lista)
+                if(l.vector)
                 {
-                    charlatán(" [lista]");
+                    charlatán(" [vector]");
                 }
                 else
                 {
