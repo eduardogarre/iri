@@ -52,8 +52,7 @@ define e32 @inicio(r32 %pi)
 
     %est43 = ponval {e32, r32} @estructura, e32 43, 0;
 
-    %tmp = leeval {e32, r32} @estructura, 0;
-    %43 = sum e32 %tmp, 1;
+    %43 = leeval {e32, r32} %est43, 0;
 
     llama nada @#poncar(%43);
 
