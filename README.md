@@ -91,7 +91,11 @@ El sistema de tipos de RIE se compone de tipos básicos y compuestos.
 
 Los tipos básicos son los enteros, los naturales y los reales, además del tipo especial `nada`. A la hora de usar los tipos, siempre debemos definir el espacio que asignaremos al tipo, de la siguiente forma: los enteros en el rango e2-64 (p.ej `e32` es un entero de 32 dígitos), los naturales en el rango n1-64 (siendo `n1` un tipo booleano, y `n16` un natural de 16dig sin signo), y los reales únicamente r16|32|64 (son válidos `r16`, `r32` y `r64`).
 
-Los tipos compuestos son las listas y las estructuras. Las listas se definen como `[<tamaño> x <tipo>]`, p.ej `[12 x n32]`.
+Los tipos compuestos son los vectores y las estructuras.
+
+El tipo de un vector se expresa como `[<tamaño> x <tipo>]`, p.ej `[12 x n32]`. El literal de un vector se expresa como `[dato,...]` , p.ej `[42, -32, 64, 288]`.
+
+El tipo de una estructura se expresa como `{tipo,...}`, p.ej `{r64, e16}` ó `{n32, [0 x n32]}`.
 
 ## Funciones
 Las funciones se definen usando la palabra reservada `define`, y se declaran con la palabra reservada `declara`.
