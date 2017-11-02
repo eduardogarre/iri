@@ -93,9 +93,9 @@ Los tipos básicos son los enteros, los naturales y los reales, además del tipo
 
 Los tipos compuestos son los vectores y las estructuras.
 
-El tipo de un vector se expresa como `[<tamaño> x <tipo>]`, p.ej `[12 x n32]`. El literal de un vector se expresa como `[dato,...]` , p.ej `[42, -32, 64, 288]`.
+El tipo de un vector se expresa como `[<tamaño> x <tipo>]`, p.ej `[12 x n32]`. El literal de un vector se expresa como `[dato,...]`, p.ej `[42, -32, 64, 288]`.
 
-El tipo de una estructura se expresa como `{tipo,...}`, p.ej `{r64, e16}` ó `{n32, [0 x n32]}`.
+El tipo de una estructura se expresa como `{tipo,...}`, p.ej `{r64, e16}` ó `{n32, [0 x n32]}`. Su literal se expresa como `{dato,...}`, p.ej `{0, 3.14, 288, -9.806}`, `{{3.14, 288, -9.806}, 64}` ó `{42, "hola"}`.
 
 ## Funciones
 Las funciones se definen usando la palabra reservada `define`, y se declaran con la palabra reservada `declara`.
