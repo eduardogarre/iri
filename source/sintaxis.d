@@ -1588,14 +1588,14 @@ private Operación op_leeval()
             cursor++;
 
             Tipo t = tipo();
-            if((t !is null) && (t.vector))
+            if((t !is null) && (t.vector || t.estructura))
             {
                 o.ramas ~= t;
             }
             else // Error.
             {
                 aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
-                ~ "correcta. Esperaba 'Tipo' conteniendo 'Vector'");
+                ~ "correcta. Esperaba 'Tipo' conteniendo 'Vector' ó 'Estructura'");
                 return null;
             }
             
@@ -1673,14 +1673,14 @@ private Operación op_ponval()
             
             if(Tipo t = tipo())
             {
-                if(t.vector)
+                if(t.vector || t.estructura)
                 {
                     o.ramas ~= t;
                 }
                 else
                 {
                     aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
-                    ~ "correcta. Esperaba 'Tipo' conteniendo 'Vector'");
+                    ~ "correcta. Esperaba 'Tipo' conteniendo 'Vector' ó 'Estructura'");
                     return null;
                 }
             }
@@ -1929,6 +1929,10 @@ private Literal literal()
     {
         return lit;
     }
+    else if(Literal lit = estructura())
+    {
+        return lit;
+    }
         
     cursor = c;
     return null;
@@ -2113,6 +2117,70 @@ private Literal vector()
 }
 
 
+//ESTRUCTURA -- Literal de una estructura
+private Literal estructura()
+{
+    uint c = cursor;
+
+    if(cursor < símbolos.length)
+    {
+        Literal l = new Literal();
+        l.estructura = true;
+
+        if(!notación("{"))
+        {
+            cursor = c;
+            return null;
+        }
+    
+        if(Identificador id = identificador())
+        {
+            l.ramas ~= id;
+        }
+        else if(Literal li = literal())
+        {
+            l.ramas ~= li;
+        }
+        else
+        {
+            aborta("Esperaba 'Literal' ó 'Id': {dato}");
+            cursor = c;
+            return null;
+        }
+
+        while(notación(","))
+        {
+            if(Identificador id = identificador())
+            {
+                l.ramas ~= id;
+            }
+            else if(Literal li = literal())
+            {
+                l.ramas ~= li;
+            }
+            else
+            {
+                aborta("Esperaba 'Literal' ó 'Id': {dato, ...}");
+                cursor = c;
+                return null;
+            }
+        }
+
+        if(!notación("}"))
+        {
+            aborta("Esperaba '}': {dato, ...}");
+            cursor = c;
+            return null;
+        }
+
+        return l;
+    }
+
+    cursor = c;
+    return null;
+}
+
+
 //TIPO -- lexema_e.TIPO, dstring nada|n|e|r+Nº, uint64_t línea
 private Tipo tipo()
 {
@@ -2142,7 +2210,7 @@ private Tipo tipo()
             }
             else
             {
-                aborta("Esperaba Número: [N x Tipo]");
+                aborta("Esperaba 'Número': [N x Tipo]");
                 cursor = c;
                 return null;
             }
@@ -2160,7 +2228,7 @@ private Tipo tipo()
             }
             else
             {
-                aborta("Esperaba Tipo: [N x Tipo]");
+                aborta("Esperaba 'Tipo': [N x Tipo]");
                 cursor = c;
                 return null;
             }
@@ -2168,6 +2236,45 @@ private Tipo tipo()
             if(!notación("]"))
             {
                 aborta("Esperaba ']': [N x Tipo]");
+                cursor = c;
+                return null;
+            }
+
+            return t;
+        }
+        else if(notación("{")) // estructura
+        {
+            Tipo t = new Tipo();
+            t.estructura = true;
+
+            if(Tipo ti = tipo())
+            {
+                t.ramas ~= ti;
+            }
+            else
+            {
+                aborta("Esperaba 'Tipo': {Tipo}");
+                cursor = c;
+                return null;
+            }
+
+            while(notación(","))
+            {
+                if(Tipo ti = tipo())
+                {
+                    t.ramas ~= ti;
+                }
+                else
+                {
+                    aborta("Esperaba 'Tipo': {Tipo}");
+                    cursor = c;
+                    return null;
+                }
+            }
+
+            if(!notación("}"))
+            {
+                aborta("Esperaba '}': {Tipo}");
                 cursor = c;
                 return null;
             }

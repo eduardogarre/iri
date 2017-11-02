@@ -7,6 +7,8 @@ También usado para pruebas.
 
 @lista = [4 x e32] [42, 288, 0, -50];
 
+@estructura = {e32, r32} {42, 3.14};
+
 @txt = privado n32 'h';
 
 declara e32 @sal(e32 %hola, r18 %lol);
@@ -44,6 +46,16 @@ define e32 @inicio(r32 %pi)
     slt n1 %a, :lol;
 
     %w = llama e32 @adiós(%pi, %a);
+
+    %42 = leeval {e32, r32} @estructura, 0;
+    llama nada @#poncar(%42);
+
+    %est43 = ponval {e32, r32} @estructura, e32 43, 0;
+
+    %tmp = leeval {e32, r32} @estructura, 0;
+    %43 = sum e32 %tmp, 1;
+
+    llama nada @#poncar(%43);
 
     llama nada @#poncar('h');
     llama nada @#poncar('o');

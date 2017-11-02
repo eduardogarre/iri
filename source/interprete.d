@@ -2555,22 +2555,45 @@ Literal op_leeval(Operación op)
         Literal lit0 = lee_argumento(op.ramas[1]);
         Literal lit1 = lee_argumento(op.ramas[2]);
 
-        if(!t.vector || !lit0.vector)
+        if(t.vector)
         {
-            aborta("'leeval' trabaja con Vectores");
-            return null;
+            if(!lit0.vector)
+            {
+                aborta("Indicas a la operación 'leeval' que debe trabajar con" ~
+                        " un vector, pero como argumento no proporcionas uno");
+                return null;
+            }
+
+            uint índice = to!uint(lit1.dato);
+
+            Literal res = cast(Literal)(lit0.ramas[índice]);
+
+            Literal resultado = res.dup();
+
+            infoln("op: leeval [" ~ to!dstring(t.elementos) ~ " x " ~ t.tipo
+                ~ "] [vector] [" ~ resultado.tipo ~ ":" ~ resultado.dato ~ "]");
+            
+            return resultado;
         }
+        else if(t.estructura)
+        {
+            if(!lit0.estructura)
+            {
+                aborta("Indicas a la operación 'leeval' que debe trabajar con " ~
+                        "una estructura, pero como argumento no proporcionas una");
+                return null;
+            }
 
-        uint índice = to!uint(lit1.dato);
+            uint índice = to!uint(lit1.dato);
 
-        Literal res = cast(Literal)(lit0.ramas[índice]);
+            Literal res = cast(Literal)(lit0.ramas[índice]);
 
-        Literal resultado = res.dup();
+            Literal resultado = res.dup();
 
-        infoln("op: leeval [" ~ to!dstring(t.elementos) ~ " x " ~ t.tipo
-               ~ "] [vector] [" ~ resultado.tipo ~ ":" ~ resultado.dato ~ "]");
-        
-        return resultado;
+            infoln("op: leeval [estructura] [" ~ resultado.tipo ~ ":" ~ resultado.dato ~ "]");
+            
+            return resultado;
+        }
     }
 
     aborta("leeval <tipo_vector> <literal>, <índice>");
@@ -2593,25 +2616,51 @@ Literal op_ponval(Operación op)
         Literal lit2 = lee_argumento(op.ramas[3]);
         Literal lit3 = lee_argumento(op.ramas[4]);
 
-        if(!t1.vector || !lit1.vector)
+        if(t1.vector)
         {
-            aborta("'ponval' trabaja con Vectores");
-            return null;
+            if(!lit1.vector)
+            {
+                aborta("Indicas a la operación 'ponval' que debe trabajar con" ~
+                        " un vector, pero como argumento no proporcionas uno");
+                return null;
+            }
+
+            uint índice = to!uint(lit3.dato);
+
+            Literal res = cast(Literal)(lit1.ramas[índice]);
+
+            Literal resultado = lit1.dup();
+
+            resultado.ramas[índice] = lit2.dup();
+
+            infoln("op: ponval [" ~ to!dstring(t1.elementos) ~ " x " ~ t1.tipo
+                ~ "] [vector] [" ~ lit2.tipo ~ ":" ~ lit2.dato ~ "] [" 
+                ~ lit3.dato ~ "] => [vector]");
+            
+            return resultado;
         }
+        else if(t1.estructura)
+        {
+            if(!lit1.estructura)
+            {
+                aborta("Indicas a la operación 'ponval' que debe trabajar con" ~
+                        " una estructura, pero como argumento no proporcionas una");
+                return null;
+            }
 
-        uint índice = to!uint(lit3.dato);
+            uint índice = to!uint(lit3.dato);
 
-        Literal res = cast(Literal)(lit1.ramas[índice]);
+            Literal res = cast(Literal)(lit1.ramas[índice]);
 
-        Literal resultado = lit1.dup();
+            Literal resultado = lit1.dup();
 
-        resultado.ramas[índice] = lit2.dup();
+            resultado.ramas[índice] = lit2.dup();
 
-        infoln("op: ponval [" ~ to!dstring(t1.elementos) ~ " x " ~ t1.tipo
-               ~ "] [vector] [" ~ lit2.tipo ~ ":" ~ lit2.dato ~ "] [" 
-               ~ lit3.dato ~ "] => [vector]");
-        
-        return resultado;
+            infoln("op: ponval [estructura] [" ~ lit2.tipo ~ ":" ~ lit2.dato ~ "] [" 
+                ~ lit3.dato ~ "] => [estructura]");
+            
+            return resultado;
+        }
     }
 
     aborta("ponval <tipo_vector> <literal_vector>, <tipo> <literal>, <índice>");
