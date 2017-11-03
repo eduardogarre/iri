@@ -121,14 +121,19 @@ bucle:
     // incremento el contador
     %0 = sum e32 %0, 1;
 
-    // escribo el carácter
-    llama nada @#poncar(%1);
-
     // compruebo si el carácter es distinto a '\0'
     %2 = cmp dsig n32 %1, '\0';
 
-    // mientras la comprobación sea cierta, salto a la etiqueta :bucle.
-    slt n1 %2, :bucle;
+    // mientras la comprobación sea cierta, salto a la etiqueta :escribe_car.
+    slt n1 %2, :escribe_car;
 
+    // si la comprobación es falsa, no escribo el carácter, salto a fin
+    slt n1 %2, :fin;
+
+escribe_car:
+    // escribo el carácter
+    llama nada @#poncar(%1);
+
+fin:
     ret;
 }
