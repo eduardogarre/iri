@@ -479,8 +479,7 @@ private DefineIdentificadorGlobal define_identificador_global()
 
     if(auto l = literal())
     {
-        // comprobar tipos
-        // l.tipo = t.tipo;
+        l.tipo = t.tipo;
         i.ramas ~= l;
     }
     else

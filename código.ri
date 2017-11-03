@@ -7,7 +7,7 @@ También usado para pruebas.
 
 @lista = [4 x e32] [42, 288, 0, -50];
 
-@estructura = {e32, r32} {42, 3.14};
+@estructura = {e32, [2 x r32], {n32, n32, e32, r32}} {42, [3.14, 0], {18, 18, -4, 3.14}};
 
 @txt = privado n32 'h';
 

@@ -74,7 +74,7 @@ void imprime_árbol(Nodo n)
                 }
                 else if(t.estructura)
                 {
-                    charlatán(" {}");
+                    charlatán(" {estructura}");
                 }
                 else
                 {
@@ -102,6 +102,10 @@ void imprime_árbol(Nodo n)
                 if(l.vector)
                 {
                     charlatán(" [vector]");
+                }
+                else if(l.estructura)
+                {
+                    charlatán(" {estructura}");
                 }
                 else
                 {
