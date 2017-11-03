@@ -256,7 +256,7 @@ private bool _cierracomentarioXL()
 private bool notación()
 {
     if(   (código[cursor] == ',')
-        | (código[cursor] == '-')
+        //| (código[cursor] == '-')
         | (código[cursor] == ';')
         | (código[cursor] == '=')
         | (código[cursor] == '(')
@@ -413,7 +413,22 @@ private bool _nombre()
 
 private bool número()
 {
-    return (_notacióncientífica() | _númerodecimales() | _número());
+    if(_notacióncientífica())
+    {
+        return true;
+    }
+    else if(_númerodecimales())
+    {
+        return true;
+    }
+    else if(_número())
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 private bool _notacióncientífica()
@@ -421,6 +436,11 @@ private bool _notacióncientífica()
     bool resultado = false;
 
     uint c = cursor;
+
+    if(código[cursor] == '-')
+    {
+        cursor++;
+    }
         
     while(esdígito(código[cursor]) && (cursor < (código.length-1)))
     {
@@ -502,6 +522,11 @@ private bool _númerodecimales()
     bool resultado = false;
 
     uint c = cursor;
+
+    if(código[cursor] == '-')
+    {
+        cursor++;
+    }
         
     while(esdígito(código[cursor]))
     {
@@ -566,6 +591,11 @@ private bool _número()
     bool resultado = false;
 
     uint c = cursor;
+
+    if(código[cursor] == '-')
+    {
+        cursor++;
+    }
 
     if(esdígito(código[cursor]))
     {

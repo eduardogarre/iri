@@ -70,7 +70,8 @@ private Módulo módulo()
     if(!fda())
     {
         aborta("Esperaba llegar al final del archivo, pero me encuentro en ["
-        ~ símbolos[cursor].símbolo ~ "]");
+        ~ símbolos[cursor].símbolo ~ "] [línea:"
+        ~ to!dstring(símbolos[cursor].línea) ~ "]");
     }
 
     return o;
@@ -1311,7 +1312,8 @@ private Operación op_llama()
             else // Error.
             {
                 aborta("La estructura de la operación '" ~ o.dato ~ "' no es "
-                ~ "correcta. Esperaba '@función()'");
+                ~ "correcta. Esperaba '@función()' [línea:" ~ to!dstring(o.línea)
+                ~ "]");
                 return null;
             }
 
@@ -1959,7 +1961,7 @@ private Nodo número()
         if(símbolos[cursor].categoría == lexema_e.NÚMERO)
         {
             n.categoría = Categoría.NÚMERO;
-            n.dato = símbolos[cursor].símbolo;
+            n.dato ~= símbolos[cursor].símbolo;
             n.línea = símbolos[cursor].línea;
 
             cursor++;

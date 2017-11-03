@@ -1,0 +1,181 @@
+//Código de ejemplo
+módulo código;
+
+@correcto_txt = ".";
+
+define e32 @inicio(r32 %pi)
+{
+divisiones_literales_prueba1:
+    %0 = llama n32 @división_literales_naturales(0, 1, 0);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :divisiones_literales_prueba2;
+    ret e32 -1;
+
+divisiones_literales_prueba2:
+    %0 = llama n32 @división_literales_naturales(200, 1, 200);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :divisiones_literales_prueba3;
+    ret e32 -1;
+
+divisiones_literales_prueba3:
+    %0 = llama n32 @división_literales_naturales(40, 8, 5);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :divisiones_literales_prueba4;
+    ret e32 -1;
+
+divisiones_literales_prueba4:
+    %0 = llama n32 @división_literales_naturales(100, 2, 50);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :divisiones_literales_prueba5;
+    ret e32 -1;
+
+divisiones_literales_prueba5:
+    %0 = llama n32 @división_literales_enteros(1, -1, -1);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :divisiones_literales_prueba6;
+    ret e32 -1;
+
+divisiones_literales_prueba6:
+    %0 = llama n32 @división_literales_enteros(-88, -8, 11);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :divisiones_literales_prueba7;
+    ret e32 -1;
+
+divisiones_literales_prueba7:
+    %0 = llama n32 @división_literales_enteros(-40, 8, -5);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :divisiones_literales_prueba8;
+    ret e32 -1;
+
+divisiones_literales_prueba8:
+    %0 = llama n32 @división_literales_enteros(100, -20, -5);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :divisiones_literales_prueba9;
+    ret e32 -1;
+
+divisiones_literales_prueba9:
+    %0 = llama n32 @división_literales_reales(-42, 0.1, -420);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :divisiones_literales_prueba10;
+    ret e32 -1;
+
+divisiones_literales_prueba10:
+    %0 = llama n32 @división_literales_reales(1.1e2, 11, 10);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :divisiones_literales_prueba11;
+    ret e32 -1;
+
+divisiones_literales_prueba11:
+    %0 = llama n32 @división_literales_reales(1.0e-2, -0.01, -1);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :divisiones_literales_prueba12;
+    ret e32 -1;
+
+divisiones_literales_prueba12:
+    %0 = llama n32 @división_literales_reales(3.14e3, -0.1, -31400);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :divisiones_literales_fin;
+    ret e32 -1;
+
+divisiones_literales_fin:
+    ret e32 0;
+}
+
+
+
+@división_literales_naturales_error_txt = "\nERROR - op:div con literales naturales\n";
+
+define n32 @división_literales_naturales(n32 %op1, n32 %op2, n32 %res)
+{
+división_literales_naturales_empieza:
+    %res_división_literales_naturales = div n32 %op1, %op2;
+    %0 = cmp ig n32 %res_división_literales_naturales, %res;
+
+    slt n1 %0, :división_literales_naturales_correcta;
+
+división_literales_naturales_error:
+    llama nada @escribe(@división_literales_naturales_error_txt);
+    ret n32 0;
+
+división_literales_naturales_correcta:
+    llama nada @escribe(@correcto_txt);
+    slt :división_literales_naturales_fin;
+
+división_literales_naturales_fin:
+    ret n32 1;
+}
+
+
+
+@división_literales_enteros_error_txt = "\nERROR - op:div con literales enteros\n";
+
+define n32 @división_literales_enteros(e32 %op1, e32 %op2, e32 %res)
+{
+división_literales_enteros_empieza:
+    %res_división_literales_enteros = div e32 %op1, %op2;
+    %0 = cmp ig e32 %res_división_literales_enteros, %res;
+
+    slt n1 %0, :división_literales_enteros_correcta;
+
+división_literales_enteros_error:
+    llama nada @escribe(@división_literales_enteros_error_txt);
+    ret n32 0;
+
+división_literales_enteros_correcta:
+    llama nada @escribe(@correcto_txt);
+    slt :división_literales_enteros_fin;
+
+división_literales_enteros_fin:
+    ret n32 1;
+}
+
+
+
+@división_literales_reales_error_txt = "\nERROR - op:div con literales reales\n";
+
+define n32 @división_literales_reales(r32 %op1, r32 %op2, r32 %res)
+{
+división_literales_reales_empieza:
+    %res_división_literales_reales = div r32 %op1, %op2;
+    %0 = cmp ig r32 %res_división_literales_reales, %res;
+
+    slt n1 %0, :división_literales_reales_correcta;
+
+división_literales_reales_error:
+    llama nada @escribe(@división_literales_reales_error_txt);
+    ret n32 0;
+
+división_literales_reales_correcta:
+    llama nada @escribe(@correcto_txt);
+    slt :división_literales_reales_fin;
+
+división_literales_reales_fin:
+    ret n32 1;
+}
+
+
+
+define nada @escribe([0 x n32] %txt)
+{
+    // preparo el contador
+    // para ponerlo a cero, guardo en él el resultado de 0+0
+    %0 = sum e32 0, 0;
+
+bucle:
+    // obtengo un carácter de la lista %txt, el de la posición designada por %0
+    %1 = leeval [6 x n32] %txt, %0;
+
+    // incremento el contador
+    %0 = sum e32 %0, 1;
+
+    // escribo el carácter
+    llama nada @#poncar(%1);
+
+    // compruebo si el carácter es distinto a '\0'
+    %2 = cmp dsig n32 %1, '\0';
+
+    // mientras la comprobación sea cierta, salto a la etiqueta :bucle.
+    slt n1 %2, :bucle;
+
+    ret;
+}

@@ -1289,6 +1289,11 @@ Literal op_div(Operación op)
             e0 = to!int64_t(lit0.dato);
             e1 = to!int64_t(lit1.dato);
 
+            if(e1 == 0)
+            {
+                aborta("[línea:" ~ to!dstring(op.línea) ~ "] división por 0");
+            }
+
             resultado = e0 / e1;
 
             auto l = new Literal();
@@ -1329,6 +1334,11 @@ Literal op_div(Operación op)
             
             n0 = to!uint64_t(lit0.dato);
             n1 = to!uint64_t(lit1.dato);
+
+            if(n1 == 0)
+            {
+                aborta("[línea:" ~ to!dstring(op.línea) ~ "] división por 0");
+            }
 
             resultado = n0 / n1;
 
@@ -1467,7 +1477,8 @@ Literal op_llama(Operación op)
 
     if(!declFunc_retorno_correcto(f.nombre, n))
     {
-        aborta("El tipo de retorno no coincide con la declaración de inicio()");
+        aborta("El tipo de retorno no coincide con la declaración de "
+                 ~ f.nombre ~ "()");
     }
 
     if(n is null)

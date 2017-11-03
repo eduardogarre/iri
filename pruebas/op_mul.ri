@@ -1,0 +1,181 @@
+//Código de ejemplo
+módulo código;
+
+@correcto_txt = ".";
+
+define e32 @inicio(r32 %pi)
+{
+multiplicaciones_literales_prueba1:
+    %0 = llama n32 @multiplicación_literales_naturales(0, 1, 0);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :multiplicaciones_literales_prueba2;
+    ret e32 -1;
+
+multiplicaciones_literales_prueba2:
+    %0 = llama n32 @multiplicación_literales_naturales(200, 2, 400);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :multiplicaciones_literales_prueba3;
+    ret e32 -1;
+
+multiplicaciones_literales_prueba3:
+    %0 = llama n32 @multiplicación_literales_naturales(40, 8, 320);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :multiplicaciones_literales_prueba4;
+    ret e32 -1;
+
+multiplicaciones_literales_prueba4:
+    %0 = llama n32 @multiplicación_literales_naturales(10, 200, 2000);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :multiplicaciones_literales_prueba5;
+    ret e32 -1;
+
+multiplicaciones_literales_prueba5:
+    %0 = llama n32 @multiplicación_literales_enteros(1, -1, -1);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :multiplicaciones_literales_prueba6;
+    ret e32 -1;
+
+multiplicaciones_literales_prueba6:
+    %0 = llama n32 @multiplicación_literales_enteros(10, -88, -880);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :multiplicaciones_literales_prueba7;
+    ret e32 -1;
+
+multiplicaciones_literales_prueba7:
+    %0 = llama n32 @multiplicación_literales_enteros(-40, 8, -320);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :multiplicaciones_literales_prueba8;
+    ret e32 -1;
+
+multiplicaciones_literales_prueba8:
+    %0 = llama n32 @multiplicación_literales_enteros(10, -200, -2000);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :multiplicaciones_literales_prueba9;
+    ret e32 -1;
+
+multiplicaciones_literales_prueba9:
+    %0 = llama n32 @multiplicación_literales_reales(-42, 0.1, -4.2);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :multiplicaciones_literales_prueba10;
+    ret e32 -1;
+
+multiplicaciones_literales_prueba10:
+    %0 = llama n32 @multiplicación_literales_reales(1.1e2, 3.14, 345.4);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :multiplicaciones_literales_prueba11;
+    ret e32 -1;
+
+multiplicaciones_literales_prueba11:
+    %0 = llama n32 @multiplicación_literales_reales(1.0e-2, -1.01, -0.0101);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :multiplicaciones_literales_prueba12;
+    ret e32 -1;
+
+multiplicaciones_literales_prueba12:
+    %0 = llama n32 @multiplicación_literales_reales(3.14e3, -0.1, -314);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :multiplicaciones_literales_fin;
+    ret e32 -1;
+
+multiplicaciones_literales_fin:
+    ret e32 0;
+}
+
+
+
+@multiplicación_literales_naturales_error_txt = "\nERROR - op:mul con literales naturales\n";
+
+define n32 @multiplicación_literales_naturales(n32 %op1, n32 %op2, n32 %res)
+{
+multiplicación_literales_naturales_empieza:
+    %res_multiplicación_literales_naturales = mul n32 %op1, %op2;
+    %0 = cmp ig n32 %res_multiplicación_literales_naturales, %res;
+
+    slt n1 %0, :multiplicación_literales_naturales_correcta;
+
+multiplicación_literales_naturales_error:
+    llama nada @escribe(@multiplicación_literales_naturales_error_txt);
+    ret n32 0;
+
+multiplicación_literales_naturales_correcta:
+    llama nada @escribe(@correcto_txt);
+    slt :multiplicación_literales_naturales_fin;
+
+multiplicación_literales_naturales_fin:
+    ret n32 1;
+}
+
+
+
+@multiplicación_literales_enteros_error_txt = "\nERROR - op:mul con literales enteros\n";
+
+define n32 @multiplicación_literales_enteros(e32 %op1, e32 %op2, e32 %res)
+{
+multiplicación_literales_enteros_empieza:
+    %res_multiplicación_literales_enteros = mul e32 %op1, %op2;
+    %0 = cmp ig e32 %res_multiplicación_literales_enteros, %res;
+
+    slt n1 %0, :multiplicación_literales_enteros_correcta;
+
+multiplicación_literales_enteros_error:
+    llama nada @escribe(@multiplicación_literales_enteros_error_txt);
+    ret n32 0;
+
+multiplicación_literales_enteros_correcta:
+    llama nada @escribe(@correcto_txt);
+    slt :multiplicación_literales_enteros_fin;
+
+multiplicación_literales_enteros_fin:
+    ret n32 1;
+}
+
+
+
+@multiplicación_literales_reales_error_txt = "\nERROR - op:mul con literales reales\n";
+
+define n32 @multiplicación_literales_reales(r32 %op1, r32 %op2, r32 %res)
+{
+multiplicación_literales_reales_empieza:
+    %res_multiplicación_literales_reales = mul r32 %op1, %op2;
+    %0 = cmp ig r32 %res_multiplicación_literales_reales, %res;
+
+    slt n1 %0, :multiplicación_literales_reales_correcta;
+
+multiplicación_literales_reales_error:
+    llama nada @escribe(@multiplicación_literales_reales_error_txt);
+    ret n32 0;
+
+multiplicación_literales_reales_correcta:
+    llama nada @escribe(@correcto_txt);
+    slt :multiplicación_literales_reales_fin;
+
+multiplicación_literales_reales_fin:
+    ret n32 1;
+}
+
+
+
+define nada @escribe([0 x n32] %txt)
+{
+    // preparo el contador
+    // para ponerlo a cero, guardo en él el resultado de 0+0
+    %0 = sum e32 0, 0;
+
+bucle:
+    // obtengo un carácter de la lista %txt, el de la posición designada por %0
+    %1 = leeval [6 x n32] %txt, %0;
+
+    // incremento el contador
+    %0 = sum e32 %0, 1;
+
+    // escribo el carácter
+    llama nada @#poncar(%1);
+
+    // compruebo si el carácter es distinto a '\0'
+    %2 = cmp dsig n32 %1, '\0';
+
+    // mientras la comprobación sea cierta, salto a la etiqueta :bucle.
+    slt n1 %2, :bucle;
+
+    ret;
+}
