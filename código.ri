@@ -1,84 +1,81 @@
 //Código de ejemplo
 módulo código;
 
-/*
-También usado para pruebas.
-*/
-
-@lista = [4 x e32] [42, 288, 0, -50];
-
-@estructura = {e32, [2 x r32], {n32, n32, e32, r32}} {42, [3.14, 0], {18, 18, -4, 3.14}};
-
-@txt = privado n32 'h';
-
-declara e32 @sal(e32 %hola, r18 %lol);
-
-@hola = público r64 3.141592;
-
-
-@lol = externo n32;
-
-@roto2 = privado e32 -288;
-
-@xd = privado e32 42;
-
-@mi.prueba<hola>#adios.xyz#entero#real = privado e32 12;
-
-
-define e32 @adiós(r64 %real, n1 %booleano)
+define e32 @inicio(r32 %pi)
 {
-    %0 = conv n1 %booleano a e32;
-    %1 = sum e32 288, %0;
-    %2 = sum e32 288, %1;
-    ret e32 %2;
+sumas_literales_prueba1:
+    %0 = llama e32 @suma_literales_naturales(0, 1, 1);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :sumas_literales_prueba2;
+    ret e32 -1;
+
+sumas_literales_prueba2:
+    %0 = llama e32 @suma_literales_naturales(288, 12, 300);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :sumas_literales_prueba3;
+    ret e32 -1;
+
+sumas_literales_prueba3:
+    %0 = llama e32 @suma_literales_naturales(42, 8, 50);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :sumas_literales_prueba4;
+    ret e32 -1;
+
+sumas_literales_prueba4:
+    %0 = llama e32 @suma_literales_naturales(100, 200, 300);
+    %1 = cmp ig n32 %0, 1;
+    slt n1 %1, :sumas_literales_fin;
+    ret e32 -1;
+
+sumas_literales_fin:
+    ret e32 0;
+}
+
+@suma_literales_naturales_correcta_txt = "OK - op:sum con literales naturales\n";
+@suma_literales_naturales_error_txt = "ERROR - op:sum con literales naturales\n";
+
+define n32 @suma_literales_naturales(n32 %op1, n32 %op2, n32 %res)
+{
+suma_literales_naturales_empieza:
+    %res_suma_literales_naturales = sum n32 %op1, %op2;
+    %0 = cmp ig n32 %res_suma_literales_naturales, %res;
+
+    slt n1 %0, :suma_literales_naturales_correcta;
+
+suma_literales_naturales_error:
+    llama nada @escribe(@suma_literales_naturales_error_txt);
+    ret e32 0;
+
+suma_literales_naturales_correcta:
+    llama nada @escribe(@suma_literales_naturales_correcta_txt);
+    slt :suma_literales_naturales_fin;
+
+suma_literales_naturales_fin:
+    ret e32 1;
 }
 
 
-define e32 @inicio(r32 %pi)
+define nada @escribe([0 x n32] %txt)
 {
-    %x = conv e32 @mi.prueba<hola>#adios.xyz#entero#real a e6;
+    // preparo el contador
+    // para ponerlo a cero, guardo en él el resultado de 0+0
+    %0 = sum e32 0, 0;
 
-    %ptr = rsrva e32;
-    guarda e32 42, e32* %ptr;
-    %mptr = lee e32, e32* %ptr;
+bucle:
+    // obtengo un carácter de la lista %txt, el de la posición designada por %0
+    %1 = leeval [6 x n32] %txt, %0;
 
-    %a = cmp ig e32 42, 41;
-    slt n1 %a, :lol;
+    // incremento el contador
+    %0 = sum e32 %0, 1;
 
-    %w = llama e32 @adiós(%pi, %a);
+    // escribo el carácter
+    llama nada @#poncar(%1);
 
-    %42 = leeval {e32, r32} @estructura, 0;
-    llama nada @#poncar(%42);
+    // compruebo si el carácter es distinto a '\0'
+    %2 = cmp dsig n32 %1, '\0';
 
-    %est43 = ponval {e32, r32} @estructura, e32 43, 0;
+    // mientras la comprobación sea cierta, salto a la etiqueta :bucle.
+    slt n1 %2, :bucle;
 
-    %43 = leeval {e32, r32} %est43, 0;
-
-    llama nada @#poncar(%43);
-
-    llama nada @#poncar('h');
-    llama nada @#poncar('o');
-    llama nada @#poncar('l');
-    llama nada @#poncar('a');
-    llama nada @#poncar('\n');
-
-lol:
-
-    %y = conv e6 %x a e32;
-    %p = phi e32 [18, :lol];
-    %1 = sum e32 %y, @roto2;
-    %2 = sum e32 @xd, %1;
-    %3 = conv e32 %2 a r64;
-    %4 = mul r64 %3, @hola;
-    %5 = conv e32 @xd a r64;
-    %6 = div r64 %4, %5;
-
-    %7 = conv r64 %6 a e32;
-    %8 = conv e32 %7 a n32;
-
-    %9 = sum n32 @txt, %8;
-
-    %10 = conv n32 %9 a e32;
-
-    ret e32 %10;
+    ret;
 }

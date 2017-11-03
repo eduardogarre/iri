@@ -391,6 +391,18 @@ Nodo interpreta(Bloque bloque)
         }
 
         resultado = interpreta_nodo(bloque.ramas[i]);
+
+        // Comprobar si la operación ejecutada ha sido un op:ret.
+        // Si es así, termino la función.
+        Nodo n = bloque.ramas[i];
+        if(n.categoría == Categoría.OPERACIÓN)
+        {
+            Operación op = cast(Operación)n;
+            if(op.dato == "ret")
+            {
+                break;
+            }
+        }
         
         if(resultado !is null)
         {
