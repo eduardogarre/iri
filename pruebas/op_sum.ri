@@ -1,5 +1,5 @@
-//Código de ejemplo
-módulo código;
+// Pruebo la operación 'sum'
+módulo prueba_op_sum;
 
 @correcto_txt = ".";
 
@@ -165,21 +165,16 @@ bucle:
     // obtengo un carácter de la lista %txt, el de la posición designada por %0
     %1 = leeval [6 x n32] %txt, %0;
 
-    // incremento el contador
-    %0 = sum e32 %0, 1;
+    // compruebo si el carácter es '\0'
+    %2 = cmp ig n32 %1, '\0';
 
-    // compruebo si el carácter es distinto a '\0'
-    %2 = cmp dsig n32 %1, '\0';
-
-    // mientras la comprobación sea cierta, salto a la etiqueta :escribe_car.
-    slt n1 %2, :escribe_car;
-
-    // si la comprobación es falsa, no escribo el carácter, salto a fin
+    // si la comprobación es cierta, salto a la etiqueta :fin
     slt n1 %2, :fin;
 
-escribe_car:
-    // escribo el carácter
+    // si la comprobación es falsa, escribo el carácter, aumento el contador y reinicio el bucle
     llama nada @#poncar(%1);
+    %0 = sum e32 %0, 1;
+    slt :bucle;
 
 fin:
     ret;

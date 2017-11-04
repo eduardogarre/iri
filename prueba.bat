@@ -20,6 +20,9 @@ echo op:llama
 echo.
 
 echo op:cmp
+.\iri.exe .\pruebas\op_cmp_ig.ri
+echo.
+.\iri.exe .\pruebas\op_cmp_dsig.ri
 echo.
 
 echo op:conv

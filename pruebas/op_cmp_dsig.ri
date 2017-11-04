@@ -1,0 +1,323 @@
+// Pruebo la operación 'cmp'
+módulo prueba_op_cmp;
+
+@correcto_txt = ".";
+@comparaciones_literales_error = "\nERROR - op:cmp dsig entre literales\n";
+
+define e32 @inicio(r32 %pi)
+{
+    %res = llama n1 @prueba_cmp_dsig_literales_naturales();
+    %er = cmp ig n1 %res, 0;
+    slt n1 %er, :error;
+
+    %res = llama n1 @prueba_cmp_dsig_literales_enteros();
+    %er = cmp ig n1 %res, 0;
+    slt n1 %er, :error;
+
+    %res = llama n1 @prueba_cmp_dsig_literales_reales();
+    %er = cmp ig n1 %res, 0;
+    slt n1 %er, :error;
+
+    ret e32 0;
+
+error:
+    ret e32 -1;
+}
+
+
+define n1 @prueba_cmp_dsig_literales_naturales()
+{
+
+//////////////////////////////  NATURALES  //////////////////////////////
+
+////////////////////////////// DESIGUALDAD //////////////////////////////
+
+
+// Los operandos SÍ son iguales
+
+naturales_prueba1: // compruebo igualdad
+    %1 = cmp dsig n32 1, 1;
+    slt n1 %1, :naturales_prueba1_error;
+    llama nada @escribe(@correcto_txt);
+    slt :naturales_prueba2;
+naturales_prueba1_error:
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+
+naturales_prueba2: // compruebo igualdad
+    %1 = cmp dsig n32 42, 42;
+    slt n1 %1, :naturales_prueba2_error;
+    llama nada @escribe(@correcto_txt);
+    slt :naturales_prueba3;
+naturales_prueba2_error:
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+
+naturales_prueba3: // compruebo igualdad
+    %1 = cmp dsig n32 288, 288;
+    slt n1 %1, :naturales_prueba3_error;
+    llama nada @escribe(@correcto_txt);
+    slt :naturales_prueba4;
+naturales_prueba3_error:
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+
+naturales_prueba4: // compruebo igualdad
+    %1 = cmp dsig n32 0, 0;
+    slt n1 %1, :naturales_prueba4_error;
+    llama nada @escribe(@correcto_txt);
+    slt :naturales_prueba5;
+naturales_prueba4_error:
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+
+
+// Los operandos NO son iguales
+
+naturales_prueba5: // compruebo desigualdad
+    %1 = cmp dsig n32 4, 1;
+    slt n1 %1, :naturales_prueba5_correcto;
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+naturales_prueba5_correcto:
+    llama nada @escribe(@correcto_txt);
+    slt :naturales_prueba6;
+
+naturales_prueba6: // compruebo desigualdad
+    %1 = cmp dsig n32 1, 42;
+    slt n1 %1, :naturales_prueba6_correcto;
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+naturales_prueba6_correcto:
+    llama nada @escribe(@correcto_txt);
+    slt :naturales_prueba7;
+
+naturales_prueba7: // compruebo desigualdad
+    %1 = cmp dsig n32 0, 288;
+    slt n1 %1, :naturales_prueba7_correcto;
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+naturales_prueba7_correcto:
+    llama nada @escribe(@correcto_txt);
+    slt :naturales_prueba8;
+
+naturales_prueba8: // compruebo desigualdad
+    %1 = cmp dsig n32 1024, 1;
+    slt n1 %1, :naturales_prueba8_correcto;
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+naturales_prueba8_correcto:
+    llama nada @escribe(@correcto_txt);
+    slt :naturales_fin;
+
+naturales_fin:
+    ret n1 1;
+}
+
+
+define n1 @prueba_cmp_dsig_literales_enteros()
+{
+
+//////////////////////////////   ENTEROS   //////////////////////////////
+
+////////////////////////////// DESIGUALDAD //////////////////////////////
+
+
+// Los operandos SÍ son iguales
+
+enteros_prueba1: // compruebo igualdad
+    %1 = cmp dsig e32 1, 1;
+    slt n1 %1, :enteros_prueba1_error;
+    llama nada @escribe(@correcto_txt);
+    slt :enteros_prueba2;
+enteros_prueba1_error:
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+
+enteros_prueba2: // compruebo igualdad
+    %1 = cmp dsig e32 -42, -42;
+    slt n1 %1, :enteros_prueba2_error;
+    llama nada @escribe(@correcto_txt);
+    slt :enteros_prueba3;
+enteros_prueba2_error:
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+
+enteros_prueba3: // compruebo igualdad
+    %1 = cmp dsig e32 288, 288;
+    slt n1 %1, :enteros_prueba3_error;
+    llama nada @escribe(@correcto_txt);
+    slt :enteros_prueba4;
+enteros_prueba3_error:
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+
+enteros_prueba4: // compruebo igualdad
+    %1 = cmp dsig e32 0, 0;
+    slt n1 %1, :enteros_prueba4_error;
+    llama nada @escribe(@correcto_txt);
+    slt :enteros_prueba5;
+enteros_prueba4_error:
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+
+
+// Los operandos NO son iguales
+
+enteros_prueba5: // compruebo desigualdad
+    %1 = cmp dsig e32 -1, 1;
+    slt n1 %1, :enteros_prueba5_correcto;
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+enteros_prueba5_correcto:
+    llama nada @escribe(@correcto_txt);
+    slt :enteros_prueba6;
+
+enteros_prueba6: // compruebo desigualdad
+    %1 = cmp dsig e32 1, 42;
+    slt n1 %1, :enteros_prueba6_correcto;
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+enteros_prueba6_correcto:
+    llama nada @escribe(@correcto_txt);
+    slt :enteros_prueba7;
+
+enteros_prueba7: // compruebo desigualdad
+    %1 = cmp dsig e32 0, -288;
+    slt n1 %1, :enteros_prueba7_correcto;
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+enteros_prueba7_correcto:
+    llama nada @escribe(@correcto_txt);
+    slt :enteros_prueba8;
+
+enteros_prueba8: // compruebo desigualdad
+    %1 = cmp dsig e32 1024, -1;
+    slt n1 %1, :enteros_prueba8_correcto;
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+enteros_prueba8_correcto:
+    llama nada @escribe(@correcto_txt);
+    slt :enteros_fin;
+
+enteros_fin:
+    ret n1 1;
+}
+
+
+define n1 @prueba_cmp_dsig_literales_reales()
+{
+
+//////////////////////////////    REALES   //////////////////////////////
+
+////////////////////////////// DESIGUALDAD //////////////////////////////
+
+
+// Los operandos SÍ son iguales
+
+reales_prueba1: // compruebo igualdad
+    %1 = cmp dsig r32 1.0, 1.0;
+    slt n1 %1, :reales_prueba1_error;
+    llama nada @escribe(@correcto_txt);
+    slt :reales_prueba2;
+reales_prueba1_error:
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+
+reales_prueba2: // compruebo igualdad
+    %1 = cmp dsig r32 -4.2, -4.2;
+    slt n1 %1, :reales_prueba2_error;
+    llama nada @escribe(@correcto_txt);
+    slt :reales_prueba3;
+reales_prueba2_error:
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+
+reales_prueba3: // compruebo igualdad
+    %1 = cmp dsig r32 2.8e8, 2.8e8;
+    slt n1 %1, :reales_prueba3_error;
+    llama nada @escribe(@correcto_txt);
+    slt :reales_prueba4;
+reales_prueba3_error:
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+
+reales_prueba4: // compruebo igualdad
+    %1 = cmp dsig r32 0, 0;
+    slt n1 %1, :reales_prueba4_error;
+    llama nada @escribe(@correcto_txt);
+    slt :reales_prueba5;
+reales_prueba4_error:
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+
+
+// Los operandos NO son iguales
+
+reales_prueba5: // compruebo desigualdad
+    %1 = cmp dsig r32 -1.0, 1;
+    slt n1 %1, :reales_prueba5_correcto;
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+reales_prueba5_correcto:
+    llama nada @escribe(@correcto_txt);
+    slt :reales_prueba6;
+
+reales_prueba6: // compruebo desigualdad
+    %1 = cmp dsig r32 1, 4.2;
+    slt n1 %1, :reales_prueba6_correcto;
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+reales_prueba6_correcto:
+    llama nada @escribe(@correcto_txt);
+    slt :reales_prueba7;
+
+reales_prueba7: // compruebo desigualdad
+    %1 = cmp dsig r32 0, -28.8;
+    slt n1 %1, :reales_prueba7_correcto;
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+reales_prueba7_correcto:
+    llama nada @escribe(@correcto_txt);
+    slt :reales_prueba8;
+
+reales_prueba8: // compruebo desigualdad
+    %1 = cmp dsig r32 10.24, -1.0;
+    slt n1 %1, :reales_prueba8_correcto;
+    llama nada @escribe(@comparaciones_literales_error);
+    ret n1 0;
+reales_prueba8_correcto:
+    llama nada @escribe(@correcto_txt);
+    slt :reales_fin;
+
+reales_fin:
+    ret n1 1;
+}
+
+
+
+
+define nada @escribe([0 x n32] %txt)
+{
+    // preparo el contador
+    // para ponerlo a cero, guardo en él el resultado de 0+0
+    %0 = sum e32 0, 0;
+
+bucle:
+    // obtengo un carácter de la lista %txt, el de la posición designada por %0
+    %1 = leeval [6 x n32] %txt, %0;
+
+    // compruebo si el carácter es '\0'
+    %2 = cmp ig n32 %1, '\0';
+
+    // si la comprobación es cierta, salto a la etiqueta :fin
+    slt n1 %2, :fin;
+
+    // si la comprobación es falsa, escribo el carácter, aumento el contador y reinicio el bucle
+    llama nada @#poncar(%1);
+    %0 = sum e32 %0, 1;
+    slt :bucle;
+
+fin:
+    ret;
+}
