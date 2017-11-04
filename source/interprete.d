@@ -1591,12 +1591,12 @@ Literal op_cmp(Operación op)
                 // menor que...
                 resultado = (var0 < var1);
             }
-            else if(comparación ==  "mai")
+            else if(comparación ==  "maig")
             {
                 // mayor o igual que...
                 resultado = (var0 >= var1);
             }
-            else if(comparación ==  "mei")
+            else if(comparación ==  "meig")
             {
                 // menor o igual que...
                 resultado = (var0 <= var1);
@@ -1662,12 +1662,12 @@ Literal op_cmp(Operación op)
                 // menor que...
                 resultado = var0 < var1;
             }
-            else if(comparación ==  "mai")
+            else if(comparación ==  "maig")
             {
                 // mayor o igual que...
                 resultado = var0 >= var1;
             }
-            else if(comparación ==  "mei")
+            else if(comparación ==  "meig")
             {
                 // menor o igual que...
                 resultado = var0 <= var1;
@@ -1733,12 +1733,12 @@ Literal op_cmp(Operación op)
                 // menor que...
                 resultado = var0 < var1;
             }
-            else if(comparación ==  "mai")
+            else if(comparación ==  "maig")
             {
                 // mayor o igual que...
                 resultado = var0 >= var1;
             }
-            else if(comparación ==  "mei")
+            else if(comparación ==  "meig")
             {
                 // menor o igual que...
                 resultado = var0 <= var1;
