@@ -1,5 +1,5 @@
 // Pruebo la operación 'cmp'
-módulo prueba_op_cmp;
+módulo prueba_op_cmp_dsig;
 
 @correcto_txt = ".";
 @comparaciones_literales_error = "\nERROR - op:cmp dsig entre literales\n";

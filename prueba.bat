@@ -24,6 +24,14 @@ echo op:cmp
 echo.
 .\iri.exe .\pruebas\op_cmp_dsig.ri
 echo.
+.\iri.exe .\pruebas\op_cmp_ma.ri
+echo.
+.\iri.exe .\pruebas\op_cmp_me.ri
+echo.
+.\iri.exe .\pruebas\op_cmp_maig.ri
+echo.
+.\iri.exe .\pruebas\op_cmp_meig.ri
+echo.
 
 echo op:conv
 echo.
