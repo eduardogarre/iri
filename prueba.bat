@@ -1,35 +1,22 @@
 @echo OFF
 
-echo op:sum
+echo aritmética: sum, res, mul, div
 .\iri.exe .\pruebas\op_sum.ri
-echo.
-
-echo op:res
 .\iri.exe .\pruebas\op_res.ri
-echo.
-
-echo op:mul
 .\iri.exe .\pruebas\op_mul.ri
-echo.
-
-echo op:div
 .\iri.exe .\pruebas\op_div.ri
 echo.
 
-echo op:llama
+echo funciones: recursión
+.\iri.exe .\pruebas\func_factorial.ri
 echo.
 
-echo op:cmp
+echo comparaciones: ig, dsig, ma, me, maig, meig
 .\iri.exe .\pruebas\op_cmp_ig.ri
-echo.
 .\iri.exe .\pruebas\op_cmp_dsig.ri
-echo.
 .\iri.exe .\pruebas\op_cmp_ma.ri
-echo.
 .\iri.exe .\pruebas\op_cmp_me.ri
-echo.
 .\iri.exe .\pruebas\op_cmp_maig.ri
-echo.
 .\iri.exe .\pruebas\op_cmp_meig.ri
 echo.
 

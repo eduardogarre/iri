@@ -1,0 +1,88 @@
+// Pruebo la operación 'sum'
+módulo prueba_op_sum;
+
+@correcto_txt = ".";
+
+@error_txt = "\nERROR: el resultado del factorial es incorrecto\n";
+
+define e32 @inicio(r32 %pi)
+{
+    %0 = llama n32 @factorial(1);
+    %1 = cmp dsig n32 %0, 1;
+    slt n1 %1, :error;
+    llama nada @escribe(@correcto_txt);
+    
+    %0 = llama n32 @factorial(3);
+    %1 = cmp dsig n32 %0, 6;
+    slt n1 %1, :error;
+    llama nada @escribe(@correcto_txt);
+
+    %0 = llama n32 @factorial(10);
+    %1 = cmp dsig n32 %0, 3628800;
+    slt n1 %1, :error;
+    llama nada @escribe(@correcto_txt);
+
+    %0 = llama n32 @factorial(5);
+    %1 = cmp dsig n32 %0, 120;
+    slt n1 %1, :error;
+    llama nada @escribe(@correcto_txt);
+    
+    %0 = llama n32 @factorial(0);
+    %1 = cmp dsig n32 %0, 1;
+    slt n1 %1, :error;
+    llama nada @escribe(@correcto_txt);
+
+    ret e32 0;
+
+error:
+    llama nada @escribe(@error_txt);
+    ret e32 -1;
+}
+
+define n32 @factorial(n32 %n)
+{
+    // Si el número recibido es 1 ó 0, devuelve 1
+    %0 = cmp meig n32 %n, 1;
+    slt n1 %0, :unidad;
+
+    // Si el n es mayor que 1:
+    // le resto 1 a n
+    %1 = res n32 %n, 1;
+    // paso n-1 a @factorial()
+    %2 = llama n32 @factorial(%1);
+    // multiplico factorial(n-1) por n
+    %f = mul n32 %n, %2;
+    // devuelvo el resultado
+    ret n32 %f;
+
+unidad:
+    ret n32 1;
+}
+
+
+
+
+define nada @escribe([0 x n32] %txt)
+{
+    // preparo el contador
+    // para ponerlo a cero, guardo en él el resultado de 0+0
+    %0 = sum e32 0, 0;
+
+bucle:
+    // obtengo un carácter de la lista %txt, el de la posición designada por %0
+    %1 = leeval [6 x n32] %txt, %0;
+
+    // compruebo si el carácter es '\0'
+    %2 = cmp ig n32 %1, '\0';
+
+    // si la comprobación es cierta, salto a la etiqueta :fin
+    slt n1 %2, :fin;
+
+    // si la comprobación es falsa, escribo el carácter, aumento el contador y reinicio el bucle
+    llama nada @#poncar(%1);
+    %0 = sum e32 %0, 1;
+    slt :bucle;
+
+fin:
+    ret;
+}
