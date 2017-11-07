@@ -305,5 +305,5 @@ Imprime un carácter
 Disponible únicamente si ejecutas el programa RIE con el intérprete `iri`.
 
 ## Licencia
-Publicado bajo la Licencia de Programación Libre 0.1 ("LPL 0.1").
+Publicado bajo la Licencia de Programación Libre ("LPL"), en su versión 0.1, ó versiones más modernas
 https://github.com/Hispanica/licencias
