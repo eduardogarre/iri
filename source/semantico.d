@@ -371,7 +371,7 @@ void paso_obtén_identificadores_globales(Nodo n)
                 auto obj = cast(Módulo)n;
 
                 // Crea la tabla de identificadores global, y la asocio al módulo.
-                auto globtid = new TablaIdentificadores(null, obj);
+                auto globtid = new TablaIdentificadores(obj);
 
                 globtid.dueño = obj;
 

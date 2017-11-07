@@ -9,7 +9,8 @@ import std.stdint;
 import std.stdio;
 
 // Tabla de identificadores que se usa en la ejecución/interpretación.
-TablaIdentificadores tid;
+TablaIdentificadores tid_local;
+TablaIdentificadores tid_global;
 
 Literal analiza(Nodo n)
 {
@@ -78,12 +79,12 @@ bool declFunc_retorno_correcto(dstring f, Nodo n)
         aborta("Me has dado algo diferente a 'null' o un literal");
     }
 
-    if(tid.lee_id(f).nombre is null)
+    if(tid_global.lee_id(f).nombre is null)
     {
         aborta("No has declarado la función '" ~ f ~ "()'.");
     }
 
-    EntradaTablaIdentificadores eid = tid.lee_id(f);
+    EntradaTablaIdentificadores eid = tid_global.lee_id(f);
     // eid: dstring nombre, bool declarado, Nodo declaración, bool definido, Nodo definición;
 
     if(!eid.definido)
@@ -101,7 +102,7 @@ void obtén_etiquetas(Nodo n)
 {
     if(n)
     {
-        tid.define_identificador(":", null, null);
+        tid_local.define_identificador(":", null, null);
 
         for(int i = 0; i < n.ramas.length; i++)
         {
@@ -111,9 +112,9 @@ void obtén_etiquetas(Nodo n)
                 lit.dato = to!dstring(i-1);
                 lit.tipo = "nada";
 
-                if(tid.define_identificador(n.ramas[i].etiqueta, null, lit))
+                if(tid_local.define_identificador(n.ramas[i].etiqueta, null, lit))
                 {
-                    charlatánln("ETIQUETA: " ~ tid.lee_id(n.ramas[i].etiqueta).nombre);
+                    charlatánln("ETIQUETA: " ~ tid_local.lee_id(n.ramas[i].etiqueta).nombre);
                 }
             }
         }
@@ -167,16 +168,16 @@ void obtén_identificadores_globales(Nodo n)
                     uint32_t dato = unsigned(lit.dato[0]);
                     lit.dato = to!dstring(dato);
                     
-                    if(tid.define_identificador(did.nombre, did, lit))
+                    if(tid_global.define_identificador(did.nombre, did, lit))
                     {
-                        charlatánln("define " ~ tid.lee_id(did.nombre).nombre);
+                        charlatánln("define " ~ tid_global.lee_id(did.nombre).nombre);
                     }
                 }
                 else
                 {
-                    if(tid.define_identificador(did.nombre, did, lit))
+                    if(tid_global.define_identificador(did.nombre, did, lit))
                     {
-                        charlatánln("define " ~ tid.lee_id(did.nombre).nombre);
+                        charlatánln("define " ~ tid_global.lee_id(did.nombre).nombre);
                     }
                 }
 
@@ -185,9 +186,9 @@ void obtén_identificadores_globales(Nodo n)
             case Categoría.DECLARA_IDENTIFICADOR_GLOBAL:
                 auto idex = cast(DeclaraIdentificadorGlobal)n;
 
-                if(tid.declara_identificador(idex.nombre, idex))
+                if(tid_global.declara_identificador(idex.nombre, idex))
                 {
-                    charlatánln("declara " ~ tid.lee_id(idex.nombre).nombre);
+                    charlatánln("declara " ~ tid_global.lee_id(idex.nombre).nombre);
                 }
 
                 break;
@@ -207,9 +208,9 @@ void obtén_identificadores_globales(Nodo n)
             case Categoría.DEFINE_FUNCIÓN:
                 auto df = cast(DefineFunción)n;
 
-                if(tid.define_identificador(df.nombre, df, null))
+                if(tid_global.define_identificador(df.nombre, df, null))
                 {
-                    charlatánln("define " ~ tid.lee_id(df.nombre).nombre);
+                    charlatánln("define " ~ tid_global.lee_id(df.nombre).nombre);
                 }
 
                 break;
@@ -217,9 +218,9 @@ void obtén_identificadores_globales(Nodo n)
             case Categoría.DECLARA_FUNCIÓN:
                 auto df = cast(DeclaraFunción)n;
 
-                if(tid.declara_identificador(df.nombre, df))
+                if(tid_global.declara_identificador(df.nombre, df))
                 {
-                    charlatánln("declara " ~ tid.lee_id(df.nombre).nombre);
+                    charlatánln("declara " ~ tid_global.lee_id(df.nombre).nombre);
                 }
 
                 break;
@@ -228,11 +229,11 @@ void obtén_identificadores_globales(Nodo n)
                 auto obj = cast(Módulo)n;
 
                 // Crea la tabla de identificadores global, y la asocio al módulo.
-                auto globtid = new TablaIdentificadores(null, obj);
+                auto globtid = new TablaIdentificadores(obj);
 
                 globtid.dueño = obj;
 
-                tid = globtid;
+                tid_global = globtid;
 
                 break;
 
@@ -251,12 +252,12 @@ Bloque prepara_función(dstring fid, Literal[] args)
 {
     charlatánln("Ejecuta '" ~ fid ~ "()'.");
     
-    if(tid.lee_id(fid).nombre is null)
+    if(tid_global.lee_id(fid).nombre is null)
     {
         aborta("No has declarado la función '" ~ fid ~ "()'.");
     }
 
-    EntradaTablaIdentificadores eid = tid.lee_id(fid);
+    EntradaTablaIdentificadores eid = tid_global.lee_id(fid);
     // eid: dstring nombre, bool declarado, Nodo declaración, bool definido, Nodo definición;
 
     if(!eid.definido)
@@ -268,11 +269,11 @@ Bloque prepara_función(dstring fid, Literal[] args)
     DefineFunción def_func = cast(DefineFunción)eid.definición;
 
     // Crea y configura la tabla de identificadores de la función
-    auto tid_func = new TablaIdentificadores(tid, def_func);
+    auto tid_func = new TablaIdentificadores(def_func);
     tid_func.dueño = def_func;
 
     // Establece la tabla de ids de @inicio() como la tid vigente.
-    tid = tid_func;
+    tid_local = tid_func;
 
     // Declara los argumentos de @inicio().
     charlatánln("Declara los argumentos de '" ~ fid ~ "()'.");
@@ -310,9 +311,9 @@ void declara_argumentos(Nodo n)
             case Categoría.ARGUMENTO:
                 auto a = cast(Argumento)n;
 
-                if(tid.declara_identificador(a.nombre, a))
+                if(tid_local.declara_identificador(a.nombre, a))
                 {
-                    charlatánln("declara " ~ tid.lee_id(a.nombre).nombre);
+                    charlatánln("declara " ~ tid_local.lee_id(a.nombre).nombre);
                 }
                 break;
 
@@ -338,9 +339,9 @@ void define_argumentos(Nodo n, Literal[] args)
                 {
                     auto a = cast(Argumento)n.ramas[i];
 
-                    if(tid.define_identificador(a.nombre, args[i], args[i]))
+                    if(tid_local.define_identificador(a.nombre, args[i], args[i]))
                     {
-                        charlatánln("define " ~ tid.lee_id(a.nombre).nombre);
+                        charlatánln("define " ~ tid_local.lee_id(a.nombre).nombre);
                     }
                 }
                 return;
@@ -383,10 +384,10 @@ Nodo interpreta(Bloque bloque)
         // Buscar nueva etiqueta, para guardarla como 'última etiqueta'
         if(bloque.ramas[i].etiqueta.length > 0)
         {
-            tid.última_etiqueta(bloque.ramas[i].etiqueta);
-            if(tid.última_etiqueta().length > 0)
+            tid_local.última_etiqueta(bloque.ramas[i].etiqueta);
+            if(tid_local.última_etiqueta().length > 0)
             {
-                charlatánln("ETIQUETA: " ~ tid.última_etiqueta());
+                charlatánln("ETIQUETA: " ~ tid_local.última_etiqueta());
             }
         }
 
@@ -413,15 +414,12 @@ Nodo interpreta(Bloque bloque)
         }
     }
 
+    // Vuelco el contenido de la tabla de identificadores local
+    vuelca_tid(tid_local);
+
     // Fin de ejecución de la función:
     // Hay que eliminar la tabla de identificadores actual
-    TablaIdentificadores tid_padre = tid.padre;
-    tid_padre.hijo = null;
-
-    vuelca_tid(tid);
-
-    tid = null;
-    tid = tid_padre;
+    tid_local = null;
 
     return resultado;
 }
@@ -483,7 +481,7 @@ Nodo interpreta_nodo(Nodo n)
                     aborta("He obtenido un literal nulo");
                 }
 
-                tid.define_identificador(id.nombre, a, lit);
+                tid_local.define_identificador(id.nombre, a, lit);
 
                 info(id.nombre ~ " <= ");
                 infoln(lit.tipo ~ ":" ~ lit.dato);
@@ -625,7 +623,12 @@ Literal lee_argumento(Nodo n)
     {
         auto id = cast(Identificador)n;
         // Accediendo a %pi...
-        Nodo l = (tid.lee_id(id.nombre).valor);
+        Nodo l = (tid_local.lee_id(id.nombre).valor);
+        if(l is null)
+        {
+            l = (tid_global.lee_id(id.nombre).valor);
+        }
+
         if(l.categoría == Categoría.LITERAL)
         {
             lit = cast(Literal)l;
@@ -708,9 +711,9 @@ Nodo ejecuta_operación(Operación op)
 
 Literal op_ret(Operación op)
 {
-    if(tid.última_etiqueta().length > 0)
+    if(tid_local.última_etiqueta().length > 0)
     {
-        charlatánln("ETIQUETA: " ~ tid.última_etiqueta());
+        charlatánln("ETIQUETA: " ~ tid_local.última_etiqueta());
     }
     else
     {
@@ -1471,9 +1474,15 @@ Literal op_llama(Operación op)
         }
     }
     
+    // Salva la tid local actual
+    TablaIdentificadores guarda_tid_local = tid_local;
+
     Bloque bloque = prepara_función(f.nombre, args);
 
     Nodo n = interpreta(bloque);
+
+    // Restaura la tid local
+    tid_local = guarda_tid_local;
 
     if(!declFunc_retorno_correcto(f.nombre, n))
     {
@@ -2343,11 +2352,11 @@ Etiqueta op_slt(Operación op)
     {
         Etiqueta etiqueta = cast(Etiqueta)(op.ramas[0]);
 
-        if(tid.lee_id(etiqueta.dato).nombre)
+        if(tid_local.lee_id(etiqueta.dato).nombre)
         {
-            dstring nombre = tid.lee_id(etiqueta.dato).nombre;
+            dstring nombre = tid_local.lee_id(etiqueta.dato).nombre;
 
-            Literal l = cast(Literal)(tid.lee_id(etiqueta.dato).valor);
+            Literal l = cast(Literal)(tid_local.lee_id(etiqueta.dato).valor);
             int contador = to!int(l.dato);
             etiqueta.línea = contador;
 
@@ -2387,11 +2396,11 @@ Etiqueta op_slt(Operación op)
             // Se cumple la condición
             Etiqueta etiqueta = cast(Etiqueta)(op.ramas[2]);
 
-            if(tid.lee_id(etiqueta.dato).nombre)
+            if(tid_local.lee_id(etiqueta.dato).nombre)
             {
-                dstring nombre = tid.lee_id(etiqueta.dato).nombre;
+                dstring nombre = tid_local.lee_id(etiqueta.dato).nombre;
 
-                Literal l = cast(Literal)(tid.lee_id(etiqueta.dato).valor);
+                Literal l = cast(Literal)(tid_local.lee_id(etiqueta.dato).valor);
                 int contador = to!int(l.dato);
                 etiqueta.línea = contador;
 
@@ -2422,9 +2431,9 @@ Literal op_phi(Operación op)
     Tipo t;
     Literal lit;
 
-    if(tid.última_etiqueta().length > 0)
+    if(tid_local.última_etiqueta().length > 0)
     {
-        etiqueta = tid.última_etiqueta();
+        etiqueta = tid_local.última_etiqueta();
         charlatánln("ETIQUETA: " ~ etiqueta);
     }
     else
@@ -2491,7 +2500,7 @@ Literal op_rsrva(Operación op)
     {
         Tipo t = cast(Tipo)(op.ramas[0]);
 
-        Literal * ptr = tid.crea_ptr_local(t);
+        Literal * ptr = tid_local.crea_ptr_local(t);
         
         Literal l = new Literal();
         l.dato = to!dstring(cast(uint64_t)(ptr));
