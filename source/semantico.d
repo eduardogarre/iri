@@ -1,5 +1,7 @@
 module semantico;
 
+dstring módulo = "Semántico.d";
+
 import apoyo;
 import arbol;
 import std.conv;
@@ -308,12 +310,12 @@ void paso_obtén_identificadores_globales(Nodo n)
                 // Debería tener colgando un hijo de clase 'Literal'
                 if(did.ramas.length != 1)
                 {
-                    aborta("El nodo DefineIdentificadorGlobal debería tener un hijo 'Literal'");
+                    aborta(módulo, n.línea, "El nodo DefineIdentificadorGlobal debería tener un hijo 'Literal'");
                 }
 
                 if(did.ramas[0].categoría != Categoría.LITERAL)
                 {
-                    aborta("El nodo DefineIdentificadorGlobal debería tener un hijo 'Literal'");
+                    aborta(módulo, n.línea, "El nodo DefineIdentificadorGlobal debería tener un hijo 'Literal'");
                 }
 
                 Literal lit = cast(Literal)(did.ramas[0]);

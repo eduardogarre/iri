@@ -98,7 +98,15 @@ class TablaIdentificadores
     {
         if(identificador is null)
         {
-            aborta("Me has pasado un identificador nulo");
+            if(declaración is null)
+            {
+                aborta("Apoyo.d", 0, "Me has pasado un identificador nulo");
+            }
+            else
+            {
+                aborta("Apoyo.d", declaración.línea, "Me has pasado un identificador nulo");
+            }
+            
             return false;
         }
 
@@ -112,7 +120,15 @@ class TablaIdentificadores
         if(id in tabla)
         {
             // El identificador ya está en uso.
-            aborta("Ya estabas usando el identificador '" ~ id ~ "'");
+            if(declaración is null)
+            {
+                aborta( "Apoyo.d", 0, "Ya estabas usando el identificador '" ~ id ~ "'");
+            }
+            else
+            {
+                aborta("Apoyo.d", declaración.línea, "Ya estabas usando el identificador '" ~ id ~ "'");
+            }
+            
             return false;
         }
 
@@ -154,7 +170,15 @@ class TablaIdentificadores
     {
         if(identificador is null)
         {
-            aborta("Me has pasado un identificador nulo");
+            if(definición is null)
+            {
+                aborta("Apoyo.d", 0, "Me has pasado un identificador nulo");
+            }
+            else
+            {
+                aborta("Apoyo.d", definición.línea, "Me has pasado un identificador nulo");
+            }
+            
             return false;
         }
 
@@ -256,9 +280,16 @@ void charlatán(dstring txt)
     }
 }
 
-void error(dstring s)
+void error(dstring módulo, ulong línea, dstring s)
 {
-    stdout.writeln("ERROR: "d, s, ".");
+    if(línea == 0)
+    {
+        stdout.writeln("[", módulo, "] ERROR: ", s, ".");
+    }
+    else
+    {
+        stdout.writeln("[", módulo, "] ERROR en línea ", to!dstring(línea), ": ", s, ".");
+    }
 }
 
 void aviso(dstring s)
@@ -269,17 +300,17 @@ void aviso(dstring s)
     }
 }
 
-void aborta(dstring s)
+void aborta(dstring módulo, ulong línea, dstring s)
 {
-    error(s);
+    error(módulo, línea, s);
     exit(-1);
 }
 
-void esperaba(dstring s)
+void esperaba(dstring módulo, ulong línea, dstring s)
 {
     dstring mensaje = "Esperaba ";
     mensaje ~= s;
-    aborta(mensaje);
+    aborta(módulo, línea, mensaje);
 }
 
 

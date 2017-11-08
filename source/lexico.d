@@ -1,5 +1,7 @@
 module lexico;
 
+dstring módulo = "Léxico.d";
+
 import std.conv; // to!tipo()
 import std.stdint;
 import std.stdio;
@@ -682,7 +684,7 @@ private bool texto()
         if(!mismocarácter(código[cursor],'\"'))
         {
             cursor = c;
-            esperaba("un cierre de comilla doble [\"] en la linea " ~ to!dstring(línea));
+            esperaba(módulo, línea, "un cierre de comilla doble [\"]");
         }
 
         cursor++;
@@ -737,7 +739,7 @@ private bool carácter()
             }
             else
             {
-                aborta("No reconozco la secuencia de escape");
+                aborta(módulo, línea, "No reconozco la secuencia de escape");
             }
         }
         else
@@ -754,7 +756,7 @@ private bool carácter()
         if(!mismocarácter(código[cursor],'\''))
         {
             cursor = c;
-            esperaba("un cierre de comilla simple [\'] en la linea " ~ to!dstring(línea));
+            esperaba(módulo, línea, "un cierre de comilla simple [\']");
         }
 
         cursor++;
