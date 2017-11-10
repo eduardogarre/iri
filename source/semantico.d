@@ -277,25 +277,9 @@ void paso_obtén_identificadores_globales(Nodo n)
     {
         switch(n.categoría)
         {
-            case Categoría.LITERAL:
-                auto l = cast(Literal)n;
-                break;
-
-            case Categoría.IDENTIFICADOR:
-                auto l = cast(Identificador)n;
-                break;
-
-            case Categoría.OPERACIÓN:
-                auto o = cast(Operación)n;
-                break;
-
-            case Categoría.ASIGNACIÓN:
-                auto a = cast(Asignación)n;
-                break;
-
             case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
                 auto did = cast(DefineIdentificadorGlobal)n;
-
+                
                 // Debería tener colgando un hijo de clase 'Literal'
                 if(did.ramas.length != 1)
                 {
@@ -326,18 +310,6 @@ void paso_obtén_identificadores_globales(Nodo n)
 
                 break;
 
-            case Categoría.BLOQUE:
-                auto b = cast(Bloque)n;
-                break;
-
-            case Categoría.ARGUMENTOS:
-                auto a = cast(Argumentos)n;
-                break;
-
-            case Categoría.ARGUMENTO:
-                auto a = cast(Argumento)n;
-                break;
-
             case Categoría.DEFINE_FUNCIÓN:
                 auto df = cast(DefineFunción)n;
 
@@ -362,11 +334,9 @@ void paso_obtén_identificadores_globales(Nodo n)
                 auto obj = cast(Módulo)n;
 
                 // Crea la tabla de identificadores global, y la asocio al módulo.
-                auto globtid = new TablaIdentificadores(obj);
+                tid_global = new TablaIdentificadores(obj);
 
-                globtid.dueño = obj;
-
-                tid_global = globtid;
+                tid_global.dueño = obj;
 
                 break;
 

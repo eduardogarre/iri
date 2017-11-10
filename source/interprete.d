@@ -151,31 +151,17 @@ void obtén_etiquetas(Nodo n)
     }
 }
 
+// Rellena tid_global con los id's globales, tanto variables como funciones,
+// independientemente de que sean declarados o definidos
 void obtén_identificadores_globales(Nodo n)
 {
     if(n)
     {
         switch(n.categoría)
         {
-            case Categoría.LITERAL:
-                auto l = cast(Literal)n;
-                break;
-
-            case Categoría.IDENTIFICADOR:
-                auto l = cast(Identificador)n;
-                break;
-
-            case Categoría.OPERACIÓN:
-                auto o = cast(Operación)n;
-                break;
-
-            case Categoría.ASIGNACIÓN:
-                auto a = cast(Asignación)n;
-                break;
-
             case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
                 auto did = cast(DefineIdentificadorGlobal)n;
-
+                
                 // Debería tener colgando un hijo de clase 'Literal'
                 if(did.ramas.length != 1)
                 {
@@ -189,22 +175,9 @@ void obtén_identificadores_globales(Nodo n)
 
                 Literal lit = cast(Literal)(did.ramas[0]);
 
-                if((lit.tipo == "carácter") && (lit.dato.length == 1))
+                if(tid_global.define_identificador(did.nombre, did, lit))
                 {
-                    uint32_t dato = unsigned(lit.dato[0]);
-                    lit.dato = to!dstring(dato);
-                    
-                    if(tid_global.define_identificador(did.nombre, did, lit))
-                    {
-                        charlatánln("define " ~ tid_global.lee_id(did.nombre).nombre);
-                    }
-                }
-                else
-                {
-                    if(tid_global.define_identificador(did.nombre, did, lit))
-                    {
-                        charlatánln("define " ~ tid_global.lee_id(did.nombre).nombre);
-                    }
+                    charlatánln("define " ~ tid_global.lee_id(did.nombre).nombre);
                 }
 
                 break;
@@ -217,18 +190,6 @@ void obtén_identificadores_globales(Nodo n)
                     charlatánln("declara " ~ tid_global.lee_id(idex.nombre).nombre);
                 }
 
-                break;
-
-            case Categoría.BLOQUE:
-                auto b = cast(Bloque)n;
-                break;
-
-            case Categoría.ARGUMENTOS:
-                auto a = cast(Argumentos)n;
-                break;
-
-            case Categoría.ARGUMENTO:
-                auto a = cast(Argumento)n;
                 break;
 
             case Categoría.DEFINE_FUNCIÓN:
@@ -255,11 +216,9 @@ void obtén_identificadores_globales(Nodo n)
                 auto obj = cast(Módulo)n;
 
                 // Crea la tabla de identificadores global, y la asocio al módulo.
-                auto globtid = new TablaIdentificadores(obj);
+                tid_global = new TablaIdentificadores(obj);
 
-                globtid.dueño = obj;
-
-                tid_global = globtid;
+                tid_global.dueño = obj;
 
                 break;
 
@@ -352,10 +311,12 @@ void declara_argumentos(Nodo n)
             default: break;
         }
 
-        int i;
-        for(i = 0; i < n.ramas.length; i++)
+        if(n.categoría == Categoría.ARGUMENTOS)
         {
-            declara_argumentos(n.ramas[i]);
+            for(int i = 0; i < n.ramas.length; i++)
+            {
+                declara_argumentos(n.ramas[i]);
+            }
         }
     }
 }
