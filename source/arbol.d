@@ -151,19 +151,6 @@ class Asignación : Nodo
     }
 }
 
-class DefineIdentificadorLocal : Nodo
-{
-    dstring ámbito  = "";
-    dstring tipo    = "";
-    dstring nombre  = "";
-
-    this()
-    {
-        super();
-        this.categoría = Categoría.DEFINE_IDENTIFICADOR_LOCAL;
-    }
-}
-
 class DefineIdentificadorGlobal : Nodo
 {
     dstring ámbito  = "";

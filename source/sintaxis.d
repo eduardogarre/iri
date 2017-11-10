@@ -349,18 +349,6 @@ private Nodo afirmación()
             return r;
         }
     }
-    else if(auto r = define_identificador_local())
-    {
-        if(e !is null)
-        {
-            r.etiqueta = e.dato;
-        }
-        
-        if(notación(";"))
-        {
-            return r;
-        }
-    }
 
     cursor = c;
     return null;
@@ -482,58 +470,6 @@ private DefineIdentificadorGlobal define_identificador_global()
     if(auto l = literal())
     {
         l.tipo = t.tipo;
-        i.ramas ~= l;
-    }
-    else
-    {
-        cursor = c;
-        return null;
-    }
-
-    return i;
-}
-
-
-//DEF_ID_LOC := ID = (local | constante) LITERAL
-private DefineIdentificadorLocal define_identificador_local()
-{
-    uint c = cursor;
-    
-    auto i = new DefineIdentificadorLocal();
-
-    if(auto id = identificador())
-    {
-        i.nombre = id.nombre;
-        i.línea = id.línea;
-    }
-    else
-    {
-        cursor = c;
-        return null;
-    }
-
-    if(!notación("="))
-    {
-        cursor = c;
-        return null;
-    }
-
-    if(auto n = reservada("local"))
-    {
-        i.ámbito = "local";
-    }
-    else if(auto n = reservada("constante"))
-    {
-        i.ámbito = "constante";
-    }
-    else
-    {
-        cursor = c;
-        return null;
-    }
-
-    if(auto l = literal())
-    {
         i.ramas ~= l;
     }
     else

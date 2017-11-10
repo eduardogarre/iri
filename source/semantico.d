@@ -16,19 +16,24 @@ import std.stdio;
 // Las variables son declaradas y definidas una sola vez en el ámbito activo
 
 
-// Para el análisis semántico creo una tabla desechable de identificadores.
-TablaIdentificadores tid;
+// Para el análisis semántico creo tablas desechables para los identificadores.
+TablaIdentificadores tid_global;
+TablaIdentificadores tid_local;
 
 Nodo analiza(Nodo n)
 {
     charlatánln("Análisis semántico.");
-    imprime_árbol(n);
+    imprime_árbol(n); // árbol antes del análisis semántico
 
 	charlatánln();
 
     paso_obtén_identificadores_globales(n);
 
     charlatánln();
+
+    imprime_árbol(n); // árbol después del análisis semántico
+
+	charlatánln();
 
     return n;
 }
@@ -161,20 +166,6 @@ void imprime_árbol(Nodo n)
                 charlatánln("]");
                 break;
 
-            case Categoría.DEFINE_IDENTIFICADOR_LOCAL:
-                auto did = cast(DefineIdentificadorLocal)n;
-                charlatán(to!dstring(did.categoría));
-                charlatán(" [ámbito:");
-                charlatán(did.ámbito);
-                charlatán("] [tipo:");
-                charlatán(did.tipo);
-                charlatán("] [nombre:");
-                charlatán(did.nombre);
-                charlatán("] [línea:");
-                charlatán(to!dstring(did.línea));
-                charlatánln("]");
-                break;
-
             case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
                 auto did = cast(DefineIdentificadorGlobal)n;
                 charlatán(to!dstring(did.categoría));
@@ -278,6 +269,8 @@ void imprime_árbol(Nodo n)
     profundidad_árbol_gramatical--;
 }
 
+// Rellena tid_global con los id's globales, tanto variables como funciones,
+// independientemente de que sean declarados o definidos
 void paso_obtén_identificadores_globales(Nodo n)
 {
     if(n)
@@ -300,10 +293,6 @@ void paso_obtén_identificadores_globales(Nodo n)
                 auto a = cast(Asignación)n;
                 break;
 
-            case Categoría.DEFINE_IDENTIFICADOR_LOCAL:
-                auto did = cast(DefineIdentificadorLocal)n;
-                break;
-
             case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
                 auto did = cast(DefineIdentificadorGlobal)n;
 
@@ -320,9 +309,9 @@ void paso_obtén_identificadores_globales(Nodo n)
 
                 Literal lit = cast(Literal)(did.ramas[0]);
 
-                if(tid.define_identificador(did.nombre, did, lit))
+                if(tid_global.define_identificador(did.nombre, did, lit))
                 {
-                    charlatánln("define " ~ tid.lee_id(did.nombre).nombre);
+                    charlatánln("define " ~ tid_global.lee_id(did.nombre).nombre);
                 }
 
                 break;
@@ -330,9 +319,9 @@ void paso_obtén_identificadores_globales(Nodo n)
             case Categoría.DECLARA_IDENTIFICADOR_GLOBAL:
                 auto idex = cast(DeclaraIdentificadorGlobal)n;
 
-                if(tid.declara_identificador(idex.nombre, idex))
+                if(tid_global.declara_identificador(idex.nombre, idex))
                 {
-                    charlatánln("declara " ~ tid.lee_id(idex.nombre).nombre);
+                    charlatánln("declara " ~ tid_global.lee_id(idex.nombre).nombre);
                 }
 
                 break;
@@ -352,9 +341,9 @@ void paso_obtén_identificadores_globales(Nodo n)
             case Categoría.DEFINE_FUNCIÓN:
                 auto df = cast(DefineFunción)n;
 
-                if(tid.define_identificador(df.nombre, df, null))
+                if(tid_global.define_identificador(df.nombre, df, null))
                 {
-                    charlatánln("define " ~ tid.lee_id(df.nombre).nombre);
+                    charlatánln("define " ~ tid_global.lee_id(df.nombre).nombre);
                 }
 
                 break;
@@ -362,9 +351,9 @@ void paso_obtén_identificadores_globales(Nodo n)
             case Categoría.DECLARA_FUNCIÓN:
                 auto df = cast(DeclaraFunción)n;
 
-                if(tid.declara_identificador(df.nombre, df))
+                if(tid_global.declara_identificador(df.nombre, df))
                 {
-                    charlatánln("declara " ~ tid.lee_id(df.nombre).nombre);
+                    charlatánln("declara " ~ tid_global.lee_id(df.nombre).nombre);
                 }
 
                 break;
@@ -377,7 +366,7 @@ void paso_obtén_identificadores_globales(Nodo n)
 
                 globtid.dueño = obj;
 
-                tid = globtid;
+                tid_global = globtid;
 
                 break;
 

@@ -173,10 +173,6 @@ void obtén_identificadores_globales(Nodo n)
                 auto a = cast(Asignación)n;
                 break;
 
-            case Categoría.DEFINE_IDENTIFICADOR_LOCAL:
-                auto did = cast(DefineIdentificadorLocal)n;
-                break;
-
             case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
                 auto did = cast(DefineIdentificadorGlobal)n;
 
@@ -522,21 +518,6 @@ Nodo interpreta_nodo(Nodo n)
                 info(id.nombre ~ " <= ");
                 infoln(lit.tipo ~ ":" ~ lit.dato);
 
-                return null;
-                //break;
-
-            case Categoría.DEFINE_IDENTIFICADOR_LOCAL:
-                auto did = cast(DefineIdentificadorLocal)n;
-                charlatán(to!dstring(did.categoría));
-                charlatán(" [ámbito:");
-                charlatán(did.ámbito);
-                charlatán("] [tipo:");
-                charlatán(did.tipo);
-                charlatán("] [nombre:");
-                charlatán(did.nombre);
-                charlatán("] [línea:");
-                charlatán(to!dstring(did.línea));
-                charlatánln("]");
                 return null;
                 //break;
 
