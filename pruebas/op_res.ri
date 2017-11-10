@@ -107,15 +107,15 @@ resta_literales_reales_fin:
 }
 
 
-
 define nada @escribe([0 x n32] %txt)
 {
-    // preparo el contador
-    // para ponerlo a cero, guardo en él el resultado de 0+0
-    %0 = sum e32 0, 0;
+    // preparo el contador %i, y lo pongo a 0
+    %ptr_i = rsrva n32;
+    guarda n32 0, n32* %ptr_i;
 
 bucle:
-    // obtengo un carácter de la lista %txt, el de la posición designada por %0
+    // obtengo un carácter de la lista %txt, el de la posición designada por %ptr_i
+    %0 = lee n32, n32* %ptr_i;
     %1 = leeval [6 x n32] %txt, %0;
 
     // compruebo si el carácter es '\0'
@@ -126,7 +126,9 @@ bucle:
 
     // si la comprobación es falsa, escribo el carácter, aumento el contador y reinicio el bucle
     llama nada @#poncar(%1);
-    %0 = sum e32 %0, 1;
+    %3 = sum e32 %0, 1;
+    guarda n32 %3, n32* %ptr_i;
+    
     slt :bucle;
 
 fin:
