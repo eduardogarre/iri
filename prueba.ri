@@ -1,10 +1,10 @@
 módulo prueba;
 
-@comparaciones_literales_error = "ERROR - op:cmp entre literales\n";
+@texto_de_prueba = "PRUEBA - texto de prueba: CORRECTO.\n";
 
 define e32 @inicio(r32 %pi)
 {
-    llama nada @escribe(@comparaciones_literales_error);
+    llama nada @escribe(@texto_de_prueba);
 
     ret e32 0;
 }
