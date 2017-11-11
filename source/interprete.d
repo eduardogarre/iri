@@ -17,7 +17,7 @@ TablaIdentificadores tid_global;
 Literal analiza(Nodo n)
 {
     charlatánln("Fase de Interpretación.");
-    
+
     obtén_identificadores_globales(n);
 
 	charlatánln();
@@ -487,8 +487,11 @@ Nodo interpreta_nodo(Nodo n)
                 charlatán(to!dstring(did.categoría));
                 charlatán(" [ámbito:");
                 charlatán(did.ámbito);
-                charlatán("] [tipo:");
-                charlatán(did.tipo);
+                if(did.tipo !is null)
+                {
+                    charlatán("] [tipo:");
+                    charlatán((cast(Tipo)(did.tipo)).tipo);
+                }
                 charlatán("] [nombre:");
                 charlatán(did.nombre);
                 charlatán("] [línea:");

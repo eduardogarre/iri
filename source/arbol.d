@@ -154,8 +154,8 @@ class Asignación : Nodo
 class DefineIdentificadorGlobal : Nodo
 {
     dstring ámbito  = "";
-    dstring tipo    = "";
     dstring nombre  = "";
+    Tipo tipo;
 
     this()
     {

@@ -416,7 +416,6 @@ private DefineIdentificadorGlobal define_identificador_global()
     uint c = cursor;
     
     auto i = new DefineIdentificadorGlobal();
-    auto t = new Tipo;
 
     if(auto id = identificador())
     {
@@ -454,7 +453,7 @@ private DefineIdentificadorGlobal define_identificador_global()
 
     if(auto ti = tipo())
     {
-        t.tipo = ti.tipo;
+        i.tipo = ti;
     }
     else if(auto l = texto())
     {
@@ -469,7 +468,6 @@ private DefineIdentificadorGlobal define_identificador_global()
 
     if(auto l = literal())
     {
-        l.tipo = t.tipo;
         i.ramas ~= l;
     }
     else

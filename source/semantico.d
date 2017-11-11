@@ -173,8 +173,11 @@ void imprime_árbol(Nodo n)
                 charlatán(to!dstring(did.categoría));
                 charlatán(" [ámbito:");
                 charlatán(did.ámbito);
-                charlatán("] [tipo:");
-                charlatán(did.tipo);
+                if(did.tipo !is null)
+                {
+                    charlatán("] [tipo:");
+                    charlatán((cast(Tipo)(did.tipo)).tipo);
+                }
                 charlatán("] [nombre:");
                 charlatán(did.nombre);
                 charlatán("] [línea:");
