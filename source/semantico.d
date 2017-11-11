@@ -338,6 +338,18 @@ void paso_obtén_identificadores_globales(Nodo n)
             case Categoría.DEFINE_FUNCIÓN:
                 auto df = cast(DefineFunción)n;
 
+                EntradaTablaIdentificadores id = tid_global.lee_id(df.nombre);
+                
+                if(id.declarado)
+                {
+                    // Comprueba que la declaración y la definición coinciden
+                }
+
+                if(id.definido)
+                {
+                    aborta(módulo, df.línea, "Ya habías definido " ~ df.nombre ~ "()");
+                }
+
                 if(tid_global.define_identificador(df.nombre, df, null))
                 {
                     charlatánln("define " ~ tid_global.lee_id(df.nombre).nombre);
@@ -347,6 +359,18 @@ void paso_obtén_identificadores_globales(Nodo n)
 
             case Categoría.DECLARA_FUNCIÓN:
                 auto df = cast(DeclaraFunción)n;
+
+                EntradaTablaIdentificadores id = tid_global.lee_id(df.nombre);
+                
+                if(id.declarado)
+                {
+                    aborta(módulo, df.línea, "Ya habías declarado " ~ df.nombre ~ "()");
+                }
+
+                if(id.definido)
+                {
+                    // Comprueba que la declaración y la definición coinciden
+                }
 
                 if(tid_global.declara_identificador(df.nombre, df))
                 {
