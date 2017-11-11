@@ -283,15 +283,28 @@ void paso_obtén_identificadores_globales(Nodo n)
                 // Debería tener colgando un hijo de clase 'Literal'
                 if(did.ramas.length != 1)
                 {
-                    aborta(módulo, n.línea, "El nodo DefineIdentificadorGlobal debería tener un hijo 'Literal'");
+                    aborta(módulo, n.línea, "El nodo DefineIdentificadorGlobal debería tener un Nodo hijo de categoría 'Literal'");
                 }
 
                 if(did.ramas[0].categoría != Categoría.LITERAL)
                 {
-                    aborta(módulo, n.línea, "El nodo DefineIdentificadorGlobal debería tener un hijo 'Literal'");
+                    aborta(módulo, n.línea, "El nodo DefineIdentificadorGlobal debería tener un Nodo hijo de categoría 'Literal'");
                 }
 
                 Literal lit = cast(Literal)(did.ramas[0]);
+
+                
+                EntradaTablaIdentificadores id = tid_global.lee_id(did.nombre);
+                
+                if(id.declarado)
+                {
+                    // Comprueba que la declaración y la definición coinciden
+                }
+
+                if(id.definido)
+                {
+                    aborta(módulo, did.línea, "Ya habías definido la variable global " ~ did.nombre);
+                }
 
                 if(tid_global.define_identificador(did.nombre, did, lit))
                 {
@@ -302,6 +315,18 @@ void paso_obtén_identificadores_globales(Nodo n)
 
             case Categoría.DECLARA_IDENTIFICADOR_GLOBAL:
                 auto idex = cast(DeclaraIdentificadorGlobal)n;
+
+                EntradaTablaIdentificadores id = tid_global.lee_id(idex.nombre);
+                
+                if(id.declarado)
+                {
+                    aborta(módulo, idex.línea, "Ya habías declarado la variable global " ~ idex.nombre);
+                }
+
+                if(id.definido)
+                {
+                    // Comprueba que la declaración y la definición coinciden
+                }
 
                 if(tid_global.declara_identificador(idex.nombre, idex))
                 {
