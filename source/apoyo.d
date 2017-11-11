@@ -157,7 +157,7 @@ class TablaIdentificadores
         EntradaTablaIdentificadores eid;
 
         eid.valor = new Literal;
-        eid.valor.tipo = t.tipo;
+        eid.valor.tipo = t;
 
         tabla[id] = eid;
 

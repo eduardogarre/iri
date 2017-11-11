@@ -84,7 +84,7 @@ class Tipo : Nodo
 
 class Literal : Nodo
 {
-    dstring tipo;
+    Tipo tipo;
     bool vector;
     bool estructura;
 
@@ -92,6 +92,7 @@ class Literal : Nodo
     {
         super();
         this.categoría = Categoría.LITERAL;
+        tipo = new Tipo();
     }
 
     Literal dup()

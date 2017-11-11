@@ -119,8 +119,15 @@ void imprime_árbol(Nodo n)
                 }
                 else
                 {
-                    charlatán(" [tipo:");
-                    charlatán(l.tipo);
+                    if(l.tipo is null)
+                    {
+
+                    }
+                    else
+                    {
+                        charlatán("] [tipo:");
+                        charlatán(l.tipo.tipo);
+                    }
                     charlatán("] [dato:");
                     charlatán(l.dato ~ "]");
                 }

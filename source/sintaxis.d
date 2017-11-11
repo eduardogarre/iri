@@ -1033,7 +1033,7 @@ private Operación op_slt()
                 {
                     auto l = new Literal();
                     l.dato = n.dato;
-                    l.tipo = t.tipo;
+                    l.tipo = t;
                     o.ramas ~= l;
                 }
                 else // Error.
@@ -1903,7 +1903,7 @@ private Literal literal()
     if(Nodo n = número())
     {
         l.dato = n.dato;
-        l.tipo = "número";
+        l.tipo.tipo = "número";
         l.línea = n.línea;
 
         return l;
@@ -1917,7 +1917,6 @@ private Literal literal()
         }
 
         l.dato = to!dstring(dato);
-        l.tipo = "";
         l.línea = n.línea;
 
         return l;
@@ -2056,12 +2055,11 @@ private Literal vector()
         }
         else if(Literal lit = literal())
         {
-            if((lit.tipo == "carácter") && (lit.dato.length == 1))
+            if((lit.tipo.tipo == "carácter") && (lit.dato.length == 1))
             {
                 uint32_t dato = unsigned(lit.dato[0]);
                 lit.dato = to!dstring(dato);
             }
-            lit.tipo = "";
             
             l.ramas ~= lit;
         }
@@ -2085,12 +2083,11 @@ private Literal vector()
             }
             else if(Literal lit = literal())
             {
-                if((lit.tipo == "carácter") && (lit.dato.length == 1))
+                if((lit.tipo.tipo == "carácter") && (lit.dato.length == 1))
                 {
                     uint32_t dato = unsigned(lit.dato[0]);
                     lit.dato = to!dstring(dato);
                 }
-                lit.tipo = "";
             
                 l.ramas ~= lit;
             }

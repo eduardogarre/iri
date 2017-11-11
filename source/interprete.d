@@ -24,7 +24,9 @@ Literal analiza(Nodo n)
 
     Literal[] args;
     args ~= new Literal();
-    args[0].tipo = "r32";
+    Tipo ti = new Tipo();
+    ti.tipo = "r32";
+    args[0].tipo = ti;
     args[0].dato = "3.14159";
     
     Bloque bloque = prepara_función("@inicio", args);
@@ -80,7 +82,7 @@ bool declFunc_retorno_correcto(dstring f, Nodo n)
     else if(n.categoría == Categoría.LITERAL)
     {
         Literal lit = cast(Literal)n;
-        tipo = lit.tipo;
+        tipo = lit.tipo.tipo;
     }
     else
     {
@@ -140,7 +142,8 @@ void obtén_etiquetas(Nodo n)
             {
                 auto lit = new Literal();
                 lit.dato = to!dstring(i-1);
-                lit.tipo = "nada";
+                lit.tipo = new Tipo();
+                lit.tipo.tipo = "nada";
 
                 if(tid_local.define_identificador(n.ramas[i].etiqueta, null, lit))
                 {
@@ -459,10 +462,12 @@ Nodo interpreta_nodo(Nodo n)
 
             case Categoría.OPERACIÓN:
                 auto o = cast(Operación)n;
+                
                 return ejecuta_operación(o);
                 //break;
 
             case Categoría.ASIGNACIÓN:
+            
                 auto a = cast(Asignación)n;
 
                 auto id = cast(Identificador)a.ramas[0];
@@ -477,7 +482,7 @@ Nodo interpreta_nodo(Nodo n)
                 tid_local.define_identificador(id.nombre, a, lit);
 
                 info(id.nombre ~ " <= ");
-                infoln(lit.tipo ~ ":" ~ lit.dato);
+                infoln(lit.tipo.tipo ~ ":" ~ lit.dato);
 
                 return null;
                 //break;
@@ -712,8 +717,8 @@ Literal op_ret(Operación op)
         // ret <tipo> (<literal>|<id>);
         Tipo t = cast(Tipo)(op.ramas[0]);
         Literal lit = lee_argumento(op.ramas[1]);
-        lit.tipo = t.tipo;
-        infoln("op: ret " ~ lit.tipo ~ " " ~ lit.dato ~ " [" ~ lit.dato ~ "]");
+        lit.tipo = t;
+        infoln("op: ret " ~ lit.tipo.tipo ~ " " ~ lit.dato ~ " [" ~ lit.dato ~ "]");
         return lit;
     }
     else if(op.ramas.length == 0)
@@ -788,7 +793,7 @@ Literal op_sum(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: sum " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e0)
@@ -829,7 +834,7 @@ Literal op_sum(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: sum " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n0)
@@ -870,7 +875,7 @@ Literal op_sum(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: sum " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r0)
@@ -951,7 +956,7 @@ Literal op_res(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: res " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e0)
@@ -992,7 +997,7 @@ Literal op_res(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: res " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n0)
@@ -1033,7 +1038,7 @@ Literal op_res(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: res " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r0)
@@ -1114,7 +1119,7 @@ Literal op_mul(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: mul " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e0)
@@ -1155,7 +1160,7 @@ Literal op_mul(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: mul " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n0)
@@ -1196,7 +1201,7 @@ Literal op_mul(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: mul " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r0)
@@ -1282,7 +1287,7 @@ Literal op_div(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: div " ~ "e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(e0)
@@ -1328,7 +1333,7 @@ Literal op_div(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: div " ~ "n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(n0)
@@ -1369,7 +1374,7 @@ Literal op_div(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: div " ~ "r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(r0)
@@ -1436,7 +1441,7 @@ Literal op_llama(Operación op)
             dato = "\\t";
         }
 
-        info(l.tipo ~ ":" ~ dato);
+        //info(l.tipo.tipo ~ ":" ~ dato);
 
         i++;
     }
@@ -1594,7 +1599,7 @@ Literal op_cmp(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: cmp " ~ comparación ~ " e" ~ to!dstring(tamaño) ~ " " ~ to!dstring(var0)
@@ -1665,7 +1670,7 @@ Literal op_cmp(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: cmp " ~ comparación ~ " n" ~ to!dstring(tamaño) ~ " " ~ to!dstring(var0)
@@ -1736,7 +1741,7 @@ Literal op_cmp(Operación op)
 
             auto l = new Literal();
             l.dato = to!dstring(resultado);
-            l.tipo = t.tipo;
+            l.tipo = t;
 
             dstring txt;
             txt = "op: cmp " ~ comparación ~ " r" ~ to!dstring(tamaño) ~ " " ~ to!dstring(var0)
@@ -1761,7 +1766,8 @@ Literal op_cmp(Operación op)
     dstring txt = (resultado?uno:cero);
 
     Literal resul = new Literal;
-    resul.tipo = "n1";
+    resul.tipo = new Tipo();
+    resul.tipo.tipo = "n1";
     resul.dato = txt;
 
     return resul;
@@ -1783,12 +1789,11 @@ Literal op_conv(Operación op)
         // conv rX eY
     Tipo t = cast(Tipo)(op.ramas[0]);
     Literal origen = lee_argumento(op.ramas[1]);
-    Tipo destino = new Tipo();
-    destino.tipo = (cast(Tipo)(op.ramas[2])).tipo;
+    Tipo destino = (cast(Tipo)(op.ramas[2]));
     Literal resultado = new Literal();
     uint32_t tamaño_origen, tamaño_destino;
 
-    resultado.tipo = destino.tipo;
+    resultado.tipo = destino;
 
     switch(t.tipo[0])
     {
@@ -2313,7 +2318,7 @@ Literal op_conv(Operación op)
     }
     else
     {
-        infoln(" [" ~ resultado.tipo ~ ":" ~ resultado.dato ~ "]");
+        infoln(" [" ~ resultado.tipo.tipo ~ ":" ~ resultado.dato ~ "]");
 
         return resultado;
     }
@@ -2451,7 +2456,7 @@ Literal op_phi(Operación op)
                 {
                     lit = cast(Literal)op.ramas[i - 1];
 
-                    lit.tipo = t.tipo;
+                    lit.tipo = t;
 
                     return lit;
                 }
@@ -2492,6 +2497,7 @@ Literal op_rsrva(Operación op)
     }
 
     aborta(módulo, op.línea, "rsrva <tipo>");
+    
     return null;
 }
 
@@ -2514,7 +2520,7 @@ Literal op_lee(Operación op)
         semantico.imprime_árbol(*l);
 
         infoln("op: lee " ~ t1.tipo ~ ", " ~ t2.tipo ~ "* " ~ lit.dato
-               ~ " [" ~ (*l).tipo ~ ":" ~ (*l).dato ~ "]");
+               ~ " [" ~ (*l).tipo.tipo ~ ":" ~ (*l).dato ~ "]");
         
         return *l;
     }
@@ -2540,7 +2546,7 @@ Literal op_guarda(Operación op)
 
         Literal * ptr = cast(Literal *)(to!uint64_t(lit1.dato));
         (*ptr).dato = lit0.dato;
-        (*ptr).tipo = t1.tipo;
+        (*ptr).tipo = t1;
 
         semantico.imprime_árbol(*ptr);
 
@@ -2584,7 +2590,7 @@ Literal op_leeval(Operación op)
             Literal resultado = res.dup();
 
             infoln("op: leeval [" ~ to!dstring(t.elementos) ~ " x " ~ t.tipo
-                ~ "] [vector] [" ~ resultado.tipo ~ ":" ~ resultado.dato ~ "]");
+                ~ "] [vector] [" ~ resultado.tipo.tipo ~ ":" ~ resultado.dato ~ "]");
             
             return resultado;
         }
@@ -2603,7 +2609,7 @@ Literal op_leeval(Operación op)
 
             Literal resultado = res.dup();
 
-            infoln("op: leeval [estructura] [" ~ resultado.tipo ~ ":" ~ resultado.dato ~ "]");
+            infoln("op: leeval [estructura] [" ~ resultado.tipo.tipo ~ ":" ~ resultado.dato ~ "]");
             
             return resultado;
         }
@@ -2647,7 +2653,7 @@ Literal op_ponval(Operación op)
             resultado.ramas[índice] = lit2.dup();
 
             infoln("op: ponval [" ~ to!dstring(t1.elementos) ~ " x " ~ t1.tipo
-                ~ "] [vector] [" ~ lit2.tipo ~ ":" ~ lit2.dato ~ "] [" 
+                ~ "] [vector] [" ~ lit2.tipo.tipo ~ ":" ~ lit2.dato ~ "] [" 
                 ~ lit3.dato ~ "] => [vector]");
             
             return resultado;
@@ -2669,8 +2675,8 @@ Literal op_ponval(Operación op)
 
             resultado.ramas[índice] = lit2.dup();
 
-            infoln("op: ponval [estructura] [" ~ lit2.tipo ~ ":" ~ lit2.dato ~ "] [" 
-                ~ lit3.dato ~ "] => [estructura]");
+            infoln("op: ponval [estructura] [" ~ lit2.tipo.tipo ~ ":"
+                ~ lit2.dato ~ "] [" ~ lit3.dato ~ "] => [estructura]");
             
             return resultado;
         }
