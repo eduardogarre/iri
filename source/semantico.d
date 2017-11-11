@@ -421,6 +421,7 @@ void paso_comprueba_tipos_ids_globales()
             {
                 case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
                     auto did = cast(DefineIdentificadorGlobal)n;
+                    comprueba_tipo_literal(did.tipo, eid.valor);
                     break;
 
                 case Categoría.DEFINE_FUNCIÓN:
@@ -435,5 +436,23 @@ void paso_comprueba_tipos_ids_globales()
 
 void comprueba_tipo_literal(Tipo t, Literal l)
 {
-
+    if(t is null)
+    {
+        if(l is null)
+        {
+            aborta(módulo, 0, "El tipo y el literal son nulos");
+        }
+        else
+        {
+            aborta(módulo, l.línea, "El tipo es nulo");
+        }
+    }
+    else if(l is null)
+    {
+        aborta(módulo, t.línea, "El literal es nulo");
+    }
+    else
+    {
+        // El tipo y el literal son válidos
+    }
 }
