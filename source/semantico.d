@@ -29,6 +29,8 @@ Nodo analiza(Nodo n)
 
     paso_obtén_identificadores_globales(n);
 
+    paso_comprueba_tipos_ids_globales();
+
     charlatánln();
 
     imprime_árbol(n); // árbol después del análisis semántico
@@ -398,4 +400,37 @@ void paso_obtén_identificadores_globales(Nodo n)
             paso_obtén_identificadores_globales(n.ramas[i]);
         }
     }
+}
+
+void paso_comprueba_tipos_ids_globales()
+{
+    // recorre los id's globales
+    foreach(EntradaTablaIdentificadores eid; tid_global.tabla)
+    {
+        // en cada iteración, eid contiene una entrada con un id global
+
+        // Analiza sólo los id's que ya están definidos
+        if(eid.definido)
+        {
+            Nodo n = eid.definición;
+
+            switch(n.categoría)
+            {
+                case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
+                    auto did = cast(DefineIdentificadorGlobal)n;
+                    break;
+
+                case Categoría.DEFINE_FUNCIÓN:
+                    auto df = cast(DefineFunción)n;
+                    break;
+
+                default: break;
+            }
+        }
+    }
+}
+
+void comprueba_tipo_literal(Tipo t, Literal l)
+{
+
 }
