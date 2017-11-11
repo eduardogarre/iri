@@ -475,7 +475,6 @@ void comprueba_tipo_literal(Tipo t, Literal l)
             // es un tipo simple
 
             uint32_t tamaño;
-            uint64_t tamaño_máximo;
 
             dchar dc = t.tipo[0];
 
@@ -519,7 +518,10 @@ void comprueba_tipo_literal(Tipo t, Literal l)
                     ////////////////////////////////////////////////////////////
                     // El valor del literal debe caber en el tipo
                     uint64_t dato = to!uint64_t(l.dato);
-                    tamaño_máximo = pow(2, tamaño-1) + (pow(2, tamaño-1) -1);
+                    uint64_t tamaño_máximo;
+                    uint64_t mitad_tamaño = pow(2, tamaño-2);
+                    
+                    tamaño_máximo = mitad_tamaño + (mitad_tamaño -1);
 
                     if(dato > tamaño_máximo)
                     {
@@ -529,18 +531,73 @@ void comprueba_tipo_literal(Tipo t, Literal l)
 
                     ////////////////////////////////////////////////////////////
                     // Fin de las comprobaciones
+                    // Si no hay errores, podemos asignar el tipo al literal
+                    l.tipo = t;
                     break;
 
                 case 'e':
+                    ////////////////////////////////////////////////////////////
+                    // Comprueba que el tamaño del tipo entero está dentro de
+                    // lo especificado (2-64 dígitos)
                     if(tamaño < 2 || tamaño > 64)
                     {
                         aborta(módulo, t.línea, "Tamaño inválido para un entero: '"
                             ~ t.tipo[1..$] ~ "'. Debería estar en el rango 2-64");
                     }
 
+                    ////////////////////////////////////////////////////////////
+                    // Comprueba que el literal contiene un número entero
+                    if(l.dato.length < 1)
+                    {
+                        aborta(módulo, t.línea, "El literal está vacío");
+                    }
+
+                    // el número es negativo
+                    int desplazamiento = 0;
+                    if(l.dato[0] == '-')
+                    {
+                        desplazamiento++;
+                        if(l.dato.length < 1)
+                        {
+                            aborta(módulo, t.línea, "El literal '" ~ l.dato
+                                ~ "' no es un número entero");
+                        }
+                    }
+
+                    for(int i = desplazamiento; i < l.dato.length; i++)
+                    {
+                        if(!esdígito(l.dato[i]))
+                        {
+                            aborta(módulo, t.línea, "El literal '" ~ l.dato
+                                ~ "' no es un número entero");
+                        }
+                    }
+
+                    ////////////////////////////////////////////////////////////
+                    // El valor del literal debe caber en el tipo
+                    int64_t dato = to!int64_t(l.dato);
+                    int64_t tamaño_máximo, tamaño_mínimo;
+                    int64_t mitad_tamaño = pow(2, tamaño-2);
+                    
+                    tamaño_máximo = mitad_tamaño + (mitad_tamaño -1);
+                    tamaño_mínimo = - mitad_tamaño - mitad_tamaño;
+
+                    if((dato > tamaño_máximo) || (dato < tamaño_mínimo))
+                    {
+                        aborta(módulo, t.línea, "El valor del literal '" ~ l.dato
+                            ~ "' no cabe " ~ "en el tipo '" ~ t.tipo ~ "'");
+                    }
+
+                    ////////////////////////////////////////////////////////////
+                    // Fin de las comprobaciones
+                    // Si no hay errores, podemos asignar el tipo al literal
+                    l.tipo = t;
                     break;
 
                 case 'r':
+                    ////////////////////////////////////////////////////////////
+                    // Comprueba que el tamaño del tipo real está dentro de
+                    // lo especificado (8|16|32|64 dígitos)
                     if(tamaño != 8 || tamaño != 16 || tamaño != 32 || tamaño != 64)
                     {
                         aborta(módulo, t.línea, "Tamaño inválido para un real: '"
