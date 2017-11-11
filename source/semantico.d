@@ -490,7 +490,7 @@ void comprueba_tipo_literal(Tipo t, Literal l)
                     if(tamaño < 1 || tamaño > 64)
                     {
                         aborta(módulo, t.línea, "Tamaño inválido para un natural: '"
-                            ~ t.tipo[1..$] ~ "', cuando debería encontrarse en el rango 1-64");
+                            ~ t.tipo[1..$] ~ "'. Debería estar en el rango 1-64");
                     }
 
                     ////////////////////////////////////////////////////////////
@@ -528,7 +528,7 @@ void comprueba_tipo_literal(Tipo t, Literal l)
                     if(tamaño < 2 || tamaño > 64)
                     {
                         aborta(módulo, t.línea, "Tamaño inválido para un entero: '"
-                            ~ t.tipo[1..$] ~ "', cuando debería encontrarse en el rango 2-64");
+                            ~ t.tipo[1..$] ~ "'. Debería estar en el rango 2-64");
                     }
 
                     break;
@@ -537,7 +537,7 @@ void comprueba_tipo_literal(Tipo t, Literal l)
                     if(tamaño != 8 || tamaño != 16 || tamaño != 32 || tamaño != 64)
                     {
                         aborta(módulo, t.línea, "Tamaño inválido para un real: '"
-                            ~ t.tipo[1..$] ~ "', cuando debería ser uno de los siguientes: 8, 16, 32 ó 64");
+                            ~ t.tipo[1..$] ~ "'. Debería ser uno de los siguientes: 8, 16, 32 ó 64");
                     }
 
                     break;
