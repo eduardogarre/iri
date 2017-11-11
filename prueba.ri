@@ -1,6 +1,7 @@
 módulo prueba;
 
 @texto_de_prueba = "PRUEBA - texto de prueba: CORRECTO.\n";
+@lol = n8 28;
 
 define e32 @inicio(r32 %pi)
 {

@@ -5,6 +5,7 @@ dstring módulo = "Semántico.d";
 import apoyo;
 import arbol;
 import std.conv;
+import std.math;
 import std.stdint;
 import std.stdio;
 
@@ -454,5 +455,95 @@ void comprueba_tipo_literal(Tipo t, Literal l)
     else
     {
         // El tipo y el literal son válidos
+        if(t.vector)
+        {
+
+        }
+        else if(t.estructura)
+        {
+
+        }
+        else
+        {
+            // es un tipo simple
+
+            uint32_t tamaño;
+            uint64_t tamaño_máximo;
+
+            dchar dc = t.tipo[0];
+
+            if((dc == 'n') || (dc == 'e') || (dc == 'r'))
+            {
+                tamaño = to!uint32_t(t.tipo[1..$]);
+            }
+            else
+            {
+                aborta(módulo, t.línea, "Tipo no válido: '" ~ t.tipo ~ "'");
+            }
+
+            switch(t.tipo[0])
+            {
+                case 'n':
+                    ////////////////////////////////////////////////////////////
+                    // Comprueba que el tamaño del tipo natural está dentro de
+                    // lo especificado (1-64 dígitos)
+                    if(tamaño < 1 || tamaño > 64)
+                    {
+                        aborta(módulo, t.línea, "Tamaño inválido para un natural: '"
+                            ~ t.tipo[1..$] ~ "', cuando debería encontrarse en el rango 1-64");
+                    }
+
+                    ////////////////////////////////////////////////////////////
+                    // Comprueba que el literal contiene un número natural
+                    if(l.dato.length < 1)
+                    {
+                        aborta(módulo, t.línea, "El literal está vacío");
+                    }
+
+                    for(int i = 0; i < l.dato.length; i++)
+                    {
+                        if(!esdígito(l.dato[i]))
+                        {
+                            aborta(módulo, t.línea, "El literal '" ~ l.dato
+                                ~ "' no es un número natural");
+                        }
+                    }
+
+                    ////////////////////////////////////////////////////////////
+                    // El valor del literal debe caber en el tipo
+                    uint64_t dato = to!uint64_t(l.dato);
+                    tamaño_máximo = pow(2, tamaño-1) + (pow(2, tamaño-1) -1);
+
+                    if(dato > tamaño_máximo)
+                    {
+                        aborta(módulo, t.línea, "El valor del literal '" ~ l.dato
+                            ~ "' no cabe " ~ "en el tipo '" ~ t.tipo ~ "'");
+                    }
+
+                    ////////////////////////////////////////////////////////////
+                    // Fin de las comprobaciones
+                    break;
+
+                case 'e':
+                    if(tamaño < 2 || tamaño > 64)
+                    {
+                        aborta(módulo, t.línea, "Tamaño inválido para un entero: '"
+                            ~ t.tipo[1..$] ~ "', cuando debería encontrarse en el rango 2-64");
+                    }
+
+                    break;
+
+                case 'r':
+                    if(tamaño != 8 || tamaño != 16 || tamaño != 32 || tamaño != 64)
+                    {
+                        aborta(módulo, t.línea, "Tamaño inválido para un real: '"
+                            ~ t.tipo[1..$] ~ "', cuando debería ser uno de los siguientes: 8, 16, 32 ó 64");
+                    }
+
+                    break;
+
+                default: break;
+            }
+        }
     }
 }
