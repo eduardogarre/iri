@@ -4,6 +4,7 @@ dstring módulo = "Semántico.d";
 
 import apoyo;
 import arbol;
+static import lexico;
 import std.conv;
 import std.math;
 import std.stdint;
@@ -416,7 +417,7 @@ void paso_obtén_identificadores_globales(Nodo n)
 void paso_comprueba_tipos_ids_globales()
 {
     // recorre los id's globales
-    foreach(EntradaTablaIdentificadores eid; tid_global.tabla)
+    foreach(ref EntradaTablaIdentificadores eid; tid_global.tabla)
     {
         // en cada iteración, eid contiene una entrada con un id global
 
@@ -442,7 +443,7 @@ void paso_comprueba_tipos_ids_globales()
     }
 }
 
-void comprueba_tipo_literal(Tipo t, Literal l)
+void comprueba_tipo_literal(ref Tipo t, ref Literal l)
 {
     if(t is null)
     {
@@ -598,11 +599,43 @@ void comprueba_tipo_literal(Tipo t, Literal l)
                     ////////////////////////////////////////////////////////////
                     // Comprueba que el tamaño del tipo real está dentro de
                     // lo especificado (8|16|32|64 dígitos)
-                    if(tamaño != 8 || tamaño != 16 || tamaño != 32 || tamaño != 64)
+                    if((tamaño != 8) && (tamaño != 16) && (tamaño != 32) && (tamaño != 64))
                     {
                         aborta(módulo, t.línea, "Tamaño inválido para un real: '"
                             ~ t.tipo[1..$] ~ "'. Debería ser uno de los siguientes: 8, 16, 32 ó 64");
                     }
+
+                    ////////////////////////////////////////////////////////////
+                    // Comprueba que el literal contiene un número entero
+                    // Aprovecho las funciones en el módulo Léxico
+                    lexico.cursor = 0;
+                    lexico.código = l.dato ~ "\n";
+                    
+                    bool res = lexico.número();
+                    
+                    if(!res)
+                    {
+                        aborta(módulo, t.línea, "El literal '" ~ l.dato
+                                ~ "' no es un número real");
+                    }
+                    else
+                    {
+                        if(lexico.cursor != l.dato.length)
+                        {
+                        aborta(módulo, t.línea, "El literal '" ~ l.dato
+                                ~ "' no es un número real correcto");
+                        }
+                    }
+
+                    ////////////////////////////////////////////////////////////
+                    // El valor del literal debe caber en el tipo
+                    // En el estándar de notación con coma flotante, si
+                    // sobrepasa el tipo máximo se convierte a infinito
+                    
+                    ////////////////////////////////////////////////////////////
+                    // Fin de las comprobaciones
+                    // Si no hay errores, podemos asignar el tipo al literal
+                    l.tipo = t;
 
                     break;
 

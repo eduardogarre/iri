@@ -7,11 +7,11 @@ import std.stdint;
 import std.stdio;
 import apoyo;
 
-private dstring código  = "";
+public dstring código  = "";
 
 private lexema[] análisis;
 
-private uint cursor = 0;
+public uint cursor = 0;
 private uint64_t línea  = 1;
 
 
@@ -413,7 +413,7 @@ private bool _nombre()
     return resultado;
 }
 
-private bool número()
+public bool número()
 {
     if(_notacióncientífica())
     {
