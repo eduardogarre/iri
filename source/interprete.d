@@ -125,7 +125,7 @@ bool declFunc_retorno_correcto(dstring f, Nodo n)
     // Obtén el Nodo de la definición
     DefineFunción def_func = cast(DefineFunción)eid.definición;
 
-    return def_func.retorno == tipo;
+    return def_func.retorno.tipo == tipo;
 }
 
 void obtén_etiquetas(Nodo n)
@@ -537,7 +537,7 @@ Nodo interpreta_nodo(Nodo n)
                 auto a = cast(Argumento)n;
                 charlatán(to!dstring(a.categoría));
                 charlatán(" [tipo:");
-                charlatán(a.tipo);
+                charlatán(a.tipo.tipo);
                 charlatán("] [nombre:");
                 charlatán(a.nombre);
                 charlatán("] [línea:");
@@ -550,7 +550,7 @@ Nodo interpreta_nodo(Nodo n)
                 auto df = cast(DefineFunción)n;
                 charlatán(to!dstring(df.categoría));
                 charlatán(" [ret:");
-                charlatán(df.retorno);
+                charlatán(df.retorno.tipo);
                 charlatán("] [nombre:");
                 charlatán(df.nombre);
                 charlatán("] [línea:");

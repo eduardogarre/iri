@@ -197,8 +197,8 @@ class Argumentos : Nodo
 
 class Argumento : Nodo
 {
-    dstring tipo;
     dstring nombre;
+    Tipo tipo;
 
     this()
     {
@@ -209,7 +209,7 @@ class Argumento : Nodo
 
 class DefineFunción : Nodo
 {
-    dstring retorno;
+    Tipo retorno;
     dstring nombre;
 
     this()

@@ -139,7 +139,7 @@ private DefineFunción define_función()
 
         if(Tipo r = tipo())
         {
-            df.retorno = r.tipo;
+            df.retorno = r;
         }
 
         if(Identificador r = identificador())
@@ -275,7 +275,7 @@ private Argumento argumento()
     {
         if(auto i = identificador())
         {
-            a.tipo = t.tipo;
+            a.tipo = t;
             a.nombre = i.nombre;
             a.línea = t.línea;
 

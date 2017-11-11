@@ -219,7 +219,7 @@ void imprime_árbol(Nodo n)
                 auto a = cast(Argumento)n;
                 charlatán(to!dstring(a.categoría));
                 charlatán(" [tipo:");
-                charlatán(a.tipo);
+                charlatán(a.tipo.tipo);
                 charlatán("] [nombre:");
                 charlatán(a.nombre);
                 charlatán("] [línea:");
@@ -231,7 +231,7 @@ void imprime_árbol(Nodo n)
                 auto df = cast(DefineFunción)n;
                 charlatán(to!dstring(df.categoría));
                 charlatán(" [ret:");
-                charlatán(df.retorno);
+                charlatán(df.retorno.tipo);
                 charlatán("] [nombre:");
                 charlatán(df.nombre);
                 charlatán("] [línea:");
