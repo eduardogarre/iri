@@ -167,8 +167,8 @@ class DefineIdentificadorGlobal : Nodo
 class DeclaraIdentificadorGlobal : Nodo
 {
     dstring ámbito  = "";
-    dstring tipo    = "";
     dstring nombre  = "";
+    Tipo tipo;
 
     this()
     {
@@ -221,7 +221,7 @@ class DefineFunción : Nodo
 
 class DeclaraFunción : Nodo
 {
-    dstring retorno;
+    Tipo retorno;
     dstring nombre;
 
     this()

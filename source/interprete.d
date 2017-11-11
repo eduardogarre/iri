@@ -503,7 +503,7 @@ Nodo interpreta_nodo(Nodo n)
                 charlatán(" [ámbito:");
                 charlatán(idex.ámbito);
                 charlatán("] [tipo:");
-                charlatán(idex.tipo);
+                charlatán((cast(Tipo)(idex.tipo)).tipo);
                 charlatán("] [nombre:");
                 charlatán(idex.nombre);
                 charlatán("] [línea:");
@@ -560,7 +560,7 @@ Nodo interpreta_nodo(Nodo n)
                 auto df = cast(DeclaraFunción)n;
                 charlatán(to!dstring(df.categoría));
                 charlatán(" [ret:");
-                charlatán(df.retorno);
+                charlatán((cast(Tipo)(df.retorno)).tipo);
                 charlatán("] [nombre:");
                 charlatán(df.nombre);
                 charlatán("] [línea:");

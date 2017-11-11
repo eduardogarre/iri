@@ -197,7 +197,7 @@ private DeclaraFunción declara_función()
 
         if(Tipo r = tipo())
         {
-            df.retorno = r.tipo;
+            df.retorno = r;
         }
 
         if(Identificador r = identificador())
@@ -399,7 +399,7 @@ private DeclaraIdentificadorGlobal declara_identificador_global()
 
     if(auto t = tipo())
     {
-        e.tipo = t.tipo;
+        e.tipo = t;
         return e;
     }
     else
