@@ -458,11 +458,14 @@ private DefineIdentificadorGlobal define_identificador_global()
     else if(auto l = texto())
     {
         Tipo ti = new Tipo;
-        ti.vector = true;
-        ti.elementos = to!dstring(l.ramas.length);
+        i.tipo = new Tipo;
+
         ti.tipo = "n32";
 
-        i.tipo = ti;
+        i.tipo.vector = true;
+        i.tipo.elementos = to!dstring(l.ramas.length);
+        i.tipo.ramas ~= ti;
+        
         i.ramas ~= l;
         return i;
     }
