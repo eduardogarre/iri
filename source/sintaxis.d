@@ -2226,7 +2226,7 @@ private Tipo tipo()
             
             if(Tipo ti = tipo())
             {
-                t.tipo = ti.tipo;
+                t.ramas ~= ti;
             }
             else
             {

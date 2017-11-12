@@ -2589,7 +2589,7 @@ Literal op_leeval(Operación op)
 
             Literal resultado = res.dup();
 
-            infoln("op: leeval [" ~ to!dstring(t.elementos) ~ " x " ~ t.tipo
+            infoln("op: leeval [" ~ to!dstring(t.elementos) ~ " x " ~ (cast(Tipo)(t.ramas[0])).tipo
                 ~ "] [vector] [" ~ resultado.tipo.tipo ~ ":" ~ resultado.dato ~ "]");
             
             return resultado;
@@ -2652,7 +2652,7 @@ Literal op_ponval(Operación op)
 
             resultado.ramas[índice] = lit2.dup();
 
-            infoln("op: ponval [" ~ to!dstring(t1.elementos) ~ " x " ~ t1.tipo
+            infoln("op: ponval [" ~ to!dstring(t1.elementos) ~ " x " ~ (cast(Tipo)(t1.ramas[0])).tipo
                 ~ "] [vector] [" ~ lit2.tipo.tipo ~ ":" ~ lit2.dato ~ "] [" 
                 ~ lit3.dato ~ "] => [vector]");
             
