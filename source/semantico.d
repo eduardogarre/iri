@@ -468,7 +468,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
             uint64_t elementos = to!uint64_t(t.elementos);
             if(t.ramas.length < 1)
             {
-                aviso(módulo, t.línea, "El vector no define un tipo que lo componga");
+                aborta(módulo, t.línea, "El vector no define un tipo que lo componga");
             }
             //Tipo tipo = cast(Tipo)(t.ramas[0]);
 
