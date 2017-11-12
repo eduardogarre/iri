@@ -16,13 +16,14 @@ int main(string[] args)
 	auto doc = "iri - Interprete de Representacion Intermedia.
 
 Usage:
-   iri [-i | -c] <archivo>
+   iri [-i | -c | --sin-avisos] <archivo>
    iri (-v | --version)
    iri (-a | --ayuda)
 
 Options:
    -a --ayuda         Muestra esta pantalla.
    -v --version       Muestra la version.
+   --sin-avisos		  Desactiva los avisos durante la compilación.
    -i --info          Opcion 'habladora'.
    -c --charlatan     Opcion 'verborreica', MUY habladora.
 
@@ -40,6 +41,11 @@ Argumentos:
 	if(argumentos["--info"].isTrue())
 	{
 		INFO = true;
+	}
+
+	if(argumentos["--sin-avisos"].isTrue())
+	{
+		AVISO = false;
 	}
 
 	if(argumentos["--charlatan"].isTrue())

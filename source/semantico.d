@@ -465,7 +465,17 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
         // El tipo y el literal son válidos
         if(t.vector)
         {
+            uint64_t elementos = to!uint64_t(t.elementos);
+            if(t.ramas.length < 1)
+            {
+                aviso(módulo, t.línea, "El vector no define un tipo que lo componga");
+            }
+            //Tipo tipo = cast(Tipo)(t.ramas[0]);
 
+            if(l.ramas.length != elementos)
+            {
+                aviso(módulo, t.línea, "El vector y el literal definen tamaños diferentes");
+            }
         }
         else if(t.estructura)
         {

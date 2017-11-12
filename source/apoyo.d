@@ -1,5 +1,7 @@
 module apoyo;
 
+dstring módulo = "Apoyo.d";
+
 import arbol;
 import core.stdc.stdlib; // exit();
 import std.conv;
@@ -11,6 +13,7 @@ import std.utf; // toUTF32()
 
 bool CHARLATÁN = false;
 bool INFO = false;
+bool AVISO = true;
 
 
 struct lexema
@@ -292,11 +295,18 @@ void error(dstring módulo, ulong línea, dstring s)
     }
 }
 
-void aviso(dstring s)
+void aviso(dstring módulo, ulong línea, dstring s)
 {
-    if(INFO)
+    if(AVISO)
     {
-        stdout.writeln("AVISO: "d, s, ".");
+        if(línea == 0)
+        {
+            stdout.writeln("[", módulo, "] AVISO: ", s, ".");
+        }
+        else
+        {
+            stdout.writeln("[", módulo, "] AVISO en línea ", to!dstring(línea), ": ", s, ".");
+        }
     }
 }
 
