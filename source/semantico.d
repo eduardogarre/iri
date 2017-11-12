@@ -489,7 +489,27 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
         }
         else if(t.estructura)
         {
+            if(t.ramas.length < 1)
+            {
+                aborta(módulo, t.línea, "La estructura no define un tipos que la compongan");
+            }
 
+            if(l.ramas.length != t.ramas.length)
+            {
+                aviso(módulo, t.línea, "La estructura y el literal definen tamaños diferentes");
+            }
+
+            // Comprueba el tipo con los literales que componen la estructura
+            // Aparentemente, al hacer una conversión de tipos se pierde la referencia
+            // Implemento la conversión mediante punteros.
+            for(int i = 0; i < l.ramas.length; i++)
+            {
+                Tipo* tipo  = cast(Tipo*)(&(t.ramas[i]));
+                Literal* li = cast(Literal*)(&(l.ramas[i]));
+
+                comprueba_tipo_literal(*tipo, *li);
+            }
+            l.tipo = t;
         }
         else
         {
