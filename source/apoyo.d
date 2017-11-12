@@ -194,26 +194,6 @@ class TablaIdentificadores
 
         EntradaTablaIdentificadores eid;
 
-        if(id in tabla)
-        {
-            // El identificador ya está en uso.
-            if(tabla[id].definido)
-            {
-                if(id[0] == '%')
-                {
-                    dstring n = (id[1..$]);
-                    foreach(c; n)
-                    {
-                        aviso("Ya habías definido el identificador '" ~ id ~ "'");
-                    }
-                }
-                else
-                {
-                    aviso("Ya habías definido el identificador '" ~ id ~ "'");
-                }
-            }
-        }
-
         eid.nombre = id;
         eid.definido = true;
         eid.definición = definición;
