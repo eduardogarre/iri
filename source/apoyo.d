@@ -120,22 +120,17 @@ class TablaIdentificadores
             id = identificador; // identificador[1..$];
         }
 
-        if(id in tabla)
-        {
-            // El identificador ya está en uso.
-            if(declaración is null)
-            {
-                aborta( "Apoyo.d", 0, "Ya estabas usando el identificador '" ~ id ~ "'");
-            }
-            else
-            {
-                aborta("Apoyo.d", declaración.línea, "Ya estabas usando el identificador '" ~ id ~ "'");
-            }
-            
-            return false;
-        }
-
         EntradaTablaIdentificadores eid;
+
+        if(identificador in tabla)
+        {
+            eid = tabla[identificador];
+
+            if(eid.declarado)
+            {
+                aborta("Apoyo.d", declaración.línea, "El identidicador ya se había declarado.");
+            }
+        }
 
         eid.nombre = id;
         eid.declarado = true;
@@ -185,21 +180,19 @@ class TablaIdentificadores
             return false;
         }
 
-        dstring id = identificador;
-
-        if((identificador[0] == '@') || (identificador[0] == '%'))
-        {
-            id = identificador; // identificador[1..$];
-        }
-
         EntradaTablaIdentificadores eid;
 
-        eid.nombre = id;
+        if(identificador in tabla)
+        {
+            eid = tabla[identificador];
+        }
+
+        eid.nombre = identificador;
         eid.definido = true;
         eid.definición = definición;
         eid.valor = valor;
 
-        tabla[id] = eid;
+        tabla[identificador] = eid;
 
         return true;
     }
