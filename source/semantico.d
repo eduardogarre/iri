@@ -33,6 +33,8 @@ Nodo analiza(Nodo n)
 
     paso_comprueba_tipos_ids_globales();
 
+    paso_comprueba_concordancia_declaración_y_definición();
+
     charlatánln();
 
     imprime_árbol(n); // árbol después del análisis semántico
@@ -424,17 +426,80 @@ void paso_comprueba_tipos_ids_globales()
         // Analiza sólo los id's que ya están definidos
         if(eid.definido)
         {
-            Nodo n = eid.definición;
+            Nodo def = eid.definición;
 
-            switch(n.categoría)
+            switch(def.categoría)
             {
                 case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
-                    auto did = cast(DefineIdentificadorGlobal)n;
+                    auto did = cast(DefineIdentificadorGlobal)def;
                     comprueba_tipo_literal(did.tipo, eid.valor);
                     break;
 
                 case Categoría.DEFINE_FUNCIÓN:
-                    auto df = cast(DefineFunción)n;
+                    auto dfn = cast(DefineFunción)def;
+                    break;
+
+                default: break;
+            }
+        }
+    }
+}
+
+void paso_comprueba_concordancia_declaración_y_definición()
+{
+    // recorre los id's globales
+    foreach(ref EntradaTablaIdentificadores eid; tid_global.tabla)
+    {
+        // en cada iteración, eid contiene una entrada con un id global
+
+        // Analiza sólo los id's que ya están definidos
+        if(eid.definido)
+        {
+            Nodo def = eid.definición;
+
+            switch(def.categoría)
+            {
+                case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
+                    auto defid = cast(DefineIdentificadorGlobal)def;
+                    // Si existe declaración, comprueba que coincide con definición
+                    if(eid.declarado)
+                    {
+                        Nodo dec = eid.declaración;
+                        auto decid = cast(DeclaraIdentificadorGlobal)dec;
+
+                        if(defid.dato != decid.dato)
+                        {
+                            aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                            ~ "DefineIdentificadorGlobal.dato y DeclaraIdentificadorGlobal.dato no coinciden:\n["
+                            ~ to!dstring(defid.dato) ~ "] vs ["
+                            ~ to!dstring(decid.dato) ~ "]");
+                        }
+                        else if(defid.ámbito != decid.ámbito)
+                        {
+                            aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                            ~ "DefineIdentificadorGlobal.ámbito y DeclaraIdentificadorGlobal.ámbito no coinciden:\n["
+                            ~ to!dstring(defid.ámbito) ~ "] vs ["
+                            ~ to!dstring(decid.ámbito) ~ "]");
+                        }
+                        else if(defid.nombre != decid.nombre)
+                        {
+                            aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                            ~ "DefineIdentificadorGlobal.nombre y DeclaraIdentificadorGlobal.nombre no coinciden:\n["
+                            ~ to!dstring(defid.nombre) ~ "] vs ["
+                            ~ to!dstring(decid.nombre) ~ "]");
+                        }
+                        else if(!compara_árboles(cast(Nodo*)(&(defid.tipo)), cast(Nodo*)(&(decid.tipo))))
+                        {
+                            aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                            ~ "DefineIdentificadorGlobal.tipo y DeclaraIdentificadorGlobal.tipo no coinciden:\n["
+                            ~ to!dstring(defid.tipo) ~ "] vs ["
+                            ~ to!dstring(decid.tipo) ~ "]");
+                        }
+                    }
+                    break;
+
+                case Categoría.DEFINE_FUNCIÓN:
+                    auto dfn = cast(DefineFunción)def;
                     break;
 
                 default: break;
