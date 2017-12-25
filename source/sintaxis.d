@@ -393,8 +393,7 @@ private DeclaraIdentificadorGlobal declara_identificador_global()
     }
     else
     {
-        cursor = c;
-        return null;
+        e.ámbito = "privado";
     }
 
     if(auto t = tipo())
@@ -448,7 +447,7 @@ private DefineIdentificadorGlobal define_identificador_global()
     }
     else
     {
-        i.ámbito = "";
+        i.ámbito = "privado";
     }
 
     if(auto ti = tipo())
