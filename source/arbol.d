@@ -3,6 +3,7 @@ module arbol;
 dstring módulo = "Árbol.d";
 
 import apoyo;
+import semantico;
 import std.conv;
 import std.stdint; // uint64_t y demás tipos
 import std.stdio;
@@ -287,13 +288,13 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 break;
 
             case Categoría.TIPO:
-                auto t1 = cast(Tipo)n;
-                auto t2 = cast(Tipo)m;
+                auto t1 = cast(Tipo)(*n);
+                auto t2 = cast(Tipo)(*m);
                 // El nodo "Tipo" tiene las siguientes variables:
                 // t.vector, .estructura, .tipo, .elementos
                 if(t1.vector != t2.vector)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, t1.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "Tipo.vector y Tipo.vector no coinciden:\n["
                     ~ to!dstring(t1.vector) ~ "] vs ["
                     ~ to!dstring(t2.vector) ~ "]");
@@ -334,8 +335,8 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 break;
 
             case Categoría.LITERAL:
-                auto l1 = cast(Literal)n;
-                auto l2 = cast(Literal)m;
+                auto l1 = cast(Literal)(*n);
+                auto l2 = cast(Literal)(*m);
                 // El nodo "Literal" tiene las siguientes variables:
                 // l.vector, .estructura, .tipo
                 if(l1.vector != l2.vector)
@@ -356,7 +357,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
 
                     return false;
                 }
-                else if(l1.tipo != l2.tipo)
+                else if(!compara_árboles(cast(Nodo *)(&(l1.tipo)), cast(Nodo *)(&(l2.tipo))))
                 {
                     aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "Literal.tipo y Literal.tipo no coinciden:\n["
@@ -368,8 +369,8 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 break;
 
             case Categoría.IDENTIFICADOR:
-                auto i1 = cast(Identificador)n;
-                auto i2 = cast(Identificador)m;
+                auto i1 = cast(Identificador)(*n);
+                auto i2 = cast(Identificador)(*m);
                 // El nodo "Identificador" tiene las siguientes variables:
                 // i.nombre
                 if(i1.nombre != i2.nombre)
@@ -384,8 +385,8 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 break;
 
             case Categoría.LLAMA_FUNCIÓN:
-                auto l1 = cast(LlamaFunción)n;
-                auto l2 = cast(LlamaFunción)m;
+                auto l1 = cast(LlamaFunción)(*n);
+                auto l2 = cast(LlamaFunción)(*m);
                 // El nodo "LlamaFunción" tiene las siguientes variables:
                 // l.nombre, .tipo
                 if(l1.nombre != l2.nombre)
@@ -397,7 +398,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
 
                     return false;
                 }
-                else if(l1.tipo != l2.tipo)
+                else if(!compara_árboles(cast(Nodo *)(&(l1.tipo)), cast(Nodo *)(&(l2.tipo))))
                 {
                     aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "LlamaFunción.tipo y LlamaFunción.tipo no coinciden:\n["
@@ -417,8 +418,8 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 break;
 
             case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
-                auto did1 = cast(DefineIdentificadorGlobal)n;
-                auto did2 = cast(DefineIdentificadorGlobal)m;
+                auto did1 = cast(DefineIdentificadorGlobal)(*n);
+                auto did2 = cast(DefineIdentificadorGlobal)(*m);
                 // El nodo "DefineIdentificadorGlobal" tiene las siguientes variables:
                 // d.ámbito, .nombre, .tipo
                 if(did1.ámbito != did2.ámbito)
@@ -451,8 +452,8 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 break;
 
             case Categoría.DECLARA_IDENTIFICADOR_GLOBAL:
-                auto idex1 = cast(DeclaraIdentificadorGlobal)n;
-                auto idex2 = cast(DeclaraIdentificadorGlobal)m;
+                auto idex1 = cast(DeclaraIdentificadorGlobal)(*n);
+                auto idex2 = cast(DeclaraIdentificadorGlobal)(*m);
                 // El nodo "DeclaraIdentificadorGlobal" tiene las siguientes variables:
                 // d.ámbito, .nombre, .tipo
                 if(idex1.ámbito != idex2.ámbito)
@@ -493,8 +494,8 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 break;
 
             case Categoría.ARGUMENTO:
-                auto a1 = cast(Argumento)n;
-                auto a2 = cast(Argumento)m;
+                auto a1 = cast(Argumento)(*n);
+                auto a2 = cast(Argumento)(*m);
                 // El nodo "Argumento" tiene las siguientes variables:
                 // a.nombre, .tipo
                 if(a1.nombre != a2.nombre)
@@ -506,8 +507,15 @@ bool compara_nodos(Nodo* n, Nodo* m)
 
                     return false;
                 }
-                else if(a1.tipo != a2.tipo)
+                else if(!compara_árboles(cast(Nodo *)(&(a1.tipo)), cast(Nodo *)(&(a2.tipo))))
                 {
+                    writeln("PRUEBA!!");
+                    bool ch = CHARLATÁN;
+                    CHARLATÁN = true;
+                    imprime_árbol(a1);
+                    imprime_árbol(a2);
+                    CHARLATÁN = ch;
+
                     aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "Argumento1.tipo y Argumento2.tipo no coinciden:\n["
                     ~ to!dstring(a1.tipo) ~ "] vs ["
@@ -518,8 +526,8 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 break;
 
             case Categoría.DEFINE_FUNCIÓN:
-                auto df1 = cast(DefineFunción)n;
-                auto df2 = cast(DefineFunción)m;
+                auto df1 = cast(DefineFunción)(*n);
+                auto df2 = cast(DefineFunción)(*m);
                 // El nodo "DefineFunción" tiene las siguientes variables:
                 // df.nombre, .retorno
                 if(df1.nombre != df2.nombre)
@@ -531,7 +539,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
 
                     return false;
                 }
-                else if(df1.retorno != df2.retorno)
+                else if(!compara_árboles(cast(Nodo *)(&(df1.retorno)), cast(Nodo *)(&(df2.retorno))))
                 {
                     aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "DefineFunción1.retorno y DefineFunción2.retorno no coinciden:\n["
@@ -543,8 +551,8 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 break;
 
             case Categoría.DECLARA_FUNCIÓN:
-                auto df1 = cast(DeclaraFunción)n;
-                auto df2 = cast(DeclaraFunción)m;
+                auto df1 = cast(DeclaraFunción)(*n);
+                auto df2 = cast(DeclaraFunción)(*m);
                 // El nodo "DeclaraFunción" tiene las siguientes variables:
                 // df.nombre, .retorno
                 if(df1.nombre != df2.nombre)
@@ -556,7 +564,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
 
                     return false;
                 }
-                else if(df1.retorno != df2.retorno)
+                else if(!compara_árboles(cast(Nodo *)(&(df1.retorno)), cast(Nodo *)(&(df2.retorno))))
                 {
                     aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "DeclaraFunción1.nombre y DeclaraFunción2.nombre no coinciden:\n["
@@ -568,8 +576,8 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 break;
 
             case Categoría.MÓDULO:
-                auto obj1 = cast(Módulo)n;
-                auto obj2 = cast(Módulo)m;
+                auto obj1 = cast(Módulo)(*n);
+                auto obj2 = cast(Módulo)(*m);
                 // El nodo "Módulo" tiene las siguientes variables:
                 // obj.nombre
                 if(obj1.nombre != obj2.nombre)

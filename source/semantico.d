@@ -499,7 +499,42 @@ void paso_comprueba_concordancia_declaración_y_definición()
                     break;
 
                 case Categoría.DEFINE_FUNCIÓN:
-                    auto dfn = cast(DefineFunción)def;
+                    auto deffn = cast(DefineFunción)def;
+                    // Si existe declaración, comprueba que coincide con definición
+                    if(eid.declarado)
+                    {
+                        Nodo dec = eid.declaración;
+                        auto decfn = cast(DeclaraFunción)dec;
+
+                        if(deffn.dato != decfn.dato)
+                        {
+                            aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                            ~ "DefineFunción.dato y DeclaraFunción.dato no coinciden:\n["
+                            ~ to!dstring(deffn.dato) ~ "] vs ["
+                            ~ to!dstring(decfn.dato) ~ "]");
+                        }
+                        else if(deffn.nombre != decfn.nombre)
+                        {
+                            aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                            ~ "DefineFunción.nombre y DeclaraFunción.nombre no coinciden:\n["
+                            ~ to!dstring(deffn.nombre) ~ "] vs ["
+                            ~ to!dstring(decfn.nombre) ~ "]");
+                        }
+                        else if(!compara_árboles(cast(Nodo*)(&(deffn.retorno)), cast(Nodo*)(&(decfn.retorno))))
+                        {
+                            aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                            ~ "DefineFunción.retorno y DeclaraFunción.retorno no coinciden:\n["
+                            ~ to!dstring(deffn.retorno) ~ "] vs ["
+                            ~ to!dstring(decfn.retorno) ~ "]");
+                        }
+                        else if(!compara_árboles(cast(Nodo*)(&(deffn.ramas[0])), cast(Nodo*)(&(decfn.ramas[0]))))
+                        {
+                            aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                            ~ "DefineFunción.ramas[0] y DeclaraFunción.ramas[0] (Argumentos) no coinciden:\n["
+                            ~ to!dstring(deffn.ramas[0]) ~ "] vs ["
+                            ~ to!dstring(decfn.ramas[0]) ~ "]");
+                        }
+                    }
                     break;
 
                 default: break;
