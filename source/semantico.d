@@ -560,61 +560,60 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
     {
         aborta(módulo, t.línea, "El literal es nulo");
     }
-    else
+    else // El tipo y el literal contienen un valor
     {
-        // El tipo y el literal son válidos
-        if(t.vector)
+        if(t.vector) // El tipo es un vector
         {
             uint64_t elementos = to!uint64_t(t.elementos);
-            if(t.ramas.length < 1)
+            if(t.ramas.length != 1) // El nodo Vector debe tener un nodo hijo Tipo, con el tipo que compone el vector
             {
                 aborta(módulo, t.línea, "El vector no define un tipo que lo componga");
             }
 
-            if(l.ramas.length != elementos)
+            if(l.ramas.length != elementos) // El nodo Literal debe tener tantos hijos como elementos dice el Vector
             {
                 aviso(módulo, t.línea, "El vector y el literal definen tamaños diferentes");
             }
 
             // Comprueba el tipo con los literales que componen el vector
-            // Aparentemente, al hacer una conversión de tipos se pierde la referencia
             // Implemento la conversión mediante punteros.
-            Tipo* tipo  = cast(Tipo*)(&(t.ramas[0]));
+            Tipo* tipo  = cast(Tipo*)(&(t.ramas[0])); // Extrae el tipo del vector
             for(int i = 0; i < l.ramas.length; i++)
             {
-                Literal* li = cast(Literal*)(&(l.ramas[i]));
-                comprueba_tipo_literal(*tipo, *li);
-            }
-            l.tipo = t;
-        }
-        else if(t.estructura)
-        {
-            if(t.ramas.length < 1)
-            {
-                aborta(módulo, t.línea, "La estructura no define un tipos que la compongan");
+                Literal* li = cast(Literal*)(&(l.ramas[i])); // Extrae cada literal del vector
+                comprueba_tipo_literal(*tipo, *li); // compara cada nodo Literal hijo con el noto Tipo hijo
             }
 
-            if(l.ramas.length != t.ramas.length)
+            // Aparentemente, al hacer una conversión de tipos se pierde la referencia
+            l.tipo = t; // Asigno al literal el tipo correspondiente
+        }
+        else if(t.estructura) // El tipo es una estructura
+        {
+            if(t.ramas.length < 1) // El nodo Estructura debe tener al menos un nodo Tipo hijo
+            {
+                aborta(módulo, t.línea, "La estructura no define tipos que la compongan");
+            }
+
+            if(l.ramas.length != t.ramas.length) // El nodo Estructura debe tener tantos hijos (literales) como el nodo Tipo (tipos hijos)
             {
                 aviso(módulo, t.línea, "La estructura y el literal definen tamaños diferentes");
             }
 
             // Comprueba el tipo con los literales que componen la estructura
-            // Aparentemente, al hacer una conversión de tipos se pierde la referencia
             // Implemento la conversión mediante punteros.
             for(int i = 0; i < l.ramas.length; i++)
             {
-                Tipo* tipo  = cast(Tipo*)(&(t.ramas[i]));
-                Literal* li = cast(Literal*)(&(l.ramas[i]));
+                Tipo* tipo  = cast(Tipo*)(&(t.ramas[i])); // Extrae cada nodo Tipo hijo del nodo Tipo padre
+                Literal* li = cast(Literal*)(&(l.ramas[i])); // Extrae cada Literal hijo del nodo Estructura padre
 
-                comprueba_tipo_literal(*tipo, *li);
+                comprueba_tipo_literal(*tipo, *li); // compara cada nodo Literal hijo con el noto Tipo hijo
             }
-            l.tipo = t;
-        }
-        else
-        {
-            // es un tipo simple
 
+            // Aparentemente, al hacer una conversión de tipos se pierde la referencia
+            l.tipo = t; // Asigno al literal el tipo correspondiente
+        }
+        else // es un tipo simple
+        {
             uint32_t tamaño;
 
             dchar dc = t.tipo[0];
