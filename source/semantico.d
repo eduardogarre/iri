@@ -35,6 +35,12 @@ Nodo analiza(Nodo n)
 
     paso_comprueba_funciones();
 
+    // Examina tid_global, para detectar identificadores no usados
+    tid_global.encuentra_ids_no_usados();
+
+    // Vuelco el contenido de la tabla de identificadores global
+    //vuelca_tid(tid_global);
+
     charlatánln();
 
     imprime_árbol(n); // árbol después del análisis semántico
@@ -774,12 +780,30 @@ void paso_comprueba_funciones()
 
                 Bloque bloque = prepara_función(def_func);
                 Nodo retorno = comprueba_bloque(bloque); // analiza semánticamente cada afirmación del bloque
+
+                // Examina tid_local, para detectar identificadores no usados
+                tid_local.encuentra_ids_no_usados();
+
+                // Vuelco el contenido de la tabla de identificadores local
+                //vuelca_tid(tid_local);
+
+                // Fin de ejecución de la función:
+                // Hay que eliminar la tabla de identificadores actual
+                tid_local = null;
                 break;
 
             default:
                 break;
             }
         }
+    }
+
+    // Compruebo que existe inicio;
+    EntradaTablaIdentificadores inicio = tid_global.coge_id("@inicio");
+    if(inicio == EntradaTablaIdentificadores(null, false, null, false, null, null))
+    {
+        // No existe una función @inicio()
+        avisa(módulo, 0, "No has definido una función '@inicio()'");
     }
 }
 
@@ -901,13 +925,6 @@ Nodo comprueba_bloque(Bloque bloque)
         comprueba_nodo(bloque.ramas[i]);
     }
 
-    // Vuelco el contenido de la tabla de identificadores local
-    //vuelca_tid(tid_local);
-
-    // Fin de ejecución de la función:
-    // Hay que eliminar la tabla de identificadores actual
-    tid_local = null;
-
     return resultado;
 }
 
@@ -946,6 +963,59 @@ Nodo comprueba_nodo(Nodo n)
                 return null;
                 //break;
         }
+    }
+
+    return null;
+}
+
+Nodo coge_identificador(Nodo n)
+{
+    if(n is null)
+    {
+        aborta(módulo, 0, "Has pasado como argumento un Nodo nulo");
+    }
+
+    if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        auto id = cast(Identificador)n;
+
+        EntradaTablaIdentificadores eid = tid_local.coge_id(id.nombre);
+        if(eid == EntradaTablaIdentificadores(null, false, null, false, null, null))
+        {
+            eid = tid_global.coge_id(id.nombre);
+        }
+
+        if(eid.declarado) // Durante el análisis sintáctico, en la tabla de id's se guarda todo como declaración.
+        {
+            Nodo dec = eid.declaración;
+            if(dec.categoría == Categoría.TIPO) // La declaración debe ser un Tipo
+            {
+                Tipo tlit = cast(Tipo)dec;
+                
+                return tlit;
+            }
+            else if(dec.categoría == Categoría.DECLARA_FUNCIÓN)
+            {
+                return dec;
+            }
+        }
+        else if(eid.definido)
+        {
+            Nodo def = eid.definición;
+            if(def.categoría == Categoría.DEFINE_IDENTIFICADOR_GLOBAL)
+            {
+                DefineIdentificadorGlobal def_id = cast(DefineIdentificadorGlobal)def;
+                Tipo tid = def_id.tipo;
+
+                return tid;
+            }
+        }
+
+        aborta(módulo, n.línea, "En las tablas de identificadores no encuentro '" ~ id.nombre ~ "'.");
+    }
+    else
+    {
+        aborta(módulo, n.línea, "No has pasado un identificador.");
     }
 
     return null;
@@ -1101,7 +1171,7 @@ Tipo op_ret(Operación op)
         else if(n.categoría == Categoría.IDENTIFICADOR)
         {
             Tipo tlit;
-            Nodo id = lee_identificador(n);
+            Nodo id = coge_identificador(n);
             if(id.categoría == Categoría.TIPO)
             {
                 tlit = cast(Tipo)id;
@@ -1166,7 +1236,7 @@ Tipo op_sum(Operación op)
     else if(n.categoría == Categoría.IDENTIFICADOR)
     {
         Tipo tlit;
-        Nodo id = lee_identificador(n);
+        Nodo id = coge_identificador(n);
         if(id.categoría == Categoría.TIPO)
         {
             tlit = cast(Tipo)id;
@@ -1195,7 +1265,7 @@ Tipo op_sum(Operación op)
     else if(n.categoría == Categoría.IDENTIFICADOR)
     {
         Tipo tlit;
-        Nodo id = lee_identificador(n);
+        Nodo id = coge_identificador(n);
         if(id.categoría == Categoría.TIPO)
         {
             tlit = cast(Tipo)id;
@@ -1245,7 +1315,7 @@ Tipo op_res(Operación op)
     else if(n.categoría == Categoría.IDENTIFICADOR)
     {
         Tipo tlit;
-        Nodo id = lee_identificador(n);
+        Nodo id = coge_identificador(n);
         if(id.categoría == Categoría.TIPO)
         {
             tlit = cast(Tipo)id;
@@ -1274,7 +1344,7 @@ Tipo op_res(Operación op)
     else if(n.categoría == Categoría.IDENTIFICADOR)
     {
         Tipo tlit;
-        Nodo id = lee_identificador(n);
+        Nodo id = coge_identificador(n);
         if(id.categoría == Categoría.TIPO)
         {
             tlit = cast(Tipo)id;
@@ -1324,7 +1394,7 @@ Tipo op_mul(Operación op)
     else if(n.categoría == Categoría.IDENTIFICADOR)
     {
         Tipo tlit;
-        Nodo id = lee_identificador(n);
+        Nodo id = coge_identificador(n);
         if(id.categoría == Categoría.TIPO)
         {
             tlit = cast(Tipo)id;
@@ -1353,7 +1423,7 @@ Tipo op_mul(Operación op)
     else if(n.categoría == Categoría.IDENTIFICADOR)
     {
         Tipo tlit;
-        Nodo id = lee_identificador(n);
+        Nodo id = coge_identificador(n);
         if(id.categoría == Categoría.TIPO)
         {
             tlit = cast(Tipo)id;
@@ -1403,7 +1473,7 @@ Tipo op_div(Operación op)
     else if(n.categoría == Categoría.IDENTIFICADOR)
     {
         Tipo tlit;
-        Nodo id = lee_identificador(n);
+        Nodo id = coge_identificador(n);
         if(id.categoría == Categoría.TIPO)
         {
             tlit = cast(Tipo)id;
@@ -1432,7 +1502,7 @@ Tipo op_div(Operación op)
     else if(n.categoría == Categoría.IDENTIFICADOR)
     {
         Tipo tlit;
-        Nodo id = lee_identificador(n);
+        Nodo id = coge_identificador(n);
         if(id.categoría == Categoría.TIPO)
         {
             tlit = cast(Tipo)id;
@@ -1478,7 +1548,7 @@ Tipo op_llama(Operación op)
     }
     
     // eid: dstring nombre, bool declarado, Nodo declaración, bool definido, Nodo definición;
-    EntradaTablaIdentificadores eid = tid_global.lee_id(f.nombre);
+    EntradaTablaIdentificadores eid = tid_global.coge_id(f.nombre);
 
     Nodo nt1;
     Nodo nt2;
@@ -1513,7 +1583,7 @@ Tipo op_llama(Operación op)
             }
             else if(arg.categoría == Categoría.IDENTIFICADOR)
             {
-                Nodo id = lee_identificador(arg);
+                Nodo id = coge_identificador(arg);
                 if(id.categoría != Categoría.TIPO)
                 {
                     aborta(módulo, arg.línea, "No he podido obtener un tipo para el identificador '" ~ arg.dato ~ "'");
@@ -1558,7 +1628,7 @@ Tipo op_llama(Operación op)
             }
             else if(arg.categoría == Categoría.IDENTIFICADOR)
             {
-                Nodo id = lee_identificador(arg);
+                Nodo id = coge_identificador(arg);
                 if(id.categoría != Categoría.TIPO)
                 {
                     aborta(módulo, arg.línea, "No he podido obtener un tipo para el identificador '" ~ arg.dato ~ "'");
@@ -1626,7 +1696,7 @@ Tipo op_cmp(Operación op)
     else if(n.categoría == Categoría.IDENTIFICADOR)
     {
         Tipo tlit;
-        Nodo id = lee_identificador(n);
+        Nodo id = coge_identificador(n);
         if(id.categoría == Categoría.TIPO)
         {
             tlit = cast(Tipo)id;
@@ -1655,7 +1725,7 @@ Tipo op_cmp(Operación op)
     else if(n.categoría == Categoría.IDENTIFICADOR)
     {
         Tipo tlit;
-        Nodo id = lee_identificador(n);
+        Nodo id = coge_identificador(n);
         if(id.categoría == Categoría.TIPO)
         {
             tlit = cast(Tipo)id;
@@ -1710,7 +1780,7 @@ Tipo op_conv(Operación op)
     else if(n.categoría == Categoría.IDENTIFICADOR)
     {
         Tipo tlit;
-        Nodo id = lee_identificador(n);
+        Nodo id = coge_identificador(n);
         if(id.categoría == Categoría.TIPO)
         {
             tlit = cast(Tipo)id;
@@ -2013,7 +2083,7 @@ Tipo op_slt(Operación op)
     {
         Etiqueta etiqueta = cast(Etiqueta)(op.ramas[0]);
 
-        if(!tid_local.lee_id(etiqueta.dato).nombre)
+        if(!tid_local.coge_id(etiqueta.dato).nombre)
         {
             aborta(módulo, op.línea, "op:slt - La etiqueta no existe");
         }
@@ -2047,7 +2117,7 @@ Tipo op_slt(Operación op)
         else if(n.categoría == Categoría.IDENTIFICADOR)
         {
             Tipo tlit;
-            Nodo id = lee_identificador(n);
+            Nodo id = coge_identificador(n);
             if(id.categoría == Categoría.TIPO)
             {
                 tlit = cast(Tipo)id;
@@ -2068,7 +2138,7 @@ Tipo op_slt(Operación op)
 
         Etiqueta etiqueta = cast(Etiqueta)(op.ramas[2]);
 
-        if(!tid_local.lee_id(etiqueta.dato).nombre)
+        if(!tid_local.coge_id(etiqueta.dato).nombre)
         {
             aborta(módulo, op.línea, "op:slt - La etiqueta no existe");
         }
@@ -2187,7 +2257,7 @@ Tipo op_guarda(Operación op)
             }
 
             Tipo tlit;
-            Nodo id = lee_identificador(n1);
+            Nodo id = coge_identificador(n1);
             if(id.categoría == Categoría.TIPO)
             {
                 tlit = cast(Tipo)id;
@@ -2211,7 +2281,7 @@ Tipo op_guarda(Operación op)
             }
             else if(n2.categoría == Categoría.IDENTIFICADOR)
             {
-                if(!tid_local.lee_id((cast(Identificador)n2).nombre).nombre)
+                if(!tid_local.coge_id((cast(Identificador)n2).nombre).nombre)
                 {
                     aborta(módulo, op.línea, "op:guarda - El identificador no existe.");
                     return null;
@@ -2257,7 +2327,7 @@ Tipo op_leeval(Operación op)
         }
         else if(var.categoría == Categoría.IDENTIFICADOR)
         {
-            Nodo ntvar = lee_identificador(var);
+            Nodo ntvar = coge_identificador(var);
             if(ntvar.categoría == Categoría.TIPO)
             {
                 tvar = cast(Tipo)ntvar;
@@ -2299,7 +2369,7 @@ Tipo op_leeval(Operación op)
             }
             else if(idx.categoría == Categoría.IDENTIFICADOR)
             {
-                Nodo id = lee_identificador(idx);
+                Nodo id = coge_identificador(idx);
                 if(id.categoría == Categoría.TIPO)
                 {
                     tidx = cast(Tipo)id;
@@ -2384,7 +2454,7 @@ Tipo op_ponval(Operación op)
         }
         else if(var.categoría == Categoría.IDENTIFICADOR)
         {
-            ntvar = lee_identificador(var);
+            ntvar = coge_identificador(var);
             if(ntvar.categoría == Categoría.TIPO)
             {
                 tvar = cast(Tipo)ntvar;
@@ -2414,7 +2484,7 @@ Tipo op_ponval(Operación op)
         }
         else if(val.categoría == Categoría.IDENTIFICADOR)
         {
-            ntvar = lee_identificador(var);
+            ntvar = coge_identificador(var);
             if(ntvar.categoría == Categoría.TIPO)
             {
                 tvar = cast(Tipo)ntvar;

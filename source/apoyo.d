@@ -75,6 +75,30 @@ class TablaIdentificadores
         return this.tabla;
     }
 
+    EntradaTablaIdentificadores coge_id(dstring identificador)
+    {
+
+        dstring id = identificador;
+
+        if((identificador[0] == '@') || (identificador[0] == '%'))
+        {
+            id = identificador; // identificador[1..$];
+        }
+
+        auto tmp = id in tabla;
+
+        if(tmp is null) //el identificador no se encuentra en la tabla actual
+        {
+            // devuelve una entrada nula
+            return EntradaTablaIdentificadores(null, false, null, false, null, null);
+        }
+        else //el identificador se encuentra en la tabla actual
+        {
+            tabla[id].usado = true;
+            return tabla[id];
+        }
+    }
+
     EntradaTablaIdentificadores lee_id(dstring identificador)
     {
 
@@ -95,6 +119,35 @@ class TablaIdentificadores
         else //el identificador se encuentra en la tabla actual
         {
             return tabla[id];
+        }
+    }
+
+    void encuentra_ids_no_usados()
+    {
+        foreach(ref EntradaTablaIdentificadores eid; this.tabla)
+        {
+            if(eid.nombre is null)
+            {
+                aborta(módulo, 0, "eid.nombre es nulo");
+            }
+            else if(eid.nombre == ":")
+            {
+                continue;
+            }
+            else if(!eid.usado)
+            {
+                ulong línea;
+                
+                if(eid.declarado)
+                {
+                    línea = eid.declaración.línea;
+                }
+                else if(eid.definido)
+                {
+                    línea = eid.definición.línea;
+                }
+                avisa(módulo, línea, "No has usado el identificador " ~ eid.nombre);
+            }
         }
     }
 
@@ -207,6 +260,7 @@ struct EntradaTablaIdentificadores
     bool    definido;
     Nodo    definición;
     Literal valor;
+    bool    usado;
 }
 
 void infoln()
@@ -261,11 +315,11 @@ void error(dstring módulo, ulong línea, dstring s)
 {
     if(línea == 0)
     {
-        stdout.writeln("ERROR (" ~ archivo ~ ") [MODULO: ", módulo, "]:: ", s, ".");
+        stdout.writeln("ERROR [" ~ archivo ~ "] ", s, ". [MODULO: ", módulo, "]");
     }
     else
     {
-        stdout.writeln("ERROR (" ~ archivo ~ ") (L:", to!dstring(línea), ") [MODULO: ", módulo, "]: ", s, ".");
+        stdout.writeln("ERROR [" ~ archivo ~ " - L:", to!dstring(línea), "] ", s, ". [MODULO: ", módulo, "]");
     }
 }
 
@@ -275,11 +329,11 @@ void avisa(dstring módulo, ulong línea, dstring s)
     {
         if(línea == 0)
         {
-            stdout.writeln("AVISO (" ~ archivo ~ ") [MODULO: ", módulo, "]:: ", s, ".");
+            stdout.writeln("AVISO [" ~ archivo ~ "] ", s, ". [MODULO: ", módulo, "]");
         }
         else
         {
-            stdout.writeln("AVISO (" ~ archivo ~ ") (L:", to!dstring(línea), ") [MODULO: ", módulo, "]: ", s, ".");
+            stdout.writeln("AVISO [" ~ archivo ~ " - L:", to!dstring(línea), "] ", s, ". [MODULO: ", módulo, "]");
         }
     }
 }
