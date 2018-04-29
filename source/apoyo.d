@@ -275,11 +275,11 @@ void avisa(dstring módulo, ulong línea, dstring s)
     {
         if(línea == 0)
         {
-            //stdout.writeln("AVISO (" ~ archivo ~ ") [MODULO: ", módulo, "]:: ", s, ".");
+            stdout.writeln("AVISO (" ~ archivo ~ ") [MODULO: ", módulo, "]:: ", s, ".");
         }
         else
         {
-            //stdout.writeln("AVISO (" ~ archivo ~ ") (L:", to!dstring(línea), ") [MODULO: ", módulo, "]: ", s, ".");
+            stdout.writeln("AVISO (" ~ archivo ~ ") (L:", to!dstring(línea), ") [MODULO: ", módulo, "]: ", s, ".");
         }
     }
 }
