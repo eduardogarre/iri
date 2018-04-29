@@ -11,8 +11,8 @@ import std.stdint;
 import std.stdio;
 
 // Tabla de identificadores que se usa en la ejecución/interpretación.
-TablaIdentificadores tid_local;
 TablaIdentificadores tid_global;
+TablaIdentificadores tid_local;
 
 Literal analiza(Nodo n)
 {
@@ -251,8 +251,8 @@ Bloque prepara_función(dstring fid, Literal[] args)
         aborta(módulo, línea_actual, "No has declarado la función '" ~ fid ~ "()'.");
     }
 
-    EntradaTablaIdentificadores eid = tid_global.lee_id(fid);
     // eid: dstring nombre, bool declarado, Nodo declaración, bool definido, Nodo definición;
+    EntradaTablaIdentificadores eid = tid_global.lee_id(fid);
 
     if(!eid.definido)
     {
@@ -311,15 +311,18 @@ void declara_argumentos(Nodo n)
                 }
                 break;
 
-            default: break;
-        }
+            case Categoría.ARGUMENTOS:
+                for(int i = 0; i < n.ramas.length; i++)
+                {
+                    declara_argumentos(n.ramas[i]);
+                }
+                break;
 
-        if(n.categoría == Categoría.ARGUMENTOS)
-        {
-            for(int i = 0; i < n.ramas.length; i++)
-            {
-                declara_argumentos(n.ramas[i]);
-            }
+            case Categoría.DEFINE_FUNCIÓN:
+                declara_argumentos(n.ramas[0]);
+                break;
+
+            default: break;
         }
     }
 }
@@ -330,24 +333,27 @@ void define_argumentos(Nodo n, Literal[] args)
     {
         switch(n.categoría)
         {
+            case Categoría.ARGUMENTO:
+                auto a = cast(Argumento)n;
+
+                if(tid_local.define_identificador(a.nombre, args[0], args[0]))
+                {
+                    charlatánln("define " ~ tid_local.lee_id(a.nombre).nombre);
+                }
+                break;
+
             case Categoría.ARGUMENTOS:
                 for(int i = 0; i < n.ramas.length; i++)
                 {
-                    auto a = cast(Argumento)n.ramas[i];
-
-                    if(tid_local.define_identificador(a.nombre, args[i], args[i]))
-                    {
-                        charlatánln("define " ~ tid_local.lee_id(a.nombre).nombre);
-                    }
-                }
-                return;
-
-            default:
-                for(int i = 0; i < n.ramas.length; i++)
-                {
-                    define_argumentos(n.ramas[i], args);
+                    define_argumentos(n.ramas[i], [] ~ args[i]);
                 }
                 break;
+
+            case Categoría.DEFINE_FUNCIÓN:
+                define_argumentos(n.ramas[0], args);
+                break;
+
+            default: break;
         }
     }
 }
@@ -372,7 +378,7 @@ Bloque obtén_bloque(Nodo nodo)
 Nodo interpreta(Bloque bloque)
 {
     Nodo resultado;
-    //recorre las ramas del bloque de @inicio()
+    //recorre las ramas del bloque
     for(int i = 0; i<bloque.ramas.length; i++)
     {
         infoln("Contador op: " ~ to!dstring(i));
@@ -1413,7 +1419,7 @@ Literal op_llama(Operación op)
     LlamaFunción f = cast(LlamaFunción)op.ramas[0];
 
     infoln();
-    info("op: llama " ~ f.tipo ~ " " ~ f.nombre ~ "(");
+    info("op: llama " ~ to!dstring(f.retorno) ~ " " ~ f.nombre ~ "(");
 
     Literal[] args;
     
@@ -1427,20 +1433,20 @@ Literal op_llama(Operación op)
         Literal l = lee_argumento(n);
         args ~= l;
         
-        dstring dato = l.dato;
-        if(dato == "\n")
-        {
-            dato = "\\n";
-        }
-        else if(dato == "\r")
-        {
-            dato = "\\r";
-        }
-        else if(dato == "\t")
-        {
-            dato = "\\t";
-        }
-
+        //dstring dato = l.dato;
+        //if(dato == "\n")
+        //{
+        //    dato = "\\n";
+        //}
+        //else if(dato == "\r")
+        //{
+        //    dato = "\\r";
+        //}
+        //else if(dato == "\t")
+        //{
+        //    dato = "\\t";
+        //}
+        //
         //info(l.tipo.tipo ~ ":" ~ dato);
 
         i++;
@@ -1505,14 +1511,12 @@ Literal op_cmp(Operación op)
 
     dstring comparación = r.dato;
 
-    dstring s = comparación;
-
-    if(   (s == "ig") // igual
-        | (s == "dsig") // diferente
-        | (s == "ma") // mayor
-        | (s == "me") // menor
-        | (s == "maig") // mayor o igual
-        | (s == "meig") // menor o igual
+    if(   (comparación == "ig") // igual
+        | (comparación == "dsig") // diferente
+        | (comparación == "ma") // mayor
+        | (comparación == "me") // menor
+        | (comparación == "maig") // mayor o igual
+        | (comparación == "meig") // menor o igual
         )
     {}
     else
@@ -2556,7 +2560,7 @@ Literal op_guarda(Operación op)
         return null;
     }
 
-    aborta(módulo, op.línea, "lee <tipo> '(' <id>|<literal> ')', <tipo>* '(' <id>|<literal> ')'");
+    aborta(módulo, op.línea, "guarda <tipo> '(' <id>|<literal> ')', <tipo>* '(' <id>|<literal> ')'");
     return null;
 }
 

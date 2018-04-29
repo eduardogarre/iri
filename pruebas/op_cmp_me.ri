@@ -1,23 +1,25 @@
 // Pruebo la operación 'cmp'
 módulo prueba_op_cmp_me;
 
+declara nada @#poncar(n32 %carácter);
+
 @correcto_txt = ".";
 @comparaciones_literales_error = "\nERROR - op:cmp me entre literales\n";
 @marcador = "\n---->MARCA<----\n";
 
 define e32 @inicio(r32 %pi)
 {
-    %res = llama n1 @prueba_cmp_me_literales_naturales();
-    %er = cmp ig n1 %res, 0;
-    slt n1 %er, :error;
+    %res0 = llama n1 @prueba_cmp_me_literales_naturales();
+    %er0 = cmp ig n1 %res0, 0;
+    slt n1 %er0, :error;
 
-    %res = llama n1 @prueba_cmp_me_literales_enteros();
-    %er = cmp ig n1 %res, 0;
-    slt n1 %er, :error;
+    %res1 = llama n1 @prueba_cmp_me_literales_enteros();
+    %er1 = cmp ig n1 %res1, 0;
+    slt n1 %er1, :error;
 
-    %res = llama n1 @prueba_cmp_me_literales_reales();
-    %er = cmp ig n1 %res, 0;
-    slt n1 %er, :error;
+    %res2 = llama n1 @prueba_cmp_me_literales_reales();
+    %er2 = cmp ig n1 %res2, 0;
+    slt n1 %er2, :error;
 
     ret e32 0;
 
@@ -45,24 +47,24 @@ naturales_prueba1_correcto:
     llama nada @escribe(@correcto_txt);
 
 naturales_prueba2:
-    %1 = cmp me n32 42, 43;
-    slt n1 %1, :naturales_prueba2_correcto;
+    %2 = cmp me n32 42, 43;
+    slt n1 %2, :naturales_prueba2_correcto;
     llama nada @escribe(@comparaciones_literales_error);
     ret n1 0;
 naturales_prueba2_correcto:
     llama nada @escribe(@correcto_txt);
 
 naturales_prueba3:
-    %1 = cmp me n32 288, 289;
-    slt n1 %1, :naturales_prueba3_correcto;
+    %3 = cmp me n32 288, 289;
+    slt n1 %3, :naturales_prueba3_correcto;
     llama nada @escribe(@comparaciones_literales_error);
     ret n1 0;
 naturales_prueba3_correcto:
     llama nada @escribe(@correcto_txt);
 
 naturales_prueba4:
-    %1 = cmp me n32 0, 1000;
-    slt n1 %1, :naturales_prueba4_correcto;
+    %4 = cmp me n32 0, 1000;
+    slt n1 %4, :naturales_prueba4_correcto;
     llama nada @escribe(@comparaciones_literales_error);
     ret n1 0;
 naturales_prueba4_correcto:
@@ -72,8 +74,8 @@ naturales_prueba4_correcto:
 // Operando_1 <= Operando_2
 
 naturales_prueba5:
-    %1 = cmp me n32 1, 0;
-    slt n1 %1, :naturales_prueba5_error;
+    %5 = cmp me n32 1, 0;
+    slt n1 %5, :naturales_prueba5_error;
     llama nada @escribe(@correcto_txt);
     slt :naturales_prueba6;
 naturales_prueba5_error:
@@ -81,8 +83,8 @@ naturales_prueba5_error:
     ret n1 0;
 
 naturales_prueba6:
-    %1 = cmp me n32 42, 1;
-    slt n1 %1, :naturales_prueba6_error;
+    %6 = cmp me n32 42, 1;
+    slt n1 %6, :naturales_prueba6_error;
     llama nada @escribe(@correcto_txt);
     slt :naturales_prueba7;
 naturales_prueba6_error:
@@ -90,8 +92,8 @@ naturales_prueba6_error:
     ret n1 0;
 
 naturales_prueba7:
-    %1 = cmp me n32 288, 0;
-    slt n1 %1, :naturales_prueba7_error;
+    %7 = cmp me n32 288, 0;
+    slt n1 %7, :naturales_prueba7_error;
     llama nada @escribe(@correcto_txt);
     slt :naturales_prueba8;
 naturales_prueba7_error:
@@ -99,8 +101,8 @@ naturales_prueba7_error:
     ret n1 0;
 
 naturales_prueba8:
-    %1 = cmp me n32 1, 1;
-    slt n1 %1, :naturales_prueba8_error;
+    %8 = cmp me n32 1, 1;
+    slt n1 %8, :naturales_prueba8_error;
     llama nada @escribe(@correcto_txt);
     slt :fin;
 naturales_prueba8_error:
@@ -131,8 +133,8 @@ enteros_prueba1_correcto:
     slt :enteros_prueba2;
 
 enteros_prueba2:
-    %1 = cmp me e32 -42, 43;
-    slt n1 %1, :enteros_prueba2_correcto;
+    %2 = cmp me e32 -42, 43;
+    slt n1 %2, :enteros_prueba2_correcto;
     llama nada @escribe(@comparaciones_literales_error);
     ret n1 0;
 enteros_prueba2_correcto:
@@ -140,16 +142,16 @@ enteros_prueba2_correcto:
     slt :enteros_prueba3;
 
 enteros_prueba3:
-    %1 = cmp me e32 -288, 288;
-    slt n1 %1, :enteros_prueba3_correcto;
+    %3 = cmp me e32 -288, 288;
+    slt n1 %3, :enteros_prueba3_correcto;
     llama nada @escribe(@comparaciones_literales_error);
     ret n1 0;
 enteros_prueba3_correcto:
     llama nada @escribe(@correcto_txt);
 
 enteros_prueba4:
-    %1 = cmp me e32 -1000, 10;
-    slt n1 %1, :enteros_prueba4_correcto;
+    %4 = cmp me e32 -1000, 10;
+    slt n1 %4, :enteros_prueba4_correcto;
     llama nada @escribe(@comparaciones_literales_error);
     ret n1 0;
 enteros_prueba4_correcto:
@@ -159,8 +161,8 @@ enteros_prueba4_correcto:
 // Operando_1 <= Operando_2
 
 enteros_prueba5:
-    %1 = cmp me e32 1, 0;
-    slt n1 %1, :enteros_prueba5_error;
+    %5 = cmp me e32 1, 0;
+    slt n1 %5, :enteros_prueba5_error;
     llama nada @escribe(@correcto_txt);
     slt :enteros_prueba6;
 enteros_prueba5_error:
@@ -168,8 +170,8 @@ enteros_prueba5_error:
     ret n1 0;
 
 enteros_prueba6:
-    %1 = cmp me e32 1, -42;
-    slt n1 %1, :enteros_prueba6_error;
+    %6 = cmp me e32 1, -42;
+    slt n1 %6, :enteros_prueba6_error;
     llama nada @escribe(@correcto_txt);
     slt :enteros_prueba7;
 enteros_prueba6_error:
@@ -177,8 +179,8 @@ enteros_prueba6_error:
     ret n1 0;
 
 enteros_prueba7:
-    %1 = cmp me e32 0, -288;
-    slt n1 %1, :enteros_prueba7_error;
+    %7 = cmp me e32 0, -288;
+    slt n1 %7, :enteros_prueba7_error;
     llama nada @escribe(@correcto_txt);
     slt :enteros_prueba8;
 enteros_prueba7_error:
@@ -186,8 +188,8 @@ enteros_prueba7_error:
     ret n1 0;
 
 enteros_prueba8:
-    %1 = cmp me e32 -1, -1;
-    slt n1 %1, :enteros_prueba8_error;
+    %8 = cmp me e32 -1, -1;
+    slt n1 %8, :enteros_prueba8_error;
     llama nada @escribe(@correcto_txt);
     slt :fin;
 enteros_prueba8_error:
@@ -219,8 +221,8 @@ reales_prueba1_correcto:
     slt :reales_prueba2;
 
 reales_prueba2:
-    %1 = cmp me r32 42.0, 43.0;
-    slt n1 %1, :reales_prueba2_correcto;
+    %2 = cmp me r32 42.0, 43.0;
+    slt n1 %2, :reales_prueba2_correcto;
     llama nada @escribe(@comparaciones_literales_error);
     ret n1 0;
 reales_prueba2_correcto:
@@ -228,16 +230,16 @@ reales_prueba2_correcto:
     slt :reales_prueba3;
 
 reales_prueba3:
-    %1 = cmp me r32 -288.143456, 288.3427;
-    slt n1 %1, :reales_prueba3_correcto;
+    %3 = cmp me r32 -288.143456, 288.3427;
+    slt n1 %3, :reales_prueba3_correcto;
     llama nada @escribe(@comparaciones_literales_error);
     ret n1 0;
 reales_prueba3_correcto:
     llama nada @escribe(@correcto_txt);
 
 reales_prueba4:
-    %1 = cmp me r32 -10.100, 10.3497;
-    slt n1 %1, :reales_prueba4_correcto;
+    %4 = cmp me r32 -10.100, 10.3497;
+    slt n1 %4, :reales_prueba4_correcto;
     llama nada @escribe(@comparaciones_literales_error);
     ret n1 0;
 reales_prueba4_correcto:
@@ -247,8 +249,8 @@ reales_prueba4_correcto:
 // Operando_1 <= Operando_2
 
 reales_prueba5:
-    %1 = cmp me r32 0, -1.3;
-    slt n1 %1, :reales_prueba5_error;
+    %5 = cmp me r32 0, -1.3;
+    slt n1 %5, :reales_prueba5_error;
     llama nada @escribe(@correcto_txt);
     slt :reales_prueba6;
 reales_prueba5_error:
@@ -256,8 +258,8 @@ reales_prueba5_error:
     ret n1 0;
 
 reales_prueba6:
-    %1 = cmp me r32 -1.12, -42.288;
-    slt n1 %1, :reales_prueba6_error;
+    %6 = cmp me r32 -1.12, -42.288;
+    slt n1 %6, :reales_prueba6_error;
     llama nada @escribe(@correcto_txt);
     slt :reales_prueba7;
 reales_prueba6_error:
@@ -265,8 +267,8 @@ reales_prueba6_error:
     ret n1 0;
 
 reales_prueba7:
-    %1 = cmp me r32 0.132, -288.543;
-    slt n1 %1, :reales_prueba7_error;
+    %7 = cmp me r32 0.132, -288.543;
+    slt n1 %7, :reales_prueba7_error;
     llama nada @escribe(@correcto_txt);
     slt :reales_prueba8;
 reales_prueba7_error:
@@ -274,8 +276,8 @@ reales_prueba7_error:
     ret n1 0;
 
 reales_prueba8:
-    %1 = cmp me r32 -1.09, -1.09;
-    slt n1 %1, :reales_prueba8_error;
+    %8 = cmp me r32 -1.09, -1.09;
+    slt n1 %8, :reales_prueba8_error;
     llama nada @escribe(@correcto_txt);
     slt :fin;
 reales_prueba8_error:
@@ -306,7 +308,7 @@ bucle:
 
     // si la comprobación es falsa, escribo el carácter, aumento el contador y reinicio el bucle
     llama nada @#poncar(%1);
-    %3 = sum e32 %0, 1;
+    %3 = sum n32 %0, 1;
     guarda n32 %3, n32* %ptr_i;
     
     slt :bucle;

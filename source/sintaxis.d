@@ -1780,11 +1780,11 @@ private LlamaFunción llama_función()
 
     if(cursor < símbolos.length)
     {
-        LlamaFunción  f  = new LlamaFunción();
+        LlamaFunción f = new LlamaFunción();
 
         if(Tipo t = tipo())
         {
-            f.tipo = t.tipo;
+            f.retorno = t;
         }
         else
         {

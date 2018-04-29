@@ -15,6 +15,7 @@ bool CHARLATÁN = false;
 bool INFO = false;
 bool AVISO = true;
 
+dstring archivo;
 
 struct lexema
 {
@@ -260,25 +261,25 @@ void error(dstring módulo, ulong línea, dstring s)
 {
     if(línea == 0)
     {
-        stdout.writeln("[", módulo, "] ERROR: ", s, ".");
+        stdout.writeln("ERROR (" ~ archivo ~ ") [MODULO: ", módulo, "]:: ", s, ".");
     }
     else
     {
-        stdout.writeln("[", módulo, "] ERROR en línea ", to!dstring(línea), ": ", s, ".");
+        stdout.writeln("ERROR (" ~ archivo ~ ") (L:", to!dstring(línea), ") [MODULO: ", módulo, "]: ", s, ".");
     }
 }
 
-void aviso(dstring módulo, ulong línea, dstring s)
+void avisa(dstring módulo, ulong línea, dstring s)
 {
     if(AVISO)
     {
         if(línea == 0)
         {
-            stdout.writeln("[", módulo, "] AVISO: ", s, ".");
+            //stdout.writeln("AVISO (" ~ archivo ~ ") [MODULO: ", módulo, "]:: ", s, ".");
         }
         else
         {
-            stdout.writeln("[", módulo, "] AVISO en línea ", to!dstring(línea), ": ", s, ".");
+            //stdout.writeln("AVISO (" ~ archivo ~ ") (L:", to!dstring(línea), ") [MODULO: ", módulo, "]: ", s, ".");
         }
     }
 }

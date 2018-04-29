@@ -1,6 +1,8 @@
 // Pruebo la operación 'sum'
 módulo prueba_op_sum;
 
+declara nada @#poncar(n32 %carácter);
+
 @correcto_txt = ".";
 
 define e32 @inicio(r32 %pi)
@@ -12,69 +14,69 @@ sumas_literales_prueba1:
     ret e32 -1;
 
 sumas_literales_prueba2:
-    %0 = llama n32 @suma_literales_naturales(288, 12, 300);
-    %1 = cmp ig n32 %0, 1;
-    slt n1 %1, :sumas_literales_prueba3;
+    %2 = llama n32 @suma_literales_naturales(288, 12, 300);
+    %3 = cmp ig n32 %2, 1;
+    slt n1 %3, :sumas_literales_prueba3;
     ret e32 -1;
 
 sumas_literales_prueba3:
-    %0 = llama n32 @suma_literales_naturales(42, 8, 50);
-    %1 = cmp ig n32 %0, 1;
-    slt n1 %1, :sumas_literales_prueba4;
+    %4 = llama n32 @suma_literales_naturales(42, 8, 50);
+    %5 = cmp ig n32 %4, 1;
+    slt n1 %5, :sumas_literales_prueba4;
     ret e32 -1;
 
 sumas_literales_prueba4:
-    %0 = llama n32 @suma_literales_naturales(100, 200, 300);
-    %1 = cmp ig n32 %0, 1;
-    slt n1 %1, :sumas_literales_prueba5;
+    %6 = llama n32 @suma_literales_naturales(100, 200, 300);
+    %7 = cmp ig n32 %6, 1;
+    slt n1 %7, :sumas_literales_prueba5;
     ret e32 -1;
 
 sumas_literales_prueba5:
-    %0 = llama n32 @suma_literales_enteros(0, -1, -1);
-    %1 = cmp ig n32 %0, 1;
-    slt n1 %1, :sumas_literales_prueba6;
+    %8 = llama n32 @suma_literales_enteros(0, -1, -1);
+    %9 = cmp ig n32 %8, 1;
+    slt n1 %9, :sumas_literales_prueba6;
     ret e32 -1;
 
 sumas_literales_prueba6:
-    %0 = llama n32 @suma_literales_enteros(288, -88, 200);
-    %1 = cmp ig n32 %0, 1;
-    slt n1 %1, :sumas_literales_prueba7;
+    %10 = llama n32 @suma_literales_enteros(288, -88, 200);
+    %11 = cmp ig n32 %10, 1;
+    slt n1 %11, :sumas_literales_prueba7;
     ret e32 -1;
 
 sumas_literales_prueba7:
-    %0 = llama n32 @suma_literales_enteros(-42, 8, -34);
-    %1 = cmp ig n32 %0, 1;
-    slt n1 %1, :sumas_literales_prueba8;
+    %12 = llama n32 @suma_literales_enteros(-42, 8, -34);
+    %13 = cmp ig n32 %12, 1;
+    slt n1 %13, :sumas_literales_prueba8;
     ret e32 -1;
 
 sumas_literales_prueba8:
-    %0 = llama n32 @suma_literales_enteros(100, -200, -100);
-    %1 = cmp ig n32 %0, 1;
-    slt n1 %1, :sumas_literales_prueba9;
+    %14 = llama n32 @suma_literales_enteros(100, -200, -100);
+    %15 = cmp ig n32 %14, 1;
+    slt n1 %15, :sumas_literales_prueba9;
     ret e32 -1;
 
 sumas_literales_prueba9:
-    %0 = llama n32 @suma_literales_reales(-42, 0.8, -41.2);
-    %1 = cmp ig n32 %0, 1;
-    slt n1 %1, :sumas_literales_prueba10;
+    %16 = llama n32 @suma_literales_reales(-42, 0.8, -41.2);
+    %17 = cmp ig n32 %16, 1;
+    slt n1 %17, :sumas_literales_prueba10;
     ret e32 -1;
 
 sumas_literales_prueba10:
-    %0 = llama n32 @suma_literales_reales(1.1e2, 3.14, 113.14);
-    %1 = cmp ig n32 %0, 1;
-    slt n1 %1, :sumas_literales_prueba11;
+    %18 = llama n32 @suma_literales_reales(1.1e2, 3.14, 113.14);
+    %19 = cmp ig n32 %18, 1;
+    slt n1 %19, :sumas_literales_prueba11;
     ret e32 -1;
 
 sumas_literales_prueba11:
-    %0 = llama n32 @suma_literales_reales(1.0e-2, -1.01, -1);
-    %1 = cmp ig n32 %0, 1;
-    slt n1 %1, :sumas_literales_prueba12;
+    %20 = llama n32 @suma_literales_reales(1.0e-2, -1.01, -1);
+    %21 = cmp ig n32 %20, 1;
+    slt n1 %21, :sumas_literales_prueba12;
     ret e32 -1;
 
 sumas_literales_prueba12:
-    %0 = llama n32 @suma_literales_reales(3.14e3, -0.1, 3139.9);
-    %1 = cmp ig n32 %0, 1;
-    slt n1 %1, :sumas_literales_fin;
+    %22 = llama n32 @suma_literales_reales(3.14e3, -0.1, 3139.9);
+    %23 = cmp ig n32 %22, 1;
+    slt n1 %23, :sumas_literales_fin;
     ret e32 -1;
 
 sumas_literales_fin:
@@ -173,7 +175,7 @@ bucle:
 
     // si la comprobación es falsa, escribo el carácter, aumento el contador y reinicio el bucle
     llama nada @#poncar(%1);
-    %3 = sum e32 %0, 1;
+    %3 = sum n32 %0, 1;
     guarda n32 %3, n32* %ptr_i;
     
     slt :bucle;

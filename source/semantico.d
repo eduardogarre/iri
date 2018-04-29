@@ -31,9 +31,9 @@ Nodo analiza(Nodo n)
 
     paso_obtén_identificadores_globales(n);
 
-    paso_comprueba_tipos_ids_globales();
+    paso_comprueba_concordancia_declaraciones_y_definiciones();
 
-    paso_comprueba_concordancia_declaración_y_definición();
+    paso_comprueba_funciones();
 
     charlatánln();
 
@@ -155,7 +155,7 @@ void imprime_árbol(Nodo n)
                 charlatán(" [id:");
                 charlatán(l.nombre);
                 charlatán(" [devuelve:");
-                charlatán(l.tipo);
+                charlatán(to!dstring(l.retorno));
                 charlatán("] [línea:");
                 charlatán(to!dstring(l.línea));
                 charlatánln("]");
@@ -416,7 +416,7 @@ void paso_obtén_identificadores_globales(Nodo n)
     }
 }
 
-void paso_comprueba_tipos_ids_globales()
+void paso_comprueba_concordancia_declaraciones_y_definiciones()
 {
     // recorre los id's globales
     foreach(ref EntradaTablaIdentificadores eid; tid_global.tabla)
@@ -429,115 +429,86 @@ void paso_comprueba_tipos_ids_globales()
             Nodo def = eid.definición;
 
             switch(def.categoría)
-            {
-                case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
-                    auto did = cast(DefineIdentificadorGlobal)def;
-                    comprueba_tipo_literal(did.tipo, eid.valor);
-                    break;
-
-                case Categoría.DEFINE_FUNCIÓN:
-                    auto dfn = cast(DefineFunción)def;
-                    break;
-
-                default: break;
-            }
-        }
-    }
-}
-
-void paso_comprueba_concordancia_declaración_y_definición()
-{
-    // recorre los id's globales
-    foreach(ref EntradaTablaIdentificadores eid; tid_global.tabla)
-    {
-        // en cada iteración, eid contiene una entrada con un id global
-
-        // Analiza sólo los id's que ya están definidos
-        if(eid.definido)
         {
-            Nodo def = eid.definición;
+            case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
+                auto defid = cast(DefineIdentificadorGlobal)def;
+                
+                comprueba_tipo_literal(defid.tipo, eid.valor);
+                
+                if(eid.declarado) // Si existe declaración, comprueba que coincide con definición
+                {
+                    auto decid = cast(DeclaraIdentificadorGlobal)(eid.declaración);
 
-            switch(def.categoría)
-            {
-                case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
-                    auto defid = cast(DefineIdentificadorGlobal)def;
-                    // Si existe declaración, comprueba que coincide con definición
-                    if(eid.declarado)
+                    if(defid.dato != decid.dato)
                     {
-                        Nodo dec = eid.declaración;
-                        auto decid = cast(DeclaraIdentificadorGlobal)dec;
-
-                        if(defid.dato != decid.dato)
-                        {
-                            aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
-                            ~ "DefineIdentificadorGlobal.dato y DeclaraIdentificadorGlobal.dato no coinciden:\n["
-                            ~ to!dstring(defid.dato) ~ "] vs ["
-                            ~ to!dstring(decid.dato) ~ "]");
-                        }
-                        else if(defid.ámbito != decid.ámbito)
-                        {
-                            aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
-                            ~ "DefineIdentificadorGlobal.ámbito y DeclaraIdentificadorGlobal.ámbito no coinciden:\n["
-                            ~ to!dstring(defid.ámbito) ~ "] vs ["
-                            ~ to!dstring(decid.ámbito) ~ "]");
-                        }
-                        else if(defid.nombre != decid.nombre)
-                        {
-                            aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
-                            ~ "DefineIdentificadorGlobal.nombre y DeclaraIdentificadorGlobal.nombre no coinciden:\n["
-                            ~ to!dstring(defid.nombre) ~ "] vs ["
-                            ~ to!dstring(decid.nombre) ~ "]");
-                        }
-                        else if(!compara_árboles(cast(Nodo*)(&(defid.tipo)), cast(Nodo*)(&(decid.tipo))))
-                        {
-                            aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
-                            ~ "DefineIdentificadorGlobal.tipo y DeclaraIdentificadorGlobal.tipo no coinciden:\n["
-                            ~ to!dstring(defid.tipo) ~ "] vs ["
-                            ~ to!dstring(decid.tipo) ~ "]");
-                        }
+                        aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        ~ "DefineIdentificadorGlobal.dato y DeclaraIdentificadorGlobal.dato no coinciden:\n["
+                        ~ to!dstring(defid.dato) ~ "] vs ["
+                        ~ to!dstring(decid.dato) ~ "]");
                     }
-                    break;
-
-                case Categoría.DEFINE_FUNCIÓN:
-                    auto deffn = cast(DefineFunción)def;
-                    // Si existe declaración, comprueba que coincide con definición
-                    if(eid.declarado)
+                    else if(defid.ámbito != decid.ámbito)
                     {
-                        Nodo dec = eid.declaración;
-                        auto decfn = cast(DeclaraFunción)dec;
-
-                        if(deffn.dato != decfn.dato)
-                        {
-                            aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
-                            ~ "DefineFunción.dato y DeclaraFunción.dato no coinciden:\n["
-                            ~ to!dstring(deffn.dato) ~ "] vs ["
-                            ~ to!dstring(decfn.dato) ~ "]");
-                        }
-                        else if(deffn.nombre != decfn.nombre)
-                        {
-                            aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
-                            ~ "DefineFunción.nombre y DeclaraFunción.nombre no coinciden:\n["
-                            ~ to!dstring(deffn.nombre) ~ "] vs ["
-                            ~ to!dstring(decfn.nombre) ~ "]");
-                        }
-                        else if(!compara_árboles(cast(Nodo*)(&(deffn.retorno)), cast(Nodo*)(&(decfn.retorno))))
-                        {
-                            aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
-                            ~ "DefineFunción.retorno y DeclaraFunción.retorno no coinciden:\n["
-                            ~ to!dstring(deffn.retorno) ~ "] vs ["
-                            ~ to!dstring(decfn.retorno) ~ "]");
-                        }
-                        else if(!compara_árboles(cast(Nodo*)(&(deffn.ramas[0])), cast(Nodo*)(&(decfn.ramas[0]))))
-                        {
-                            aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
-                            ~ "DefineFunción.ramas[0] y DeclaraFunción.ramas[0] (Argumentos) no coinciden:\n["
-                            ~ to!dstring(deffn.ramas[0]) ~ "] vs ["
-                            ~ to!dstring(decfn.ramas[0]) ~ "]");
-                        }
+                        aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        ~ "DefineIdentificadorGlobal.ámbito y DeclaraIdentificadorGlobal.ámbito no coinciden:\n["
+                        ~ to!dstring(defid.ámbito) ~ "] vs ["
+                        ~ to!dstring(decid.ámbito) ~ "]");
                     }
-                    break;
+                    else if(defid.nombre != decid.nombre)
+                    {
+                        aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        ~ "DefineIdentificadorGlobal.nombre y DeclaraIdentificadorGlobal.nombre no coinciden:\n["
+                        ~ to!dstring(defid.nombre) ~ "] vs ["
+                        ~ to!dstring(decid.nombre) ~ "]");
+                    }
+                    else if(!compara_árboles(cast(Nodo*)(&(defid.tipo)), cast(Nodo*)(&(decid.tipo))))
+                    {
+                        aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        ~ "DefineIdentificadorGlobal.tipo y DeclaraIdentificadorGlobal.tipo no coinciden:\n["
+                        ~ to!dstring(defid.tipo) ~ "] vs ["
+                        ~ to!dstring(decid.tipo) ~ "]");
+                    }
+                }
+                break;
 
-                default: break;
+            case Categoría.DEFINE_FUNCIÓN:
+                auto deffn = cast(DefineFunción)def;
+                
+                if(eid.declarado) // Si existe declaración, comprueba que coincide con definición
+                {
+                    auto decfn = cast(DeclaraFunción)(eid.declaración);
+
+                    if(deffn.dato != decfn.dato)
+                    {
+                        aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        ~ "DefineFunción.dato y DeclaraFunción.dato no coinciden:\n["
+                        ~ to!dstring(deffn.dato) ~ "] vs ["
+                        ~ to!dstring(decfn.dato) ~ "]");
+                    }
+                    else if(deffn.nombre != decfn.nombre)
+                    {
+                        aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        ~ "DefineFunción.nombre y DeclaraFunción.nombre no coinciden:\n["
+                        ~ to!dstring(deffn.nombre) ~ "] vs ["
+                        ~ to!dstring(decfn.nombre) ~ "]");
+                    }
+                    else if(!compara_árboles(cast(Nodo*)(&(deffn.retorno)), cast(Nodo*)(&(decfn.retorno))))
+                    {
+                        aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        ~ "DefineFunción.retorno y DeclaraFunción.retorno no coinciden:\n["
+                        ~ to!dstring(deffn.retorno) ~ "] vs ["
+                        ~ to!dstring(decfn.retorno) ~ "]");
+                    }
+                    else if(!compara_árboles(cast(Nodo*)(&(deffn.ramas[0])), cast(Nodo*)(&(decfn.ramas[0]))))
+                    {
+                        aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        ~ "DefineFunción.ramas[0] y DeclaraFunción.ramas[0] (Argumentos) no coinciden:\n["
+                        ~ to!dstring(deffn.ramas[0]) ~ "] vs ["
+                        ~ to!dstring(decfn.ramas[0]) ~ "]");
+                    }
+                }
+                break;
+
+            default: break;
             }
         }
     }
@@ -572,7 +543,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
 
             if(l.ramas.length != elementos) // El nodo Literal debe tener tantos hijos como elementos dice el Vector
             {
-                aviso(módulo, t.línea, "El vector y el literal definen tamaños diferentes");
+                avisa(módulo, t.línea, "El vector y el literal definen tamaños diferentes");
             }
 
             // Comprueba el tipo con los literales que componen el vector
@@ -596,7 +567,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
 
             if(l.ramas.length != t.ramas.length) // El nodo Estructura debe tener tantos hijos (literales) como el nodo Tipo (tipos hijos)
             {
-                aviso(módulo, t.línea, "La estructura y el literal definen tamaños diferentes");
+                avisa(módulo, t.línea, "La estructura y el literal definen tamaños diferentes");
             }
 
             // Comprueba el tipo con los literales que componen la estructura
@@ -782,4 +753,1735 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
             }
         }
     }
+}
+
+void paso_comprueba_funciones()
+{
+    // recorre los id's globales
+    foreach(ref EntradaTablaIdentificadores eid; tid_global.tabla)
+    {
+        // en cada iteración, eid contiene una entrada con un id global
+
+        // Analiza sólo los id's que ya están definidos
+        if(eid.definido)
+        {
+            Nodo def = eid.definición;
+
+            switch(def.categoría)
+            {
+            case Categoría.DEFINE_FUNCIÓN:
+                auto def_func = cast(DefineFunción)def;
+
+                Bloque bloque = prepara_función(def_func);
+                Nodo retorno = comprueba_bloque(bloque); // analiza semánticamente cada afirmación del bloque
+                break;
+
+            default:
+                break;
+            }
+        }
+    }
+}
+
+Bloque prepara_función(DefineFunción def_func)
+{
+    ulong línea_actual = 0;
+
+    if(def_func is null)
+    {
+        aborta(módulo, línea_actual, "Me has pasado un 'null' en lugar de una función.");
+    }
+    else
+    {
+        línea_actual = def_func.línea;
+    }
+    
+    // Crea y configura la tabla de identificadores de la función
+    auto tid_func = new TablaIdentificadores(def_func);
+    tid_func.dueño = def_func;
+    
+    // Establece la tabla de ids de la función como la tid vigente.
+    tid_local = tid_func;
+
+    // Declara los argumentos de la función.
+    charlatánln("Declara los argumentos de '" ~ def_func.nombre ~ "()'.");
+    declara_argumentos(def_func);
+
+    // Obtén el bloque de la función, para poder ejecutarlo.
+    Bloque bloque = obtén_bloque(def_func);
+
+    if(bloque is null)
+    {
+        aborta(módulo, línea_actual, "No puedo ejecutar el bloque");
+    }
+
+    obtén_etiquetas(bloque);
+
+    return bloque;
+}
+
+void declara_argumentos(Nodo n)
+{
+    if(n)
+    {
+        switch(n.categoría)
+        {
+            case Categoría.ARGUMENTO:
+                auto a = cast(Argumento)n;
+
+                if(tid_local.declara_identificador(a.nombre, a.tipo))
+                {
+                    charlatánln("declara " ~ tid_local.lee_id(a.nombre).nombre);
+                }
+                break;
+
+            case Categoría.ARGUMENTOS:
+                for(int i = 0; i < n.ramas.length; i++)
+                {
+                    declara_argumentos(n.ramas[i]);
+                }
+                break;
+
+            case Categoría.DEFINE_FUNCIÓN:
+                declara_argumentos(n.ramas[0]);
+                break;
+
+            default: break;
+        }
+    }
+}
+
+Bloque obtén_bloque(Nodo nodo)
+{
+    Bloque bloque = null;
+
+    for(int i = 0; i<nodo.ramas.length; i++)
+    {
+        Nodo r = cast(Nodo)nodo.ramas[i];
+        if(r.categoría == Categoría.BLOQUE)
+        {
+            bloque = cast(Bloque)r;
+            break;
+        }
+    }
+
+    return bloque;
+}
+
+void obtén_etiquetas(Nodo n)
+{
+    if(n)
+    {
+        tid_local.define_identificador(":", null, null);
+
+        for(int i = 0; i < n.ramas.length; i++)
+        {
+            if(n.ramas[i].etiqueta.length > 0)
+            {
+                auto lit = new Literal();
+                lit.dato = to!dstring(i-1);
+                lit.tipo = new Tipo();
+                lit.tipo.tipo = "nada";
+
+                if(tid_local.define_identificador(n.ramas[i].etiqueta, null, lit))
+                {
+                    charlatánln("ETIQUETA: " ~ tid_local.lee_id(n.ramas[i].etiqueta).nombre);
+                }
+            }
+        }
+    }
+}
+
+Nodo comprueba_bloque(Bloque bloque)
+{
+    Nodo resultado;
+    //recorre las ramas del bloque
+    for(int i = 0; i<bloque.ramas.length; i++)
+    {
+        comprueba_nodo(bloque.ramas[i]);
+    }
+
+    // Vuelco el contenido de la tabla de identificadores local
+    //vuelca_tid(tid_local);
+
+    // Fin de ejecución de la función:
+    // Hay que eliminar la tabla de identificadores actual
+    tid_local = null;
+
+    return resultado;
+}
+
+Nodo comprueba_nodo(Nodo n)
+{
+    if(n)
+    {
+        switch(n.categoría)
+        {
+            case Categoría.OPERACIÓN:
+                auto o = cast(Operación)n;
+                
+                return comprueba_operación(o);
+                //break;
+
+            case Categoría.ASIGNACIÓN:
+                auto a = cast(Asignación)n;
+
+                auto id = cast(Identificador)a.ramas[0];
+
+                auto tipo = cast(Tipo)comprueba_nodo(a.ramas[1]);
+
+                if(tipo is null || tipo.categoría != Categoría.TIPO)
+                {
+                    aborta(módulo, a.línea, "El operador del lado derecho no declara ningún tipo.");
+                }
+
+                tid_local.declara_identificador(id.nombre, tipo);
+
+                return null;
+                //break;
+
+            default:
+                aborta(módulo, n.línea, "No reconozco el Nodo.");
+
+                return null;
+                //break;
+        }
+    }
+
+    return null;
+}
+
+Nodo lee_identificador(Nodo n)
+{
+    if(n is null)
+    {
+        aborta(módulo, 0, "Has pasado como argumento un Nodo nulo");
+    }
+
+    if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        auto id = cast(Identificador)n;
+
+        EntradaTablaIdentificadores eid = tid_local.lee_id(id.nombre);
+        if(eid == EntradaTablaIdentificadores(null, false, null, false, null, null))
+        {
+            eid = tid_global.lee_id(id.nombre);
+        }
+
+        if(eid.declarado) // Durante el análisis sintáctico, en la tabla de id's se guarda todo como declaración.
+        {
+            Nodo dec = eid.declaración;
+            if(dec.categoría == Categoría.TIPO) // La declaración debe ser un Tipo
+            {
+                Tipo tlit = cast(Tipo)dec;
+                
+                return tlit;
+            }
+            else if(dec.categoría == Categoría.DECLARA_FUNCIÓN)
+            {
+                return dec;
+            }
+        }
+        else if(eid.definido)
+        {
+            Nodo def = eid.definición;
+            if(def.categoría == Categoría.DEFINE_IDENTIFICADOR_GLOBAL)
+            {
+                DefineIdentificadorGlobal def_id = cast(DefineIdentificadorGlobal)def;
+                Tipo tid = def_id.tipo;
+
+                return tid;
+            }
+        }
+
+        aborta(módulo, n.línea, "En las tablas de identificadores no encuentro '" ~ id.nombre ~ "'.");
+    }
+    else
+    {
+        aborta(módulo, n.línea, "No has pasado un identificador.");
+    }
+
+    return null;
+}
+
+Tipo comprueba_operación(Operación op)
+{
+    switch(op.dato)
+    {
+        case "ret":
+            return op_ret(op);
+            //break;
+
+        case "sum":
+            return op_sum(op);
+            //break;
+
+        case "res":
+            return op_res(op);
+            //break;
+
+        case "mul":
+            return op_mul(op);
+            //break;
+
+        case "div":
+            return op_div(op);
+            //break;
+
+        case "llama":
+            return op_llama(op);
+            //break;
+
+        case "cmp":
+            return op_cmp(op);
+            //break;
+
+        case "conv":
+            return op_conv(op);
+            //break;
+
+        case "slt":
+            return op_slt(op);
+            //break;
+
+        case "phi":
+            return op_phi(op);
+            //break;
+
+        case "rsrva":
+            return op_rsrva(op);
+            //break;
+
+        case "lee":
+            return op_lee(op);
+            //break;
+
+        case "guarda":
+            return op_guarda(op);
+            //break;
+
+        case "leeval":
+            return op_leeval(op);
+            //break;
+
+        case "ponval":
+            return op_ponval(op);
+            //break;
+
+        default:
+            break;
+    }
+
+    return null;
+}
+
+Tipo op_ret(Operación op)
+{
+    if(op.dato != "ret")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'ret'");
+        return null;
+    }
+
+    if(op.ramas.length == 2)
+    {
+        // ret <tipo> (<literal>|<id>);
+        Tipo t = cast(Tipo)(op.ramas[0]);
+        Nodo n = op.ramas[1];
+
+        if(n.categoría == Categoría.LITERAL)
+        {
+            auto lit = cast(Literal)n;
+
+            comprueba_tipo_literal(t, lit); // Si los tipos no coinciden, abortará.
+
+            // Si el curso de ejecución llega hasta aquí, los tipos coincidían
+            return t;
+        }
+        else if(n.categoría == Categoría.IDENTIFICADOR)
+        {
+            Tipo tlit;
+            Nodo id = lee_identificador(n);
+            if(id.categoría == Categoría.TIPO)
+            {
+                tlit = cast(Tipo)id;
+            }
+            else
+            {
+                aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            }
+            
+            Nodo nt1 = cast(Nodo)t;
+            Nodo nt2 = cast(Nodo)tlit;
+
+            if(compara_árboles(&nt1, &nt2))
+            {
+                return t;
+            }
+            else
+            {
+                aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            }
+        }
+    }
+    else if(op.ramas.length == 0)
+    {
+        // ret;
+        infoln("op: ret");
+        return null;
+    }
+    else
+    {
+        aborta(módulo, op.línea, "Esperaba que 'ret' tuviera uno o ningún argumento");
+        return null;
+    }
+
+    return null;
+}
+
+Tipo op_sum(Operación op)
+{
+    if(op.dato != "sum")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'sum'");
+        return null;
+    }
+
+    if(op.ramas.length != 3)
+    {
+        aborta(módulo, op.línea, "sum <tipo> <arg1>, <arg2>");
+        return null;
+    }
+
+    Nodo n;
+    Tipo t = cast(Tipo)(op.ramas[0]);
+    
+    // Comprobaciones entre el tipo y el primer argumento de la operación
+    n = op.ramas[1];
+    if(n.categoría == Categoría.LITERAL)
+    {
+        Literal l = cast(Literal)n;
+        comprueba_tipo_literal(t, l);
+    }
+    else if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        Tipo tlit;
+        Nodo id = lee_identificador(n);
+        if(id.categoría == Categoría.TIPO)
+        {
+            tlit = cast(Tipo)id;
+        }
+        else
+        {
+            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+        }
+
+        Nodo nt1 = cast(Nodo)t;
+        Nodo nt2 = cast(Nodo)tlit;
+
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+        }
+    }
+    
+    // Comprobaciones entre el tipo y el segundo argumento de la operación
+    n = op.ramas[2];
+    if(n.categoría == Categoría.LITERAL)
+    {
+        Literal l = cast(Literal)n;
+        comprueba_tipo_literal(t, l);
+    }
+    else if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        Tipo tlit;
+        Nodo id = lee_identificador(n);
+        if(id.categoría == Categoría.TIPO)
+        {
+            tlit = cast(Tipo)id;
+        }
+        else
+        {
+            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+        }
+
+        Nodo nt1 = cast(Nodo)t;
+        Nodo nt2 = cast(Nodo)tlit;
+
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+        }
+    }
+
+    // Si llegamos hasta aquí, todas las comprobaciones han sido correctas
+    return t;
+}
+
+Tipo op_res(Operación op)
+{
+    if(op.dato != "res")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'res'");
+        return null;
+    }
+
+    if(op.ramas.length != 3)
+    {
+        aborta(módulo, op.línea, "res <tipo> <arg1>, <arg2>");
+        return null;
+    }
+
+    Nodo n;
+    Tipo t = cast(Tipo)(op.ramas[0]);
+    
+    // Comprobaciones entre el tipo y el primer argumento de la operación
+    n = op.ramas[1];
+    if(n.categoría == Categoría.LITERAL)
+    {
+        Literal l = cast(Literal)n;
+        comprueba_tipo_literal(t, l);
+    }
+    else if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        Tipo tlit;
+        Nodo id = lee_identificador(n);
+        if(id.categoría == Categoría.TIPO)
+        {
+            tlit = cast(Tipo)id;
+        }
+        else
+        {
+            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+        }
+
+        Nodo nt1 = cast(Nodo)t;
+        Nodo nt2 = cast(Nodo)tlit;
+
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+        }
+    }
+    
+    // Comprobaciones entre el tipo y el segundo argumento de la operación
+    n = op.ramas[2];
+    if(n.categoría == Categoría.LITERAL)
+    {
+        Literal l = cast(Literal)n;
+        comprueba_tipo_literal(t, l);
+    }
+    else if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        Tipo tlit;
+        Nodo id = lee_identificador(n);
+        if(id.categoría == Categoría.TIPO)
+        {
+            tlit = cast(Tipo)id;
+        }
+        else
+        {
+            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+        }
+
+        Nodo nt1 = cast(Nodo)t;
+        Nodo nt2 = cast(Nodo)tlit;
+
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+        }
+    }
+
+    // Si llegamos hasta aquí, todas las comprobaciones han sido correctas
+    return t;
+}
+
+Tipo op_mul(Operación op)
+{
+    if(op.dato != "mul")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'mul'");
+        return null;
+    }
+
+    if(op.ramas.length != 3)
+    {
+        aborta(módulo, op.línea, "mul <tipo> <arg1>, <arg2>");
+        return null;
+    }
+
+    Nodo n;
+    Tipo t = cast(Tipo)(op.ramas[0]);
+    
+    // Comprobaciones entre el tipo y el primer argumento de la operación
+    n = op.ramas[1];
+    if(n.categoría == Categoría.LITERAL)
+    {
+        Literal l = cast(Literal)n;
+        comprueba_tipo_literal(t, l);
+    }
+    else if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        Tipo tlit;
+        Nodo id = lee_identificador(n);
+        if(id.categoría == Categoría.TIPO)
+        {
+            tlit = cast(Tipo)id;
+        }
+        else
+        {
+            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+        }
+
+        Nodo nt1 = cast(Nodo)t;
+        Nodo nt2 = cast(Nodo)tlit;
+
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+        }
+    }
+    
+    // Comprobaciones entre el tipo y el segundo argumento de la operación
+    n = op.ramas[2];
+    if(n.categoría == Categoría.LITERAL)
+    {
+        Literal l = cast(Literal)n;
+        comprueba_tipo_literal(t, l);
+    }
+    else if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        Tipo tlit;
+        Nodo id = lee_identificador(n);
+        if(id.categoría == Categoría.TIPO)
+        {
+            tlit = cast(Tipo)id;
+        }
+        else
+        {
+            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+        }
+
+        Nodo nt1 = cast(Nodo)t;
+        Nodo nt2 = cast(Nodo)tlit;
+
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+        }
+    }
+
+    // Si llegamos hasta aquí, todas las comprobaciones han sido correctas
+    return t;
+}
+
+Tipo op_div(Operación op)
+{
+    if(op.dato != "div")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'div'");
+        return null;
+    }
+
+    if(op.ramas.length != 3)
+    {
+        aborta(módulo, op.línea, "div <tipo> <arg1>, <arg2>");
+        return null;
+    }
+
+    Nodo n;
+    Tipo t = cast(Tipo)(op.ramas[0]);
+    
+    // Comprobaciones entre el tipo y el primer argumento de la operación
+    n = op.ramas[1];
+    if(n.categoría == Categoría.LITERAL)
+    {
+        Literal l = cast(Literal)n;
+        comprueba_tipo_literal(t, l);
+    }
+    else if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        Tipo tlit;
+        Nodo id = lee_identificador(n);
+        if(id.categoría == Categoría.TIPO)
+        {
+            tlit = cast(Tipo)id;
+        }
+        else
+        {
+            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+        }
+
+        Nodo nt1 = cast(Nodo)t;
+        Nodo nt2 = cast(Nodo)tlit;
+
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+        }
+    }
+    
+    // Comprobaciones entre el tipo y el segundo argumento de la operación
+    n = op.ramas[2];
+    if(n.categoría == Categoría.LITERAL)
+    {
+        Literal l = cast(Literal)n;
+        comprueba_tipo_literal(t, l);
+    }
+    else if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        Tipo tlit;
+        Nodo id = lee_identificador(n);
+        if(id.categoría == Categoría.TIPO)
+        {
+            tlit = cast(Tipo)id;
+        }
+        else
+        {
+            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+        }
+
+        Nodo nt1 = cast(Nodo)t;
+        Nodo nt2 = cast(Nodo)tlit;
+
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+        }
+    }
+
+    // Si llegamos hasta aquí, todas las comprobaciones han sido correctas
+    return t;
+}
+
+Tipo op_llama(Operación op)
+{
+    if(op.dato != "llama")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'llama'");
+        return null;
+    }
+
+    if(op.ramas.length != 1)
+    {
+        aborta(módulo, op.línea, "Esperaba que la operación 'llama' se acompañara de una función");
+        return null;
+    }
+
+    LlamaFunción f = cast(LlamaFunción)op.ramas[0];
+
+    // Obtengo la función de la tabla de id's global
+    if(tid_global.lee_id(f.nombre).nombre is null)
+    {
+        aborta(módulo, op.línea, "La función '" ~ f.nombre ~ "()' es desconocida.");
+    }
+    
+    // eid: dstring nombre, bool declarado, Nodo declaración, bool definido, Nodo definición;
+    EntradaTablaIdentificadores eid = tid_global.lee_id(f.nombre);
+
+    Nodo nt1;
+    Nodo nt2;
+
+    Argumentos args;
+
+    if(eid.declarado)
+    {
+        // Obtén el Nodo de la definición
+        DeclaraFunción dec_func = cast(DeclaraFunción)eid.declaración;
+
+        // Comparo tipos de retorno
+        nt1 = cast(Nodo)(f.retorno);
+        nt2 = cast(Nodo)(dec_func.retorno);
+        
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo de retorno no coincide con el declarado.");
+        }
+
+        // Comparo tipos de los argumentos
+        for(int i = 0; i < f.ramas.length; i++)
+        {
+            Argumento a = cast(Argumento)(dec_func.ramas[0].ramas[i]);
+            Tipo t = a.tipo;
+
+            Nodo arg = f.ramas[i];
+            if(arg.categoría == Categoría.LITERAL)
+            {
+                Literal l = cast(Literal)arg;
+                comprueba_tipo_literal(t, l);
+            }
+            else if(arg.categoría == Categoría.IDENTIFICADOR)
+            {
+                Nodo id = lee_identificador(arg);
+                if(id.categoría != Categoría.TIPO)
+                {
+                    aborta(módulo, arg.línea, "No he podido obtener un tipo para el identificador '" ~ arg.dato ~ "'");
+                }
+
+                nt1 = cast(Nodo)t;
+                nt2 = cast(Nodo)id;
+
+                if(!compara_árboles(&nt1, &nt2))
+                {
+                    aborta(módulo, op.línea, "La firma de la función no coincide con la declarada previamente.");
+                }
+            }
+        }
+
+        return f.retorno;
+    }
+    else if(eid.definido)
+    {
+        // Obtén el Nodo de la definición
+        DefineFunción def_func = cast(DefineFunción)eid.definición;
+
+        // Comparo tipos de retorno
+        nt1 = cast(Nodo)(f.retorno);
+        nt2 = cast(Nodo)(def_func.retorno);
+        
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo de retorno no coincide con el declarado.");
+        }
+
+        for(int i = 0; i < f.ramas.length; i++)
+        {
+            Argumento a = cast(Argumento)(def_func.ramas[0].ramas[i]);
+            Tipo t = a.tipo;
+
+            Nodo arg = f.ramas[i];
+            if(arg.categoría == Categoría.LITERAL)
+            {
+                Literal l = cast(Literal)arg;
+                comprueba_tipo_literal(t, l);
+            }
+            else if(arg.categoría == Categoría.IDENTIFICADOR)
+            {
+                Nodo id = lee_identificador(arg);
+                if(id.categoría != Categoría.TIPO)
+                {
+                    aborta(módulo, arg.línea, "No he podido obtener un tipo para el identificador '" ~ arg.dato ~ "'");
+                }
+
+                nt1 = cast(Nodo)t;
+                nt2 = cast(Nodo)id;
+
+                if(!compara_árboles(&nt1, &nt2))
+                {
+                    aborta(módulo, op.línea, "La firma de la función no coincide con la declrada previamente.");
+                }
+            }
+        }
+
+        return f.retorno;
+    }
+    
+    aborta(módulo, op.línea, "La función '" ~ f.nombre ~ "()' es desconocida.");
+
+    return null;
+}
+
+Tipo op_cmp(Operación op)
+{
+    if(op.dato != "cmp")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'cmp'");
+        return null;
+    }
+
+    if(op.ramas.length != 4)
+    {
+        aborta(módulo, op.línea, "cmp <comparación> <tipo> (<literal>|<id>), (<literal>|<id>)");
+        return null;
+    }
+
+    auto r = op.ramas[0];
+
+    dstring comparación = r.dato;
+
+    if(   (comparación == "ig") // igual
+        | (comparación == "dsig") // diferente
+        | (comparación == "ma") // mayor
+        | (comparación == "me") // menor
+        | (comparación == "maig") // mayor o igual
+        | (comparación == "meig") // menor o igual
+        )
+    {}
+    else
+    {
+        aborta(módulo, op.línea, "op:cmp - El comando de comparación es incorrecto");
+    }
+
+    Nodo n;
+    Tipo t = cast(Tipo)(op.ramas[1]);
+    
+    // Comprobaciones entre el tipo y el primer argumento de la operación
+    n = op.ramas[2];
+    if(n.categoría == Categoría.LITERAL)
+    {
+        Literal l = cast(Literal)n;
+        comprueba_tipo_literal(t, l);
+    }
+    else if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        Tipo tlit;
+        Nodo id = lee_identificador(n);
+        if(id.categoría == Categoría.TIPO)
+        {
+            tlit = cast(Tipo)id;
+        }
+        else
+        {
+            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+        }
+
+        Nodo nt1 = cast(Nodo)t;
+        Nodo nt2 = cast(Nodo)tlit;
+
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+        }
+    }
+    
+    // Comprobaciones entre el tipo y el segundo argumento de la operación
+    n = op.ramas[3];
+    if(n.categoría == Categoría.LITERAL)
+    {
+        Literal l = cast(Literal)n;
+        comprueba_tipo_literal(t, l);
+    }
+    else if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        Tipo tlit;
+        Nodo id = lee_identificador(n);
+        if(id.categoría == Categoría.TIPO)
+        {
+            tlit = cast(Tipo)id;
+        }
+        else
+        {
+            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+        }
+
+        Nodo nt1 = cast(Nodo)t;
+        Nodo nt2 = cast(Nodo)tlit;
+
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+        }
+    }
+
+    // Si llegamos hasta aquí, todas las comprobaciones han sido correctas
+    // El resultado de una comparación siempre debe ser n1
+
+    Tipo tipo_n1 = new Tipo();
+    tipo_n1.tipo = "n1";
+    tipo_n1.línea = op.línea;
+    return tipo_n1;
+}
+
+Tipo op_conv(Operación op)
+{
+    if(op.dato != "conv")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'conv'");
+        return null;
+    }
+
+    if(op.ramas.length != 3)
+    {
+        aborta(módulo, op.línea, "conv <tipo-origen> (<literal>|<id>) a <tipo-destino>)");
+        return null;
+    }
+
+    Tipo origen = cast(Tipo)(op.ramas[0]);
+    Tipo destino = (cast(Tipo)(op.ramas[2]));
+    Nodo n = op.ramas[1];
+
+    // Primero compruebo que el valor coincide con el Tipo origen
+    if(n.categoría == Categoría.LITERAL)
+    {
+        Literal l = cast(Literal)n;
+        comprueba_tipo_literal(origen, l);
+    }
+    else if(n.categoría == Categoría.IDENTIFICADOR)
+    {
+        Tipo tlit;
+        Nodo id = lee_identificador(n);
+        if(id.categoría == Categoría.TIPO)
+        {
+            tlit = cast(Tipo)id;
+        }
+        else
+        {
+            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+        }
+
+        Nodo nt1 = cast(Nodo)origen;
+        Nodo nt2 = cast(Nodo)tlit;
+
+        if(!compara_árboles(&nt1, &nt2))
+        {
+            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+        }
+    }
+
+    // Luego compruebo que la conversión es posible
+    uint32_t tamaño_origen, tamaño_destino;
+
+    switch(origen.tipo[0])
+    {
+        case 'n': // convertimos desde 'natural'
+            tamaño_origen = to!uint32_t(origen.tipo[1..$]);
+            if(tamaño_origen > 64)
+            {
+                aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                            ~ " pedido " ~ to!dstring(tamaño_origen) ~ "bits");
+            }
+            if(tamaño_origen < 1)
+            {
+                aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                            ~ " pedido " ~ to!dstring(tamaño_origen) ~ "bits");
+            }
+
+            switch(destino.tipo[0])
+            {
+                case 'n': // convertimos de natural a natural
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+
+                    if(tamaño_destino > 64)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                                    ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
+                    }
+
+                    if(tamaño_destino < 1)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                                    ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
+                    }
+
+                    // si el tamaño de destino es mayor o igual, no hay problema
+                    if(tamaño_destino < tamaño_origen)
+                    {
+                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable");
+                    }
+                    break;
+
+                case 'e': // convertimos de natural a entero
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+
+                    if(tamaño_destino > 64)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                                    ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
+                    }
+
+                    if(tamaño_destino < 1)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 2 bits, y has"
+                                    ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
+                    }
+
+                    // si el tamaño de destino es mayor o igual, no hay problema
+                    if(tamaño_destino < tamaño_origen)
+                    {
+                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                    }
+                    break;
+
+                case 'r':
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+
+                    // en los reales cuando se desborda se para en +/-infinito.
+                    // El problema principal, no evitable, es la pérdida de
+                    // precisión con números muy positivos o muy negativos.
+                    // La máxima precisión se encuentra en torno al cero.
+
+                    if(tamaño_destino > 64)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
+                    }
+                    if(tamaño_destino < 1)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                        ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
+                    }
+
+                    // si el tamaño de destino es mayor o igual, no hay problema
+                    if(tamaño_destino < tamaño_origen)
+                    {
+                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                    }
+                    break;
+
+                default:
+                    aborta(módulo, op.línea, "op:conv - tipo desconocido");
+                    break;
+            }
+
+            break;
+
+        case 'e':
+            tamaño_origen = to!uint32_t(origen.tipo[1..$]);
+
+            switch(destino.tipo[0])
+            {
+                case 'n': // convertimos de natural a natural
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+
+                    if(tamaño_destino > 64)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                                    ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
+                    }
+
+                    if(tamaño_destino < 1)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                                    ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
+                    }
+
+                    // si el tamaño de destino es mayor o igual, no hay problema
+                    if(tamaño_destino < tamaño_origen)
+                    {
+                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                    }
+                    break;
+
+                case 'e': // convertimos de natural a entero
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+
+                    if(tamaño_destino > 64)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                                    ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
+                    }
+
+                    if(tamaño_destino < 1)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 2 bits, y has"
+                                    ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
+                    }
+
+                    // si el tamaño de destino es mayor o igual, no hay problema
+                    if(tamaño_destino < tamaño_origen)
+                    {
+                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                    }
+                    break;
+
+                case 'r':
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+
+                    // en los reales cuando se desborda se para en +/-infinito.
+                    // El problema principal, no evitable, es la pérdida de
+                    // precisión con números muy positivos o muy negativos.
+                    // La máxima precisión se encuentra en torno al cero.
+
+                    if(tamaño_destino > 64)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
+                    }
+                    if(tamaño_destino < 1)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                        ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
+                    }
+
+                    // si el tamaño de destino es mayor o igual, no hay problema
+                    if(tamaño_destino < tamaño_origen)
+                    {
+                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                    }
+                    break;
+
+                default:
+                    aborta(módulo, op.línea, "op:conv - tipo desconocido");
+                    break;
+            }
+            
+            break;
+
+        case 'r':
+            tamaño_origen = to!uint32_t(origen.tipo[1..$]);
+
+            switch(destino.tipo[0])
+            {
+                case 'n': // convertimos de natural a natural
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+
+                    if(tamaño_destino > 64)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                                    ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
+                    }
+
+                    if(tamaño_destino < 1)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                                    ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
+                    }
+
+                    // si el tamaño de destino es mayor o igual, no hay problema
+                    if(tamaño_destino < tamaño_origen)
+                    {
+                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                    }
+                    break;
+
+                case 'e': // convertimos de natural a entero
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+
+                    if(tamaño_destino > 64)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                                    ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
+                    }
+
+                    if(tamaño_destino < 1)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 2 bits, y has"
+                                    ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
+                    }
+
+                    // si el tamaño de destino es mayor o igual, no hay problema
+                    if(tamaño_destino < tamaño_origen)
+                    {
+                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                    }
+                    break;
+
+                case 'r':
+                    tamaño_destino = to!uint32_t(destino.tipo[1..$]);
+
+                    // en los reales cuando se desborda se para en +/-infinito.
+                    // El problema principal, no evitable, es la pérdida de
+                    // precisión con números muy positivos o muy negativos.
+                    // La máxima precisión se encuentra en torno al cero.
+
+                    if(tamaño_destino > 64)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
+                    }
+                    if(tamaño_destino < 1)
+                    {
+                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                        ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
+                    }
+
+                    // si el tamaño de destino es mayor o igual, no hay problema
+                    if(tamaño_destino < tamaño_origen)
+                    {
+                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                    }
+                    break;
+
+                default:
+                    aborta(módulo, op.línea, "op:conv - tipo desconocido");
+                    break;
+            }
+            
+            break;
+
+        default:
+            aborta(módulo, op.línea, "op:conv - tipo desconocido");
+            break;
+    }
+
+    // Si llego hasta aquí, devuelvo el tipo de destino
+    return destino;
+}
+
+Tipo op_slt(Operación op)
+{
+    if(op.dato != "slt")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'slt'");
+        return null;
+    }
+
+    // Salto incondicional
+    // slt :<etiqueta>
+    if(op.ramas.length == 1)
+    {
+        Etiqueta etiqueta = cast(Etiqueta)(op.ramas[0]);
+
+        if(!tid_local.lee_id(etiqueta.dato).nombre)
+        {
+            aborta(módulo, op.línea, "op:slt - La etiqueta no existe");
+        }
+
+        return null;
+    }
+    // Salto condicional
+    // slt n1 (<id>|<literal>) :<etiqueta>
+    else if(op.ramas.length == 3)
+    {
+        Tipo t = cast(Tipo)(op.ramas[0]);
+        bool condición = false;
+
+        if(t is null)
+        {
+            aborta(módulo, op.línea, "op:slt - Tipo 'null'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
+            return null;
+        }
+        else if(t.tipo != "n1")
+        {
+            aborta(módulo, op.línea, "op:slt - Tipo incorrecto. Esperaba 'n1'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
+            return null;
+        }
+
+        Nodo n = op.ramas[1];
+        if(n.categoría == Categoría.LITERAL)
+        {
+            Literal l = cast(Literal)n;
+            comprueba_tipo_literal(t, l);
+        }
+        else if(n.categoría == Categoría.IDENTIFICADOR)
+        {
+            Tipo tlit;
+            Nodo id = lee_identificador(n);
+            if(id.categoría == Categoría.TIPO)
+            {
+                tlit = cast(Tipo)id;
+            }
+            else
+            {
+                aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            }
+
+            Nodo nt1 = cast(Nodo)t;
+            Nodo nt2 = cast(Nodo)tlit;
+
+            if(!compara_árboles(&nt1, &nt2))
+            {
+                aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            }
+        }
+
+        Etiqueta etiqueta = cast(Etiqueta)(op.ramas[2]);
+
+        if(!tid_local.lee_id(etiqueta.dato).nombre)
+        {
+            aborta(módulo, op.línea, "op:slt - La etiqueta no existe");
+        }
+        
+        return null;
+    }
+
+    aborta(módulo, op.línea, "slt [n1 (<id>|<literal>)] :<etiqueta>");
+
+    return null;
+}
+
+Tipo op_phi(Operación op)
+{
+    aborta(módulo, op.línea, "No he implementado la operación Phi.");
+    return null;
+}
+
+Tipo op_rsrva(Operación op)
+{
+    if(op.dato != "rsrva")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'rsrva'");
+        return null;
+    }
+
+    if(op.ramas.length == 1)
+    {
+        Tipo t = cast(Tipo)(op.ramas[0]);
+
+        return t;
+    }
+
+    aborta(módulo, op.línea, "rsrva <tipo>");
+    
+    return null;
+}
+
+Tipo op_lee(Operación op)
+{
+    if(op.dato != "lee")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'lee'");
+        return null;
+    }
+
+    if(op.ramas.length == 3)
+    {
+        // Extraigo los 3 nodos hijos
+        Tipo t1 = cast(Tipo)(op.ramas[0]);  // tipo
+        Tipo t2 = cast(Tipo)(op.ramas[1]);  // tipo *
+        Nodo n = op.ramas[2];               // dirección de memoria conteniendo tipo
+
+        // Si 'n' es un Literal, no podemos hacer más comprobaciones
+        if(n.categoría == Categoría.LITERAL)
+        {
+            return t1;
+        }
+        else if(n.categoría == Categoría.IDENTIFICADOR) // Sólo podemos comprobar que el identificador existe
+        {
+            if(!tid_local.lee_id((cast(Identificador)n).nombre).nombre)
+            {
+                aborta(módulo, op.línea, "op:lee - El identificador no existe.");
+                return null;
+            }
+
+            return t1;
+        }
+    }
+
+    aborta(módulo, op.línea, "lee <tipo>, <tipo> * ( <id>|<literal> )");
+    return null;
+}
+
+Tipo op_guarda(Operación op)
+{
+    if(op.dato != "guarda")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'guarda'");
+        return null;
+    }
+
+    if(op.ramas.length == 4)
+    {
+        Tipo t1 = cast(Tipo)(op.ramas[0]);  // tipo
+        Tipo t2 = cast(Tipo)(op.ramas[2]);  // tipo *
+        Nodo n1 = op.ramas[1];              // valor (Literal / Identificador)
+        Nodo n2 = op.ramas[3];              // dirección de memoria (Literal / Identificador)
+
+        if(n1.categoría == Categoría.LITERAL)
+        {
+            Literal l1 = cast(Literal)n1;
+            comprueba_tipo_literal(t1, l1); // Aborta si incorrecto
+
+            if(n2.categoría == Categoría.LITERAL)
+            {
+                return null;
+            }
+            else if(n2.categoría == Categoría.IDENTIFICADOR)
+            {
+                if(!tid_local.lee_id((cast(Identificador)n2).nombre).nombre)
+                {
+                    aborta(módulo, op.línea, "op:guarda - El identificador no existe.");
+                    return null;
+                }
+
+                return null;
+            }
+        }
+        else if(n1.categoría == Categoría.IDENTIFICADOR) // Sólo podemos comprobar que el identificador existe
+        {
+            if(!tid_local.lee_id((cast(Identificador)n1).nombre).nombre)
+            {
+                aborta(módulo, op.línea, "op:guarda - El identificador no existe.");
+                return null;
+            }
+
+            Tipo tlit;
+            Nodo id = lee_identificador(n1);
+            if(id.categoría == Categoría.TIPO)
+            {
+                tlit = cast(Tipo)id;
+            }
+            else
+            {
+                aborta(módulo, n1.línea, "No he podido obtener un tipo para el identificador '" ~ n1.dato ~ "'");
+            }
+
+            Nodo nt1 = cast(Nodo)t1;
+            Nodo nt2 = cast(Nodo)tlit;
+
+            if(!compara_árboles(&nt1, &nt2))
+            {
+                aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            }
+
+            if(n2.categoría == Categoría.LITERAL)
+            {
+                return null;
+            }
+            else if(n2.categoría == Categoría.IDENTIFICADOR)
+            {
+                if(!tid_local.lee_id((cast(Identificador)n2).nombre).nombre)
+                {
+                    aborta(módulo, op.línea, "op:guarda - El identificador no existe.");
+                    return null;
+                }
+
+                return null;
+            }
+        }
+    }
+
+    aborta(módulo, op.línea, "guarda <tipo> '(' <id>|<literal> ')', <tipo>* '(' <id>|<literal> ')'");
+    return null;
+}
+
+Tipo op_leeval(Operación op)
+{
+    if(op.dato != "leeval")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'leeval'");
+        return null;
+    }
+
+    if(op.ramas.length == 3)
+    {
+        Tipo tip = cast(Tipo)(op.ramas[0]); // Tipo
+        Nodo ntip = cast(Nodo)tip;
+        Nodo var = op.ramas[1];             // Valor
+        Tipo tvar;
+        Nodo idx = op.ramas[2];             // Índice
+        Tipo tidx;
+        uint índice;
+
+        if(var.categoría == Categoría.LITERAL)
+        {
+            if(!tip.vector && !tip.estructura)
+            {
+                aborta(módulo, op.línea, "op:leeval trabaja con estructuras o vectores.");
+                return null;
+            }
+
+            Literal l = cast(Literal)var;
+            comprueba_tipo_literal(tip, l);
+        }
+        else if(var.categoría == Categoría.IDENTIFICADOR)
+        {
+            Nodo ntvar = lee_identificador(var);
+            if(ntvar.categoría == Categoría.TIPO)
+            {
+                tvar = cast(Tipo)ntvar;
+            }
+            else
+            {
+                aborta(módulo, var.línea, "No he podido obtener un tipo para el identificador '" ~ var.dato ~ "'");
+            }
+
+            if(!tvar.vector && !tvar.estructura)
+            {
+                aborta(módulo, op.línea, "op:leeval trabaja con estructuras o vectores.");
+                return null;
+            }
+
+            if(!compara_árboles(&ntip, &ntvar))
+            {
+                aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+                return null;
+            }
+        }
+        else
+        {
+            aborta(módulo, op.línea, "leeval <tipo-compuesto> <literal/identificador>, <índice>");
+            return null;
+        }
+
+        if(tvar.vector)
+        {
+            if(idx.categoría == Categoría.LITERAL)
+            {
+                índice = to!uint(idx.dato);
+                if(índice > to!uint(tvar.elementos))
+                {
+                    aborta(módulo, op.línea, "El vector no tiene " ~ to!dstring(índice) ~ " elementos.");
+                }
+
+                return cast(Tipo)(tvar.ramas[0]);
+            }
+            else if(idx.categoría == Categoría.IDENTIFICADOR)
+            {
+                Nodo id = lee_identificador(idx);
+                if(id.categoría == Categoría.TIPO)
+                {
+                    tidx = cast(Tipo)id;
+                }
+                else
+                {
+                    aborta(módulo, idx.línea, "No he podido obtener un tipo para el identificador '" ~ idx.dato ~ "'");
+                }
+
+                if(!tipo_natural(tidx))
+                {
+                    aborta(módulo, op.línea, "El índice no es un Tipo Natural.");
+                }
+
+                return cast(Tipo)(tvar.ramas[0]);
+            }
+            else
+            {
+                aborta(módulo, op.línea, "leeval <tipo-compuesto> <literal/identificador>, <índice>");
+                return null;
+            }
+        }
+        else if(tvar.estructura)
+        {
+            if(idx.categoría == Categoría.LITERAL)
+            {
+                índice = to!uint(idx.dato);
+                if(índice > to!uint(tvar.elementos))
+                {
+                    aborta(módulo, op.línea, "La estructura no tiene " ~ to!dstring(índice) ~ " elementos.");
+                }
+
+                return cast(Tipo)(tvar.ramas[índice]);
+            }
+            else if(idx.categoría == Categoría.IDENTIFICADOR)
+            {
+                aborta(módulo, op.línea, "Al evaluar estructuras, el índice debe conocerse en tiempo de compilación.");
+            }
+            else
+            {
+                aborta(módulo, op.línea, "leeval <tipo-compuesto> <literal/identificador>, <índice>");
+                return null;
+            }
+        }
+    }
+
+    aborta(módulo, op.línea, "leeval <tipo_vector> <literal>, <índice>");
+    return null;
+}
+
+Tipo op_ponval(Operación op)
+{
+    if(op.dato != "ponval")
+    {
+        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'ponval'");
+        return null;
+    }
+
+    if(op.ramas.length == 5)
+    {
+        Tipo tip1  = cast(Tipo)(op.ramas[0]);   // Tipo1
+        Nodo ntip1 = cast(Nodo)tip1;
+        Nodo var   = op.ramas[1];               // Variable compuesta (lit/id)
+        Tipo tvar;
+        Nodo ntvar;
+
+        Tipo tip2  = cast(Tipo)(op.ramas[2]);   // Tipo2
+        Nodo ntip2 = cast(Nodo)tip2;
+        Nodo val   = op.ramas[4];               // Valor (lit/id)
+        Tipo tval;
+        Nodo ntval;
+        
+        Nodo idx = op.ramas[2];                 // Índice (lit/id)
+        Tipo tidx;
+        uint índice;
+
+        // Primero comprueba concordancia de tipo entre tip1 y var.
+        if(var.categoría == Categoría.LITERAL)
+        {
+            Literal lvar = cast(Literal)var;
+            comprueba_tipo_literal(tip1, lvar); // continúa si correcto
+        }
+        else if(var.categoría == Categoría.IDENTIFICADOR)
+        {
+            ntvar = lee_identificador(var);
+            if(ntvar.categoría == Categoría.TIPO)
+            {
+                tvar = cast(Tipo)ntvar;
+            }
+            else
+            {
+                aborta(módulo, var.línea, "No he podido obtener un tipo para el identificador '" ~ var.dato ~ "'");
+            }
+
+            if(!compara_árboles(&ntip1, &ntvar))
+            {
+                aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+                return null;
+            }
+        }
+        else
+        {
+            aborta(módulo, op.línea, "ponval <tipo_vector> <literal_vector>, <tipo> <literal>, <índice>");
+            return null;
+        }
+
+        // Segundo comprueba concordancia de tipo entre tip2 y val.
+        if(val.categoría == Categoría.LITERAL)
+        {
+            Literal lval = cast(Literal)val;
+            comprueba_tipo_literal(tip2, lval); // continúa si correcto
+        }
+        else if(val.categoría == Categoría.IDENTIFICADOR)
+        {
+            ntvar = lee_identificador(var);
+            if(ntvar.categoría == Categoría.TIPO)
+            {
+                tvar = cast(Tipo)ntvar;
+            }
+            else
+            {
+                aborta(módulo, var.línea, "No he podido obtener un tipo para el identificador '" ~ var.dato ~ "'");
+            }
+
+            if(!compara_árboles(&ntip2, &ntval))
+            {
+                aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+                return null;
+            }
+        }
+        else
+        {
+            aborta(módulo, op.línea, "ponval <tipo_vector> <literal_vector>, <tipo> <literal>, <índice>");
+            return null;
+        }
+
+        // Después comprueba que tip1 tiene suficientes elementos para que
+        // índice no ocasione un desbordamiento (sólo si índice es Literal)
+        if(idx.categoría == Categoría.LITERAL)
+        {
+            índice = to!uint(idx.dato);
+
+            if(índice > to!uint(tip1.elementos))
+            {
+                aborta(módulo, op.línea, "El índice es demasiado grande. Desbordará la memoria reservada.");
+            }
+        }
+
+        // Finalmente comprueba que el tipo de var[índice] coincide con el de val
+        if(tip1.vector)
+        {
+            // Si trabajo con un vector, tip2 siempre será el mismo
+            // Comparo tip2 con tip1[0]
+            compara_árboles(&(tip1.ramas[0]), &ntip2); // Sólo continúa si es correcto
+
+            return tip1; // Devuelve el tipo compuesto
+        }
+        else if(tip1.estructura)
+        {
+            // Si trabajo con una estructura, tip2 depende del índice
+            // Debo conocer el valor del índice durante la compilación
+            // índice debe ser un Literal
+            if(idx.categoría == Categoría.LITERAL)
+            {
+                // Comparo tip2 con tip1[índice]
+                índice = to!uint(idx.dato);
+                compara_árboles(&(tip1.ramas[índice]), &ntip2); // Sólo continúa si es correcto
+            }
+            else
+            {
+                aborta(módulo, op.línea, "Al trabajar con estructuras, el índice debe ser conocido en tiempo de compilación.");
+                return null;
+            }
+
+            return tip1; // Devuelve el tipo compuesto
+        }
+        else
+        {
+            aborta(módulo, op.línea, "el tipo debe ser un vector o una estructura.");
+            return null;
+        }
+    }
+
+    return null;
 }

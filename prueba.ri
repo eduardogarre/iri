@@ -1,5 +1,7 @@
 módulo prueba;
 
+declara nada @#poncar(n32 %carácter);
+
 @texto_de_prueba = "PRUEBA - texto de prueba: CORRECTO.\n";
 @lol = n8 28;
 
@@ -30,8 +32,8 @@ bucle:
 
     // si la comprobación es falsa, escribo el carácter, aumento el contador y reinicio el bucle
     llama nada @#poncar(%1);
-    %3 = sum e32 %0, 1;
-    guarda n32 %3, n32* %ptr_i;
+    %4 = sum n32 %0, 1;
+    guarda n32 %4, n32* %ptr_i;
     
     slt :bucle;
 

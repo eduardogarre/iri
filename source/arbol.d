@@ -129,7 +129,7 @@ class Identificador : Nodo
 class LlamaFunción : Nodo
 {
     dstring nombre;
-    dstring tipo;
+    Tipo retorno;
 
     this()
     {
@@ -312,8 +312,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(t1.tipo != t2.tipo)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
-                    ~ "Tipo.tipo y Tipo.tipo no coinciden:\n["
+                    aborta(módulo, n.línea, "Estos 2 tipos no coinciden: ["
                     ~ to!dstring(t1.tipo) ~ "] vs ["
                     ~ to!dstring(t2.tipo) ~ "]");
 
@@ -321,12 +320,11 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(t1.elementos != t2.elementos)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
-                    ~ "Tipo.elementos y Tipo.elementos no coinciden:\n["
+                    avisa(módulo, n.línea, "Estos 2 tipos tienen tamaños distintos: ["
                     ~ to!dstring(t1.elementos) ~ "] vs ["
                     ~ to!dstring(t2.elementos) ~ "]");
 
-                    return false;
+                    //return true;
                 }
                 break;
 
@@ -388,7 +386,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 auto l1 = cast(LlamaFunción)(*n);
                 auto l2 = cast(LlamaFunción)(*m);
                 // El nodo "LlamaFunción" tiene las siguientes variables:
-                // l.nombre, .tipo
+                // l.nombre, .retorno
                 if(l1.nombre != l2.nombre)
                 {
                     aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
@@ -398,12 +396,12 @@ bool compara_nodos(Nodo* n, Nodo* m)
 
                     return false;
                 }
-                else if(!compara_árboles(cast(Nodo *)(&(l1.tipo)), cast(Nodo *)(&(l2.tipo))))
+                else if(!compara_árboles(cast(Nodo *)(&(l1.retorno)), cast(Nodo *)(&(l2.retorno))))
                 {
                     aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "LlamaFunción.tipo y LlamaFunción.tipo no coinciden:\n["
-                    ~ to!dstring(l1.tipo) ~ "] vs ["
-                    ~ to!dstring(l2.tipo) ~ "]");
+                    ~ to!dstring(l1.retorno) ~ "] vs ["
+                    ~ to!dstring(l2.retorno) ~ "]");
 
                     return false;
                 }
@@ -592,12 +590,15 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 break;
 
             default:
+                aborta(módulo, n.línea, "Error al comparar los árboles de nodos: no existen reglas para este nodo");
                 return false;
                 //break;
         }
 
         return true;
     }
+
+    avisa(módulo, 0, "Alguno de los nodos es nulo, no puedo realizar una comparación de árboles");
 
     return false;
 }
@@ -635,4 +636,67 @@ bool compara_árboles(Nodo* a, Nodo* b)
             return true;
         }
     }
+}
+
+bool tipo_natural(Nodo n)
+{
+    if(n.categoría == Categoría.TIPO)
+    {
+        Tipo t = cast(Tipo)n;
+        uint32_t tamaño;
+
+        if(t.tipo[0] == 'n')
+        {
+            tamaño = to!uint32_t(t.tipo[1..$]);
+
+            if(tamaño >= 1 && tamaño <= 64)
+            {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+bool tipo_entero(Nodo n)
+{
+    if(n.categoría == Categoría.TIPO)
+    {
+        Tipo t = cast(Tipo)n;
+        uint32_t tamaño;
+
+        if(t.tipo[0] == 'e')
+        {
+            tamaño = to!uint32_t(t.tipo[1..$]);
+
+            if(tamaño >= 2 && tamaño <= 64)
+            {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+bool tipo_real(Nodo n)
+{
+    if(n.categoría == Categoría.TIPO)
+    {
+        Tipo t = cast(Tipo)n;
+        uint32_t tamaño;
+
+        if(t.tipo[0] == 'r')
+        {
+            tamaño = to!uint32_t(t.tipo[1..$]);
+
+            if(tamaño == 8 || tamaño == 16|| tamaño == 32|| tamaño == 64)
+            {
+                return true;
+            }
+        }
+    }
+    
+    return false;
 }

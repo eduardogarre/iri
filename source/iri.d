@@ -9,8 +9,6 @@ import std.conv;
 import std.stdio;
 import std.string;
 
-dstring archivo;
-
 int main(string[] args)
 {
 	auto doc = "iri - Interprete de Representacion Intermedia.
