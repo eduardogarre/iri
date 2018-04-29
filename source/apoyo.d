@@ -124,6 +124,25 @@ class TablaIdentificadores
 
     void encuentra_ids_no_usados()
     {
+        /*
+        foreach(eid; tabla)
+        {
+            if(eid.nombre !is null)
+            {
+                if(eid.usado)
+                {
+                    write("[X] ");
+                }
+                else if(!eid.usado)
+                {
+                    write("[ ] ");
+                }
+
+                writeln(eid.nombre);
+            }
+        }
+        */
+
         foreach(ref EntradaTablaIdentificadores eid; this.tabla)
         {
             if(eid.nombre is null)
@@ -136,17 +155,21 @@ class TablaIdentificadores
             }
             else if(!eid.usado)
             {
-                ulong línea;
+                ulong línea = 0;
                 
-                if(eid.declarado)
+                if(eid.declarado && eid.declaración !is null)
                 {
                     línea = eid.declaración.línea;
                 }
-                else if(eid.definido)
+                else if(eid.definido && eid.definición !is null)
                 {
                     línea = eid.definición.línea;
                 }
-                avisa(módulo, línea, "No has usado el identificador " ~ eid.nombre);
+                else if(eid.nombre[0] == ':')
+                {
+                    línea = eid.valor.línea;
+                }
+                avisa(módulo, línea, "No has usado el identificador '" ~ eid.nombre ~ "'");
             }
         }
     }
@@ -267,7 +290,8 @@ void infoln()
 {
     if(INFO)
     {
-        writeln();
+        stdout.writeln();
+        stdout.flush();
     }
 }
 
@@ -275,7 +299,8 @@ void infoln(dstring txt)
 {
     if(INFO)
     {
-        writeln(txt);
+        stdout.writeln(txt);
+        stdout.flush();
     }
 }
 
@@ -283,7 +308,8 @@ void info(dstring txt)
 {
     if(INFO)
     {
-        write(txt);
+        stdout.write(txt);
+        stdout.flush();
     }
 }
 
@@ -291,7 +317,8 @@ void charlatánln()
 {
     if(CHARLATÁN)
     {
-        writeln();
+        stdout.writeln();
+        stdout.flush();
     }
 }
 
@@ -299,7 +326,8 @@ void charlatánln(dstring txt)
 {
     if(CHARLATÁN)
     {
-        writeln(txt);
+        stdout.writeln(txt);
+        stdout.flush();
     }
 }
 
@@ -307,7 +335,8 @@ void charlatán(dstring txt)
 {
     if(CHARLATÁN)
     {
-        write(txt);
+        stdout.write(txt);
+        stdout.flush();
     }
 }
 
@@ -321,6 +350,7 @@ void error(dstring módulo, ulong línea, dstring s)
     {
         stdout.writeln("ERROR [" ~ archivo ~ " - L:", to!dstring(línea), "] ", s, ". [MODULO: ", módulo, "]");
     }
+    stdout.flush();
 }
 
 void avisa(dstring módulo, ulong línea, dstring s)
@@ -335,6 +365,7 @@ void avisa(dstring módulo, ulong línea, dstring s)
         {
             stdout.writeln("AVISO [" ~ archivo ~ " - L:", to!dstring(línea), "] ", s, ". [MODULO: ", módulo, "]");
         }
+        stdout.flush();
     }
 }
 
@@ -356,7 +387,8 @@ dstring leearchivo(dstring archivo)
 {
     if(!exists(archivo))
     {
-        writeln("ERROR");
+        stdout.writeln("ERROR");
+        stdout.flush();
     }
 
     File Fuente = File(archivo, "r");

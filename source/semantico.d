@@ -789,7 +789,7 @@ void paso_comprueba_funciones()
 
                 // Fin de ejecución de la función:
                 // Hay que eliminar la tabla de identificadores actual
-                tid_local = null;
+                //tid_local = null;
                 break;
 
             default:
@@ -906,6 +906,7 @@ void obtén_etiquetas(Nodo n)
                 lit.dato = to!dstring(i-1);
                 lit.tipo = new Tipo();
                 lit.tipo.tipo = "nada";
+                lit.línea = n.ramas[i].línea;
 
                 if(tid_local.define_identificador(n.ramas[i].etiqueta, null, lit))
                 {
