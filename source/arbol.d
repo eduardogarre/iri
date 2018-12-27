@@ -56,8 +56,6 @@ class Nodo
 
 class Etiqueta : Nodo
 {
-    uint64_t línea;
-
     this()
     {
         super();
