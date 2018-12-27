@@ -154,7 +154,8 @@ class TablaIdentificadores
         {
             if(eid.nombre is null)
             {
-                aborta(módulo, 0, "eid.nombre es nulo");
+                posición3d pos;
+                aborta(módulo, pos, "eid.nombre es nulo");
             }
             else if(eid.nombre == ":")
             {
@@ -162,21 +163,21 @@ class TablaIdentificadores
             }
             else if(!eid.usado)
             {
-                ulong línea = 0;
+                posición3d pos;
                 
                 if(eid.declarado && eid.declaración !is null)
                 {
-                    línea = eid.declaración.posición.línea;
+                    pos = eid.declaración.posición;
                 }
                 else if(eid.definido && eid.definición !is null)
                 {
-                    línea = eid.definición.posición.línea;
+                    pos = eid.definición.posición;
                 }
                 else if(eid.nombre[0] == ':')
                 {
-                    línea = eid.valor.posición.línea;
+                    pos = eid.valor.posición;
                 }
-                avisa(módulo, línea, "No has usado el identificador '" ~ eid.nombre ~ "'");
+                avisa(módulo, pos, "No has usado el identificador '" ~ eid.nombre ~ "'");
             }
         }
     }
@@ -187,11 +188,12 @@ class TablaIdentificadores
         {
             if(declaración is null)
             {
-                aborta("Apoyo.d", 0, "Me has pasado un identificador nulo");
+                posición3d pos;
+                aborta("Apoyo.d", pos, "Me has pasado un identificador nulo");
             }
             else
             {
-                aborta("Apoyo.d", declaración.posición.línea, "Me has pasado un identificador nulo");
+                aborta("Apoyo.d", declaración.posición, "Me has pasado un identificador nulo");
             }
             
             return false;
@@ -212,7 +214,7 @@ class TablaIdentificadores
 
             if(eid.declarado)
             {
-                aborta("Apoyo.d", declaración.posición.línea, "El identidicador ya se había declarado.");
+                aborta("Apoyo.d", declaración.posición, "El identidicador ya se había declarado.");
             }
         }
 
@@ -254,11 +256,12 @@ class TablaIdentificadores
         {
             if(definición is null)
             {
-                aborta("Apoyo.d", 0, "Me has pasado un identificador nulo");
+                posición3d pos;
+                aborta("Apoyo.d", pos, "Me has pasado un identificador nulo");
             }
             else
             {
-                aborta("Apoyo.d", definición.posición.línea, "Me has pasado un identificador nulo");
+                aborta("Apoyo.d", definición.posición, "Me has pasado un identificador nulo");
             }
             
             return false;
@@ -347,46 +350,46 @@ void charlatán(dstring txt)
     }
 }
 
-void error(dstring módulo, ulong línea, dstring s)
+void error(dstring módulo, posición3d posición, dstring s)
 {
-    if(línea == 0)
+    if(posición.línea == 0)
     {
         stdout.writeln("ERROR [" ~ archivo ~ "] ", s, ". [MODULO: ", módulo, "]");
     }
     else
     {
-        stdout.writeln("ERROR [" ~ archivo ~ " - L:", to!dstring(línea), "] ", s, ". [MODULO: ", módulo, "]");
+        stdout.writeln("ERROR [" ~ archivo ~ " - L:", to!dstring(posición.línea), "] ", s, ". [MODULO: ", módulo, "]");
     }
     stdout.flush();
 }
 
-void avisa(dstring módulo, ulong línea, dstring s)
+void avisa(dstring módulo, posición3d posición, dstring s)
 {
     if(AVISO)
     {
-        if(línea == 0)
+        if(posición.línea == 0)
         {
             stdout.writeln("AVISO [" ~ archivo ~ "] ", s, ". [MODULO: ", módulo, "]");
         }
         else
         {
-            stdout.writeln("AVISO [" ~ archivo ~ " - L:", to!dstring(línea), "] ", s, ". [MODULO: ", módulo, "]");
+            stdout.writeln("AVISO [" ~ archivo ~ " - L:", to!dstring(posición.línea), "] ", s, ". [MODULO: ", módulo, "]");
         }
         stdout.flush();
     }
 }
 
-void aborta(dstring módulo, ulong línea, dstring s)
+void aborta(dstring módulo, posición3d posición, dstring s)
 {
-    error(módulo, línea, s);
+    error(módulo, posición, s);
     exit(-1);
 }
 
-void esperaba(dstring módulo, ulong línea, dstring s)
+void esperaba(dstring módulo, posición3d posición, dstring s)
 {
     dstring mensaje = "Esperaba ";
     mensaje ~= s;
-    aborta(módulo, línea, mensaje);
+    aborta(módulo, posición, mensaje);
 }
 
 

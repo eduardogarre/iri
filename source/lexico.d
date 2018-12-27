@@ -688,7 +688,7 @@ private bool texto()
         if(!mismocarácter(código[cursor],'\"'))
         {
             cursor = c;
-            esperaba(módulo, línea, "un cierre de comilla doble [\"]");
+            esperaba(módulo, l.posición, "un cierre de comilla doble [\"]");
         }
 
         cursor++;
@@ -743,7 +743,11 @@ private bool carácter()
             }
             else
             {
-                aborta(módulo, línea, "No reconozco la secuencia de escape");
+                posición3d pos;
+                pos.línea = línea;
+                pos.columna = cursor - inicio_línea;
+                pos.desplazamiento = cursor;
+                aborta(módulo, pos, "No reconozco la secuencia de escape");
             }
         }
         else
@@ -762,7 +766,7 @@ private bool carácter()
         if(!mismocarácter(código[cursor],'\''))
         {
             cursor = c;
-            esperaba(módulo, línea, "un cierre de comilla simple [\']");
+            esperaba(módulo, l.posición, "un cierre de comilla simple [\']");
         }
 
         cursor++;
