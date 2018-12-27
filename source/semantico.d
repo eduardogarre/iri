@@ -79,7 +79,7 @@ void imprime_árbol(Nodo n)
                 charlatán(" [");
                 charlatán(e.dato);
                 charlatán("] [línea:");
-                charlatán(to!dstring(e.línea));
+                charlatán(to!dstring(e.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -101,7 +101,7 @@ void imprime_árbol(Nodo n)
                     charlatán("]");
                 }
                 charlatán(" [línea:");
-                charlatán(to!dstring(t.línea));
+                charlatán(to!dstring(t.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -111,7 +111,7 @@ void imprime_árbol(Nodo n)
                 charlatán("] [dato:");
                 charlatán(l.dato);
                 charlatán("] [línea:");
-                charlatán(to!dstring(l.línea));
+                charlatán(to!dstring(l.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -141,7 +141,7 @@ void imprime_árbol(Nodo n)
                     charlatán(l.dato ~ "]");
                 }
                 charlatán(" [línea:");
-                charlatán(to!dstring(l.línea));
+                charlatán(to!dstring(l.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -151,7 +151,7 @@ void imprime_árbol(Nodo n)
                 charlatán(" [id:");
                 charlatán(l.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(l.línea));
+                charlatán(to!dstring(l.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -163,7 +163,7 @@ void imprime_árbol(Nodo n)
                 charlatán(" [devuelve:");
                 charlatán(to!dstring(l.retorno));
                 charlatán("] [línea:");
-                charlatán(to!dstring(l.línea));
+                charlatán(to!dstring(l.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -173,7 +173,7 @@ void imprime_árbol(Nodo n)
                 charlatán(" [op:");
                 charlatán(o.dato);
                 charlatán("] [línea:");
-                charlatán(to!dstring(o.línea));
+                charlatán(to!dstring(o.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -181,7 +181,7 @@ void imprime_árbol(Nodo n)
                 auto a = cast(Asignación)n;
                 charlatán(to!dstring(a.categoría));
                 charlatán(" [línea:");
-                charlatán(to!dstring(a.línea));
+                charlatán(to!dstring(a.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -198,7 +198,7 @@ void imprime_árbol(Nodo n)
                 charlatán("] [nombre:");
                 charlatán(did.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(did.línea));
+                charlatán(to!dstring(did.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -212,7 +212,7 @@ void imprime_árbol(Nodo n)
                 charlatán("] [nombre:");
                 charlatán(idex.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(idex.línea));
+                charlatán(to!dstring(idex.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -220,7 +220,7 @@ void imprime_árbol(Nodo n)
                 auto b = cast(Bloque)n;
                 charlatán(to!dstring(b.categoría));
                 charlatán(" [línea:");
-                charlatán(to!dstring(b.línea));
+                charlatán(to!dstring(b.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -228,7 +228,7 @@ void imprime_árbol(Nodo n)
                 auto a = cast(Argumentos)n;
                 charlatán(to!dstring(a.categoría));
                 charlatán(" [línea:");
-                charlatán(to!dstring(a.línea));
+                charlatán(to!dstring(a.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -240,7 +240,7 @@ void imprime_árbol(Nodo n)
                 charlatán("] [nombre:");
                 charlatán(a.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(a.línea));
+                charlatán(to!dstring(a.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -252,7 +252,7 @@ void imprime_árbol(Nodo n)
                 charlatán("] [nombre:");
                 charlatán(df.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(df.línea));
+                charlatán(to!dstring(df.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -264,7 +264,7 @@ void imprime_árbol(Nodo n)
                 charlatán("] [nombre:");
                 charlatán(df.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(df.línea));
+                charlatán(to!dstring(df.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -274,7 +274,7 @@ void imprime_árbol(Nodo n)
                 charlatán(" [nombre:");
                 charlatán(obj.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(obj.línea));
+                charlatán(to!dstring(obj.posición.línea));
                 charlatánln("]");
                 break;
 
@@ -305,12 +305,12 @@ void paso_obtén_identificadores_globales(Nodo n)
                 // Debería tener colgando un hijo de clase 'Literal'
                 if(did.ramas.length != 1)
                 {
-                    aborta(módulo, n.línea, "El nodo DefineIdentificadorGlobal debería tener un Nodo hijo de categoría 'Literal'");
+                    aborta(módulo, n.posición.línea, "El nodo DefineIdentificadorGlobal debería tener un Nodo hijo de categoría 'Literal'");
                 }
 
                 if(did.ramas[0].categoría != Categoría.LITERAL)
                 {
-                    aborta(módulo, n.línea, "El nodo DefineIdentificadorGlobal debería tener un Nodo hijo de categoría 'Literal'");
+                    aborta(módulo, n.posición.línea, "El nodo DefineIdentificadorGlobal debería tener un Nodo hijo de categoría 'Literal'");
                 }
 
                 Literal lit = cast(Literal)(did.ramas[0]);
@@ -325,7 +325,7 @@ void paso_obtén_identificadores_globales(Nodo n)
 
                 if(id.definido)
                 {
-                    aborta(módulo, did.línea, "Ya habías definido la variable global " ~ did.nombre);
+                    aborta(módulo, did.posición.línea, "Ya habías definido la variable global " ~ did.nombre);
                 }
 
                 if(tid_global.define_identificador(did.nombre, did, lit))
@@ -342,7 +342,7 @@ void paso_obtén_identificadores_globales(Nodo n)
                 
                 if(id.declarado)
                 {
-                    aborta(módulo, idex.línea, "Ya habías declarado la variable global " ~ idex.nombre);
+                    aborta(módulo, idex.posición.línea, "Ya habías declarado la variable global " ~ idex.nombre);
                 }
 
                 if(id.definido)
@@ -369,7 +369,7 @@ void paso_obtén_identificadores_globales(Nodo n)
 
                 if(id.definido)
                 {
-                    aborta(módulo, df.línea, "Ya habías definido " ~ df.nombre ~ "()");
+                    aborta(módulo, df.posición.línea, "Ya habías definido " ~ df.nombre ~ "()");
                 }
 
                 if(tid_global.define_identificador(df.nombre, df, null))
@@ -386,7 +386,7 @@ void paso_obtén_identificadores_globales(Nodo n)
                 
                 if(id.declarado)
                 {
-                    aborta(módulo, df.línea, "Ya habías declarado " ~ df.nombre ~ "()");
+                    aborta(módulo, df.posición.línea, "Ya habías declarado " ~ df.nombre ~ "()");
                 }
 
                 if(id.definido)
@@ -447,28 +447,28 @@ void paso_comprueba_concordancia_declaraciones_y_definiciones()
 
                     if(defid.dato != decid.dato)
                     {
-                        aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        aborta(módulo, defid.posición.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
                         ~ "DefineIdentificadorGlobal.dato y DeclaraIdentificadorGlobal.dato no coinciden:\n["
                         ~ to!dstring(defid.dato) ~ "] vs ["
                         ~ to!dstring(decid.dato) ~ "]");
                     }
                     else if(defid.ámbito != decid.ámbito)
                     {
-                        aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        aborta(módulo, defid.posición.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
                         ~ "DefineIdentificadorGlobal.ámbito y DeclaraIdentificadorGlobal.ámbito no coinciden:\n["
                         ~ to!dstring(defid.ámbito) ~ "] vs ["
                         ~ to!dstring(decid.ámbito) ~ "]");
                     }
                     else if(defid.nombre != decid.nombre)
                     {
-                        aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        aborta(módulo, defid.posición.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
                         ~ "DefineIdentificadorGlobal.nombre y DeclaraIdentificadorGlobal.nombre no coinciden:\n["
                         ~ to!dstring(defid.nombre) ~ "] vs ["
                         ~ to!dstring(decid.nombre) ~ "]");
                     }
                     else if(!compara_árboles(cast(Nodo*)(&(defid.tipo)), cast(Nodo*)(&(decid.tipo))))
                     {
-                        aborta(módulo, defid.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        aborta(módulo, defid.posición.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
                         ~ "DefineIdentificadorGlobal.tipo y DeclaraIdentificadorGlobal.tipo no coinciden:\n["
                         ~ to!dstring(defid.tipo) ~ "] vs ["
                         ~ to!dstring(decid.tipo) ~ "]");
@@ -485,28 +485,28 @@ void paso_comprueba_concordancia_declaraciones_y_definiciones()
 
                     if(deffn.dato != decfn.dato)
                     {
-                        aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        aborta(módulo, deffn.posición.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
                         ~ "DefineFunción.dato y DeclaraFunción.dato no coinciden:\n["
                         ~ to!dstring(deffn.dato) ~ "] vs ["
                         ~ to!dstring(decfn.dato) ~ "]");
                     }
                     else if(deffn.nombre != decfn.nombre)
                     {
-                        aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        aborta(módulo, deffn.posición.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
                         ~ "DefineFunción.nombre y DeclaraFunción.nombre no coinciden:\n["
                         ~ to!dstring(deffn.nombre) ~ "] vs ["
                         ~ to!dstring(decfn.nombre) ~ "]");
                     }
                     else if(!compara_árboles(cast(Nodo*)(&(deffn.retorno)), cast(Nodo*)(&(decfn.retorno))))
                     {
-                        aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        aborta(módulo, deffn.posición.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
                         ~ "DefineFunción.retorno y DeclaraFunción.retorno no coinciden:\n["
                         ~ to!dstring(deffn.retorno) ~ "] vs ["
                         ~ to!dstring(decfn.retorno) ~ "]");
                     }
                     else if(!compara_árboles(cast(Nodo*)(&(deffn.ramas[0])), cast(Nodo*)(&(decfn.ramas[0]))))
                     {
-                        aborta(módulo, deffn.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
+                        aborta(módulo, deffn.posición.línea, "paso_comprueba_concordancia_declaración_y_definición()::compara_nodos(Nodo1, Nodo2): \n"
                         ~ "DefineFunción.ramas[0] y DeclaraFunción.ramas[0] (Argumentos) no coinciden:\n["
                         ~ to!dstring(deffn.ramas[0]) ~ "] vs ["
                         ~ to!dstring(decfn.ramas[0]) ~ "]");
@@ -530,12 +530,12 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
         }
         else
         {
-            aborta(módulo, l.línea, "El tipo es nulo");
+            aborta(módulo, l.posición.línea, "El tipo es nulo");
         }
     }
     else if(l is null)
     {
-        aborta(módulo, t.línea, "El literal es nulo");
+        aborta(módulo, t.posición.línea, "El literal es nulo");
     }
     else // El tipo y el literal contienen un valor
     {
@@ -544,12 +544,12 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
             uint64_t elementos = to!uint64_t(t.elementos);
             if(t.ramas.length != 1) // El nodo Vector debe tener un nodo hijo Tipo, con el tipo que compone el vector
             {
-                aborta(módulo, t.línea, "El vector no define un tipo que lo componga");
+                aborta(módulo, t.posición.línea, "El vector no define un tipo que lo componga");
             }
 
             if(l.ramas.length != elementos) // El nodo Literal debe tener tantos hijos como elementos dice el Vector
             {
-                avisa(módulo, t.línea, "El vector y el literal definen tamaños diferentes");
+                avisa(módulo, t.posición.línea, "El vector y el literal definen tamaños diferentes");
             }
 
             // Comprueba el tipo con los literales que componen el vector
@@ -568,12 +568,12 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
         {
             if(t.ramas.length < 1) // El nodo Estructura debe tener al menos un nodo Tipo hijo
             {
-                aborta(módulo, t.línea, "La estructura no define tipos que la compongan");
+                aborta(módulo, t.posición.línea, "La estructura no define tipos que la compongan");
             }
 
             if(l.ramas.length != t.ramas.length) // El nodo Estructura debe tener tantos hijos (literales) como el nodo Tipo (tipos hijos)
             {
-                avisa(módulo, t.línea, "La estructura y el literal definen tamaños diferentes");
+                avisa(módulo, t.posición.línea, "La estructura y el literal definen tamaños diferentes");
             }
 
             // Comprueba el tipo con los literales que componen la estructura
@@ -601,7 +601,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
             }
             else
             {
-                aborta(módulo, t.línea, "Tipo no válido: '" ~ t.tipo ~ "'");
+                aborta(módulo, t.posición.línea, "Tipo no válido: '" ~ t.tipo ~ "'");
             }
 
             switch(t.tipo[0])
@@ -612,7 +612,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
                     // lo especificado (1-64 dígitos)
                     if(tamaño < 1 || tamaño > 64)
                     {
-                        aborta(módulo, t.línea, "Tamaño inválido para un natural: '"
+                        aborta(módulo, t.posición.línea, "Tamaño inválido para un natural: '"
                             ~ t.tipo[1..$] ~ "'. Debería estar en el rango 1-64");
                     }
 
@@ -620,14 +620,14 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
                     // Comprueba que el literal contiene un número natural
                     if(l.dato.length < 1)
                     {
-                        aborta(módulo, t.línea, "El literal está vacío");
+                        aborta(módulo, t.posición.línea, "El literal está vacío");
                     }
 
                     for(int i = 0; i < l.dato.length; i++)
                     {
                         if(!esdígito(l.dato[i]))
                         {
-                            aborta(módulo, t.línea, "El literal '" ~ l.dato
+                            aborta(módulo, t.posición.línea, "El literal '" ~ l.dato
                                 ~ "' no es un número natural");
                         }
                     }
@@ -642,7 +642,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
 
                     if(dato > tamaño_máximo)
                     {
-                        aborta(módulo, t.línea, "El valor del literal '" ~ l.dato
+                        aborta(módulo, t.posición.línea, "El valor del literal '" ~ l.dato
                             ~ "' no cabe " ~ "en el tipo '" ~ t.tipo ~ "'");
                     }
 
@@ -658,7 +658,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
                     // lo especificado (2-64 dígitos)
                     if(tamaño < 2 || tamaño > 64)
                     {
-                        aborta(módulo, t.línea, "Tamaño inválido para un entero: '"
+                        aborta(módulo, t.posición.línea, "Tamaño inválido para un entero: '"
                             ~ t.tipo[1..$] ~ "'. Debería estar en el rango 2-64");
                     }
 
@@ -666,7 +666,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
                     // Comprueba que el literal contiene un número entero
                     if(l.dato.length < 1)
                     {
-                        aborta(módulo, t.línea, "El literal está vacío");
+                        aborta(módulo, t.posición.línea, "El literal está vacío");
                     }
 
                     // el número es negativo
@@ -676,7 +676,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
                         desplazamiento++;
                         if(l.dato.length < 1)
                         {
-                            aborta(módulo, t.línea, "El literal '" ~ l.dato
+                            aborta(módulo, t.posición.línea, "El literal '" ~ l.dato
                                 ~ "' no es un número entero");
                         }
                     }
@@ -685,7 +685,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
                     {
                         if(!esdígito(l.dato[i]))
                         {
-                            aborta(módulo, t.línea, "El literal '" ~ l.dato
+                            aborta(módulo, t.posición.línea, "El literal '" ~ l.dato
                                 ~ "' no es un número entero");
                         }
                     }
@@ -701,7 +701,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
 
                     if((dato > tamaño_máximo) || (dato < tamaño_mínimo))
                     {
-                        aborta(módulo, t.línea, "El valor del literal '" ~ l.dato
+                        aborta(módulo, t.posición.línea, "El valor del literal '" ~ l.dato
                             ~ "' no cabe " ~ "en el tipo '" ~ t.tipo ~ "'");
                     }
 
@@ -717,7 +717,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
                     // lo especificado (8|16|32|64 dígitos)
                     if((tamaño != 8) && (tamaño != 16) && (tamaño != 32) && (tamaño != 64))
                     {
-                        aborta(módulo, t.línea, "Tamaño inválido para un real: '"
+                        aborta(módulo, t.posición.línea, "Tamaño inválido para un real: '"
                             ~ t.tipo[1..$] ~ "'. Debería ser uno de los siguientes: 8, 16, 32 ó 64");
                     }
 
@@ -731,14 +731,14 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
                     
                     if(!res)
                     {
-                        aborta(módulo, t.línea, "El literal '" ~ l.dato
+                        aborta(módulo, t.posición.línea, "El literal '" ~ l.dato
                                 ~ "' no es un número real");
                     }
                     else
                     {
                         if(lexico.cursor != l.dato.length)
                         {
-                        aborta(módulo, t.línea, "El literal '" ~ l.dato
+                        aborta(módulo, t.posición.línea, "El literal '" ~ l.dato
                                 ~ "' no es un número real correcto");
                         }
                     }
@@ -817,7 +817,7 @@ Bloque prepara_función(DefineFunción def_func)
     }
     else
     {
-        línea_actual = def_func.línea;
+        línea_actual = def_func.posición.línea;
     }
     
     // Crea y configura la tabla de identificadores de la función
@@ -906,7 +906,7 @@ void obtén_etiquetas(Nodo n)
                 lit.dato = to!dstring(i-1);
                 lit.tipo = new Tipo();
                 lit.tipo.tipo = "nada";
-                lit.línea = n.ramas[i].línea;
+                lit.posición = n.ramas[i].posición;
 
                 if(tid_local.define_identificador(n.ramas[i].etiqueta, null, lit))
                 {
@@ -950,7 +950,7 @@ Nodo comprueba_nodo(Nodo n)
 
                 if(tipo is null || tipo.categoría != Categoría.TIPO)
                 {
-                    aborta(módulo, a.línea, "El operador del lado derecho no declara ningún tipo.");
+                    aborta(módulo, a.posición.línea, "El operador del lado derecho no declara ningún tipo.");
                 }
 
                 tid_local.declara_identificador(id.nombre, tipo);
@@ -959,7 +959,7 @@ Nodo comprueba_nodo(Nodo n)
                 //break;
 
             default:
-                aborta(módulo, n.línea, "No reconozco el Nodo.");
+                aborta(módulo, n.posición.línea, "No reconozco el Nodo.");
 
                 return null;
                 //break;
@@ -1012,11 +1012,11 @@ Nodo coge_identificador(Nodo n)
             }
         }
 
-        aborta(módulo, n.línea, "En las tablas de identificadores no encuentro '" ~ id.nombre ~ "'.");
+        aborta(módulo, n.posición.línea, "En las tablas de identificadores no encuentro '" ~ id.nombre ~ "'.");
     }
     else
     {
-        aborta(módulo, n.línea, "No has pasado un identificador.");
+        aborta(módulo, n.posición.línea, "No has pasado un identificador.");
     }
 
     return null;
@@ -1065,11 +1065,11 @@ Nodo lee_identificador(Nodo n)
             }
         }
 
-        aborta(módulo, n.línea, "En las tablas de identificadores no encuentro '" ~ id.nombre ~ "'.");
+        aborta(módulo, n.posición.línea, "En las tablas de identificadores no encuentro '" ~ id.nombre ~ "'.");
     }
     else
     {
-        aborta(módulo, n.línea, "No has pasado un identificador.");
+        aborta(módulo, n.posición.línea, "No has pasado un identificador.");
     }
 
     return null;
@@ -1150,7 +1150,7 @@ Tipo op_ret(Operación op)
 {
     if(op.dato != "ret")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'ret'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'ret'");
         return null;
     }
 
@@ -1179,7 +1179,7 @@ Tipo op_ret(Operación op)
             }
             else
             {
-                aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+                aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
             }
             
             Nodo nt1 = cast(Nodo)t;
@@ -1191,7 +1191,7 @@ Tipo op_ret(Operación op)
             }
             else
             {
-                aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+                aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
             }
         }
     }
@@ -1203,7 +1203,7 @@ Tipo op_ret(Operación op)
     }
     else
     {
-        aborta(módulo, op.línea, "Esperaba que 'ret' tuviera uno o ningún argumento");
+        aborta(módulo, op.posición.línea, "Esperaba que 'ret' tuviera uno o ningún argumento");
         return null;
     }
 
@@ -1214,13 +1214,13 @@ Tipo op_sum(Operación op)
 {
     if(op.dato != "sum")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'sum'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'sum'");
         return null;
     }
 
     if(op.ramas.length != 3)
     {
-        aborta(módulo, op.línea, "sum <tipo> <arg1>, <arg2>");
+        aborta(módulo, op.posición.línea, "sum <tipo> <arg1>, <arg2>");
         return null;
     }
 
@@ -1244,7 +1244,7 @@ Tipo op_sum(Operación op)
         }
         else
         {
-            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
         }
 
         Nodo nt1 = cast(Nodo)t;
@@ -1252,7 +1252,7 @@ Tipo op_sum(Operación op)
 
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
         }
     }
     
@@ -1273,7 +1273,7 @@ Tipo op_sum(Operación op)
         }
         else
         {
-            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
         }
 
         Nodo nt1 = cast(Nodo)t;
@@ -1281,7 +1281,7 @@ Tipo op_sum(Operación op)
 
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
         }
     }
 
@@ -1293,13 +1293,13 @@ Tipo op_res(Operación op)
 {
     if(op.dato != "res")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'res'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'res'");
         return null;
     }
 
     if(op.ramas.length != 3)
     {
-        aborta(módulo, op.línea, "res <tipo> <arg1>, <arg2>");
+        aborta(módulo, op.posición.línea, "res <tipo> <arg1>, <arg2>");
         return null;
     }
 
@@ -1323,7 +1323,7 @@ Tipo op_res(Operación op)
         }
         else
         {
-            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
         }
 
         Nodo nt1 = cast(Nodo)t;
@@ -1331,7 +1331,7 @@ Tipo op_res(Operación op)
 
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
         }
     }
     
@@ -1352,7 +1352,7 @@ Tipo op_res(Operación op)
         }
         else
         {
-            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
         }
 
         Nodo nt1 = cast(Nodo)t;
@@ -1360,7 +1360,7 @@ Tipo op_res(Operación op)
 
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
         }
     }
 
@@ -1372,13 +1372,13 @@ Tipo op_mul(Operación op)
 {
     if(op.dato != "mul")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'mul'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'mul'");
         return null;
     }
 
     if(op.ramas.length != 3)
     {
-        aborta(módulo, op.línea, "mul <tipo> <arg1>, <arg2>");
+        aborta(módulo, op.posición.línea, "mul <tipo> <arg1>, <arg2>");
         return null;
     }
 
@@ -1402,7 +1402,7 @@ Tipo op_mul(Operación op)
         }
         else
         {
-            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
         }
 
         Nodo nt1 = cast(Nodo)t;
@@ -1410,7 +1410,7 @@ Tipo op_mul(Operación op)
 
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
         }
     }
     
@@ -1431,7 +1431,7 @@ Tipo op_mul(Operación op)
         }
         else
         {
-            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
         }
 
         Nodo nt1 = cast(Nodo)t;
@@ -1439,7 +1439,7 @@ Tipo op_mul(Operación op)
 
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
         }
     }
 
@@ -1451,13 +1451,13 @@ Tipo op_div(Operación op)
 {
     if(op.dato != "div")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'div'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'div'");
         return null;
     }
 
     if(op.ramas.length != 3)
     {
-        aborta(módulo, op.línea, "div <tipo> <arg1>, <arg2>");
+        aborta(módulo, op.posición.línea, "div <tipo> <arg1>, <arg2>");
         return null;
     }
 
@@ -1481,7 +1481,7 @@ Tipo op_div(Operación op)
         }
         else
         {
-            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
         }
 
         Nodo nt1 = cast(Nodo)t;
@@ -1489,7 +1489,7 @@ Tipo op_div(Operación op)
 
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
         }
     }
     
@@ -1510,7 +1510,7 @@ Tipo op_div(Operación op)
         }
         else
         {
-            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
         }
 
         Nodo nt1 = cast(Nodo)t;
@@ -1518,7 +1518,7 @@ Tipo op_div(Operación op)
 
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
         }
     }
 
@@ -1530,13 +1530,13 @@ Tipo op_llama(Operación op)
 {
     if(op.dato != "llama")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'llama'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'llama'");
         return null;
     }
 
     if(op.ramas.length != 1)
     {
-        aborta(módulo, op.línea, "Esperaba que la operación 'llama' se acompañara de una función");
+        aborta(módulo, op.posición.línea, "Esperaba que la operación 'llama' se acompañara de una función");
         return null;
     }
 
@@ -1545,7 +1545,7 @@ Tipo op_llama(Operación op)
     // Obtengo la función de la tabla de id's global
     if(tid_global.lee_id(f.nombre).nombre is null)
     {
-        aborta(módulo, op.línea, "La función '" ~ f.nombre ~ "()' es desconocida.");
+        aborta(módulo, op.posición.línea, "La función '" ~ f.nombre ~ "()' es desconocida.");
     }
     
     // eid: dstring nombre, bool declarado, Nodo declaración, bool definido, Nodo definición;
@@ -1567,7 +1567,7 @@ Tipo op_llama(Operación op)
         
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo de retorno no coincide con el declarado.");
+            aborta(módulo, op.posición.línea, "El tipo de retorno no coincide con el declarado.");
         }
 
         // Comparo tipos de los argumentos
@@ -1587,7 +1587,7 @@ Tipo op_llama(Operación op)
                 Nodo id = coge_identificador(arg);
                 if(id.categoría != Categoría.TIPO)
                 {
-                    aborta(módulo, arg.línea, "No he podido obtener un tipo para el identificador '" ~ arg.dato ~ "'");
+                    aborta(módulo, arg.posición.línea, "No he podido obtener un tipo para el identificador '" ~ arg.dato ~ "'");
                 }
 
                 nt1 = cast(Nodo)t;
@@ -1595,7 +1595,7 @@ Tipo op_llama(Operación op)
 
                 if(!compara_árboles(&nt1, &nt2))
                 {
-                    aborta(módulo, op.línea, "La firma de la función no coincide con la declarada previamente.");
+                    aborta(módulo, op.posición.línea, "La firma de la función no coincide con la declarada previamente.");
                 }
             }
         }
@@ -1613,7 +1613,7 @@ Tipo op_llama(Operación op)
         
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo de retorno no coincide con el declarado.");
+            aborta(módulo, op.posición.línea, "El tipo de retorno no coincide con el declarado.");
         }
 
         for(int i = 0; i < f.ramas.length; i++)
@@ -1632,7 +1632,7 @@ Tipo op_llama(Operación op)
                 Nodo id = coge_identificador(arg);
                 if(id.categoría != Categoría.TIPO)
                 {
-                    aborta(módulo, arg.línea, "No he podido obtener un tipo para el identificador '" ~ arg.dato ~ "'");
+                    aborta(módulo, arg.posición.línea, "No he podido obtener un tipo para el identificador '" ~ arg.dato ~ "'");
                 }
 
                 nt1 = cast(Nodo)t;
@@ -1640,7 +1640,7 @@ Tipo op_llama(Operación op)
 
                 if(!compara_árboles(&nt1, &nt2))
                 {
-                    aborta(módulo, op.línea, "La firma de la función no coincide con la declrada previamente.");
+                    aborta(módulo, op.posición.línea, "La firma de la función no coincide con la declrada previamente.");
                 }
             }
         }
@@ -1648,7 +1648,7 @@ Tipo op_llama(Operación op)
         return f.retorno;
     }
     
-    aborta(módulo, op.línea, "La función '" ~ f.nombre ~ "()' es desconocida.");
+    aborta(módulo, op.posición.línea, "La función '" ~ f.nombre ~ "()' es desconocida.");
 
     return null;
 }
@@ -1657,13 +1657,13 @@ Tipo op_cmp(Operación op)
 {
     if(op.dato != "cmp")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'cmp'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'cmp'");
         return null;
     }
 
     if(op.ramas.length != 4)
     {
-        aborta(módulo, op.línea, "cmp <comparación> <tipo> (<literal>|<id>), (<literal>|<id>)");
+        aborta(módulo, op.posición.línea, "cmp <comparación> <tipo> (<literal>|<id>), (<literal>|<id>)");
         return null;
     }
 
@@ -1681,7 +1681,7 @@ Tipo op_cmp(Operación op)
     {}
     else
     {
-        aborta(módulo, op.línea, "op:cmp - El comando de comparación es incorrecto");
+        aborta(módulo, op.posición.línea, "op:cmp - El comando de comparación es incorrecto");
     }
 
     Nodo n;
@@ -1704,7 +1704,7 @@ Tipo op_cmp(Operación op)
         }
         else
         {
-            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
         }
 
         Nodo nt1 = cast(Nodo)t;
@@ -1712,7 +1712,7 @@ Tipo op_cmp(Operación op)
 
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
         }
     }
     
@@ -1733,7 +1733,7 @@ Tipo op_cmp(Operación op)
         }
         else
         {
-            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
         }
 
         Nodo nt1 = cast(Nodo)t;
@@ -1741,7 +1741,7 @@ Tipo op_cmp(Operación op)
 
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
         }
     }
 
@@ -1750,7 +1750,7 @@ Tipo op_cmp(Operación op)
 
     Tipo tipo_n1 = new Tipo();
     tipo_n1.tipo = "n1";
-    tipo_n1.línea = op.línea;
+    tipo_n1.posición = op.posición;
     return tipo_n1;
 }
 
@@ -1758,13 +1758,13 @@ Tipo op_conv(Operación op)
 {
     if(op.dato != "conv")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'conv'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'conv'");
         return null;
     }
 
     if(op.ramas.length != 3)
     {
-        aborta(módulo, op.línea, "conv <tipo-origen> (<literal>|<id>) a <tipo-destino>)");
+        aborta(módulo, op.posición.línea, "conv <tipo-origen> (<literal>|<id>) a <tipo-destino>)");
         return null;
     }
 
@@ -1788,7 +1788,7 @@ Tipo op_conv(Operación op)
         }
         else
         {
-            aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+            aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
         }
 
         Nodo nt1 = cast(Nodo)origen;
@@ -1796,7 +1796,7 @@ Tipo op_conv(Operación op)
 
         if(!compara_árboles(&nt1, &nt2))
         {
-            aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+            aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
         }
     }
 
@@ -1809,12 +1809,12 @@ Tipo op_conv(Operación op)
             tamaño_origen = to!uint32_t(origen.tipo[1..$]);
             if(tamaño_origen > 64)
             {
-                aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                             ~ " pedido " ~ to!dstring(tamaño_origen) ~ "bits");
             }
             if(tamaño_origen < 1)
             {
-                aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
                             ~ " pedido " ~ to!dstring(tamaño_origen) ~ "bits");
             }
 
@@ -1825,20 +1825,20 @@ Tipo op_conv(Operación op)
 
                     if(tamaño_destino > 64)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                                     ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
                     }
 
                     if(tamaño_destino < 1)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
                                     ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
                     }
 
                     // si el tamaño de destino es mayor o igual, no hay problema
                     if(tamaño_destino < tamaño_origen)
                     {
-                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable");
+                        avisa(módulo, op.posición.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable");
                     }
                     break;
 
@@ -1847,20 +1847,20 @@ Tipo op_conv(Operación op)
 
                     if(tamaño_destino > 64)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                                     ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
                     }
 
                     if(tamaño_destino < 1)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 2 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo mínimo es 2 bits, y has"
                                     ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
                     }
 
                     // si el tamaño de destino es mayor o igual, no hay problema
                     if(tamaño_destino < tamaño_origen)
                     {
-                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                        avisa(módulo, op.posición.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
                     }
                     break;
 
@@ -1874,24 +1874,24 @@ Tipo op_conv(Operación op)
 
                     if(tamaño_destino > 64)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                         ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
                     }
                     if(tamaño_destino < 1)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
                         ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
                     }
 
                     // si el tamaño de destino es mayor o igual, no hay problema
                     if(tamaño_destino < tamaño_origen)
                     {
-                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                        avisa(módulo, op.posición.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
                     }
                     break;
 
                 default:
-                    aborta(módulo, op.línea, "op:conv - tipo desconocido");
+                    aborta(módulo, op.posición.línea, "op:conv - tipo desconocido");
                     break;
             }
 
@@ -1907,20 +1907,20 @@ Tipo op_conv(Operación op)
 
                     if(tamaño_destino > 64)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                                     ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
                     }
 
                     if(tamaño_destino < 1)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
                                     ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
                     }
 
                     // si el tamaño de destino es mayor o igual, no hay problema
                     if(tamaño_destino < tamaño_origen)
                     {
-                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                        avisa(módulo, op.posición.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
                     }
                     break;
 
@@ -1929,20 +1929,20 @@ Tipo op_conv(Operación op)
 
                     if(tamaño_destino > 64)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                                     ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
                     }
 
                     if(tamaño_destino < 1)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 2 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo mínimo es 2 bits, y has"
                                     ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
                     }
 
                     // si el tamaño de destino es mayor o igual, no hay problema
                     if(tamaño_destino < tamaño_origen)
                     {
-                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                        avisa(módulo, op.posición.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
                     }
                     break;
 
@@ -1956,24 +1956,24 @@ Tipo op_conv(Operación op)
 
                     if(tamaño_destino > 64)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                         ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
                     }
                     if(tamaño_destino < 1)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
                         ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
                     }
 
                     // si el tamaño de destino es mayor o igual, no hay problema
                     if(tamaño_destino < tamaño_origen)
                     {
-                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                        avisa(módulo, op.posición.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
                     }
                     break;
 
                 default:
-                    aborta(módulo, op.línea, "op:conv - tipo desconocido");
+                    aborta(módulo, op.posición.línea, "op:conv - tipo desconocido");
                     break;
             }
             
@@ -1989,20 +1989,20 @@ Tipo op_conv(Operación op)
 
                     if(tamaño_destino > 64)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                                     ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
                     }
 
                     if(tamaño_destino < 1)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
                                     ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
                     }
 
                     // si el tamaño de destino es mayor o igual, no hay problema
                     if(tamaño_destino < tamaño_origen)
                     {
-                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                        avisa(módulo, op.posición.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
                     }
                     break;
 
@@ -2011,20 +2011,20 @@ Tipo op_conv(Operación op)
 
                     if(tamaño_destino > 64)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                                     ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
                     }
 
                     if(tamaño_destino < 1)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 2 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo mínimo es 2 bits, y has"
                                     ~ " pedido " ~ to!dstring(tamaño_destino) ~ "bits");
                     }
 
                     // si el tamaño de destino es mayor o igual, no hay problema
                     if(tamaño_destino < tamaño_origen)
                     {
-                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                        avisa(módulo, op.posición.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
                     }
                     break;
 
@@ -2038,31 +2038,31 @@ Tipo op_conv(Operación op)
 
                     if(tamaño_destino > 64)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                         ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
                     }
                     if(tamaño_destino < 1)
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo mínimo es 1 bit, y has"
                         ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
                     }
 
                     // si el tamaño de destino es mayor o igual, no hay problema
                     if(tamaño_destino < tamaño_origen)
                     {
-                        avisa(módulo, op.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
+                        avisa(módulo, op.posición.línea, "op:conv - Tipo de destino menor que Tipo de origen, podrías desbordar la variable.");
                     }
                     break;
 
                 default:
-                    aborta(módulo, op.línea, "op:conv - tipo desconocido");
+                    aborta(módulo, op.posición.línea, "op:conv - tipo desconocido");
                     break;
             }
             
             break;
 
         default:
-            aborta(módulo, op.línea, "op:conv - tipo desconocido");
+            aborta(módulo, op.posición.línea, "op:conv - tipo desconocido");
             break;
     }
 
@@ -2074,7 +2074,7 @@ Tipo op_slt(Operación op)
 {
     if(op.dato != "slt")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'slt'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'slt'");
         return null;
     }
 
@@ -2086,7 +2086,7 @@ Tipo op_slt(Operación op)
 
         if(!tid_local.coge_id(etiqueta.dato).nombre)
         {
-            aborta(módulo, op.línea, "op:slt - La etiqueta no existe");
+            aborta(módulo, op.posición.línea, "op:slt - La etiqueta no existe");
         }
 
         return null;
@@ -2100,12 +2100,12 @@ Tipo op_slt(Operación op)
 
         if(t is null)
         {
-            aborta(módulo, op.línea, "op:slt - Tipo 'null'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
+            aborta(módulo, op.posición.línea, "op:slt - Tipo 'null'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
             return null;
         }
         else if(t.tipo != "n1")
         {
-            aborta(módulo, op.línea, "op:slt - Tipo incorrecto. Esperaba 'n1'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
+            aborta(módulo, op.posición.línea, "op:slt - Tipo incorrecto. Esperaba 'n1'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
             return null;
         }
 
@@ -2125,7 +2125,7 @@ Tipo op_slt(Operación op)
             }
             else
             {
-                aborta(módulo, n.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
+                aborta(módulo, n.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n.dato ~ "'");
             }
 
             Nodo nt1 = cast(Nodo)t;
@@ -2133,7 +2133,7 @@ Tipo op_slt(Operación op)
 
             if(!compara_árboles(&nt1, &nt2))
             {
-                aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+                aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
             }
         }
 
@@ -2141,20 +2141,20 @@ Tipo op_slt(Operación op)
 
         if(!tid_local.coge_id(etiqueta.dato).nombre)
         {
-            aborta(módulo, op.línea, "op:slt - La etiqueta no existe");
+            aborta(módulo, op.posición.línea, "op:slt - La etiqueta no existe");
         }
         
         return null;
     }
 
-    aborta(módulo, op.línea, "slt [n1 (<id>|<literal>)] :<etiqueta>");
+    aborta(módulo, op.posición.línea, "slt [n1 (<id>|<literal>)] :<etiqueta>");
 
     return null;
 }
 
 Tipo op_phi(Operación op)
 {
-    aborta(módulo, op.línea, "No he implementado la operación Phi.");
+    aborta(módulo, op.posición.línea, "No he implementado la operación Phi.");
     return null;
 }
 
@@ -2162,7 +2162,7 @@ Tipo op_rsrva(Operación op)
 {
     if(op.dato != "rsrva")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'rsrva'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'rsrva'");
         return null;
     }
 
@@ -2173,7 +2173,7 @@ Tipo op_rsrva(Operación op)
         return t;
     }
 
-    aborta(módulo, op.línea, "rsrva <tipo>");
+    aborta(módulo, op.posición.línea, "rsrva <tipo>");
     
     return null;
 }
@@ -2182,7 +2182,7 @@ Tipo op_lee(Operación op)
 {
     if(op.dato != "lee")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'lee'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'lee'");
         return null;
     }
 
@@ -2202,7 +2202,7 @@ Tipo op_lee(Operación op)
         {
             if(!tid_local.lee_id((cast(Identificador)n).nombre).nombre)
             {
-                aborta(módulo, op.línea, "op:lee - El identificador no existe.");
+                aborta(módulo, op.posición.línea, "op:lee - El identificador no existe.");
                 return null;
             }
 
@@ -2210,7 +2210,7 @@ Tipo op_lee(Operación op)
         }
     }
 
-    aborta(módulo, op.línea, "lee <tipo>, <tipo> * ( <id>|<literal> )");
+    aborta(módulo, op.posición.línea, "lee <tipo>, <tipo> * ( <id>|<literal> )");
     return null;
 }
 
@@ -2218,7 +2218,7 @@ Tipo op_guarda(Operación op)
 {
     if(op.dato != "guarda")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'guarda'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'guarda'");
         return null;
     }
 
@@ -2242,7 +2242,7 @@ Tipo op_guarda(Operación op)
             {
                 if(!tid_local.lee_id((cast(Identificador)n2).nombre).nombre)
                 {
-                    aborta(módulo, op.línea, "op:guarda - El identificador no existe.");
+                    aborta(módulo, op.posición.línea, "op:guarda - El identificador no existe.");
                     return null;
                 }
 
@@ -2253,7 +2253,7 @@ Tipo op_guarda(Operación op)
         {
             if(!tid_local.lee_id((cast(Identificador)n1).nombre).nombre)
             {
-                aborta(módulo, op.línea, "op:guarda - El identificador no existe.");
+                aborta(módulo, op.posición.línea, "op:guarda - El identificador no existe.");
                 return null;
             }
 
@@ -2265,7 +2265,7 @@ Tipo op_guarda(Operación op)
             }
             else
             {
-                aborta(módulo, n1.línea, "No he podido obtener un tipo para el identificador '" ~ n1.dato ~ "'");
+                aborta(módulo, n1.posición.línea, "No he podido obtener un tipo para el identificador '" ~ n1.dato ~ "'");
             }
 
             Nodo nt1 = cast(Nodo)t1;
@@ -2273,7 +2273,7 @@ Tipo op_guarda(Operación op)
 
             if(!compara_árboles(&nt1, &nt2))
             {
-                aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+                aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
             }
 
             if(n2.categoría == Categoría.LITERAL)
@@ -2284,7 +2284,7 @@ Tipo op_guarda(Operación op)
             {
                 if(!tid_local.coge_id((cast(Identificador)n2).nombre).nombre)
                 {
-                    aborta(módulo, op.línea, "op:guarda - El identificador no existe.");
+                    aborta(módulo, op.posición.línea, "op:guarda - El identificador no existe.");
                     return null;
                 }
 
@@ -2293,7 +2293,7 @@ Tipo op_guarda(Operación op)
         }
     }
 
-    aborta(módulo, op.línea, "guarda <tipo> '(' <id>|<literal> ')', <tipo>* '(' <id>|<literal> ')'");
+    aborta(módulo, op.posición.línea, "guarda <tipo> '(' <id>|<literal> ')', <tipo>* '(' <id>|<literal> ')'");
     return null;
 }
 
@@ -2301,7 +2301,7 @@ Tipo op_leeval(Operación op)
 {
     if(op.dato != "leeval")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'leeval'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'leeval'");
         return null;
     }
 
@@ -2319,7 +2319,7 @@ Tipo op_leeval(Operación op)
         {
             if(!tip.vector && !tip.estructura)
             {
-                aborta(módulo, op.línea, "op:leeval trabaja con estructuras o vectores.");
+                aborta(módulo, op.posición.línea, "op:leeval trabaja con estructuras o vectores.");
                 return null;
             }
 
@@ -2335,24 +2335,24 @@ Tipo op_leeval(Operación op)
             }
             else
             {
-                aborta(módulo, var.línea, "No he podido obtener un tipo para el identificador '" ~ var.dato ~ "'");
+                aborta(módulo, var.posición.línea, "No he podido obtener un tipo para el identificador '" ~ var.dato ~ "'");
             }
 
             if(!tvar.vector && !tvar.estructura)
             {
-                aborta(módulo, op.línea, "op:leeval trabaja con estructuras o vectores.");
+                aborta(módulo, op.posición.línea, "op:leeval trabaja con estructuras o vectores.");
                 return null;
             }
 
             if(!compara_árboles(&ntip, &ntvar))
             {
-                aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+                aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
                 return null;
             }
         }
         else
         {
-            aborta(módulo, op.línea, "leeval <tipo-compuesto> <literal/identificador>, <índice>");
+            aborta(módulo, op.posición.línea, "leeval <tipo-compuesto> <literal/identificador>, <índice>");
             return null;
         }
 
@@ -2363,7 +2363,7 @@ Tipo op_leeval(Operación op)
                 índice = to!uint(idx.dato);
                 if(índice > to!uint(tvar.elementos))
                 {
-                    aborta(módulo, op.línea, "El vector no tiene " ~ to!dstring(índice) ~ " elementos.");
+                    aborta(módulo, op.posición.línea, "El vector no tiene " ~ to!dstring(índice) ~ " elementos.");
                 }
 
                 return cast(Tipo)(tvar.ramas[0]);
@@ -2377,19 +2377,19 @@ Tipo op_leeval(Operación op)
                 }
                 else
                 {
-                    aborta(módulo, idx.línea, "No he podido obtener un tipo para el identificador '" ~ idx.dato ~ "'");
+                    aborta(módulo, idx.posición.línea, "No he podido obtener un tipo para el identificador '" ~ idx.dato ~ "'");
                 }
 
                 if(!tipo_natural(tidx))
                 {
-                    aborta(módulo, op.línea, "El índice no es un Tipo Natural.");
+                    aborta(módulo, op.posición.línea, "El índice no es un Tipo Natural.");
                 }
 
                 return cast(Tipo)(tvar.ramas[0]);
             }
             else
             {
-                aborta(módulo, op.línea, "leeval <tipo-compuesto> <literal/identificador>, <índice>");
+                aborta(módulo, op.posición.línea, "leeval <tipo-compuesto> <literal/identificador>, <índice>");
                 return null;
             }
         }
@@ -2400,24 +2400,24 @@ Tipo op_leeval(Operación op)
                 índice = to!uint(idx.dato);
                 if(índice > to!uint(tvar.elementos))
                 {
-                    aborta(módulo, op.línea, "La estructura no tiene " ~ to!dstring(índice) ~ " elementos.");
+                    aborta(módulo, op.posición.línea, "La estructura no tiene " ~ to!dstring(índice) ~ " elementos.");
                 }
 
                 return cast(Tipo)(tvar.ramas[índice]);
             }
             else if(idx.categoría == Categoría.IDENTIFICADOR)
             {
-                aborta(módulo, op.línea, "Al evaluar estructuras, el índice debe conocerse en tiempo de compilación.");
+                aborta(módulo, op.posición.línea, "Al evaluar estructuras, el índice debe conocerse en tiempo de compilación.");
             }
             else
             {
-                aborta(módulo, op.línea, "leeval <tipo-compuesto> <literal/identificador>, <índice>");
+                aborta(módulo, op.posición.línea, "leeval <tipo-compuesto> <literal/identificador>, <índice>");
                 return null;
             }
         }
     }
 
-    aborta(módulo, op.línea, "leeval <tipo_vector> <literal>, <índice>");
+    aborta(módulo, op.posición.línea, "leeval <tipo_vector> <literal>, <índice>");
     return null;
 }
 
@@ -2425,7 +2425,7 @@ Tipo op_ponval(Operación op)
 {
     if(op.dato != "ponval")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'ponval'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'ponval'");
         return null;
     }
 
@@ -2462,18 +2462,18 @@ Tipo op_ponval(Operación op)
             }
             else
             {
-                aborta(módulo, var.línea, "No he podido obtener un tipo para el identificador '" ~ var.dato ~ "'");
+                aborta(módulo, var.posición.línea, "No he podido obtener un tipo para el identificador '" ~ var.dato ~ "'");
             }
 
             if(!compara_árboles(&ntip1, &ntvar))
             {
-                aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+                aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
                 return null;
             }
         }
         else
         {
-            aborta(módulo, op.línea, "ponval <tipo_vector> <literal_vector>, <tipo> <literal>, <índice>");
+            aborta(módulo, op.posición.línea, "ponval <tipo_vector> <literal_vector>, <tipo> <literal>, <índice>");
             return null;
         }
 
@@ -2492,18 +2492,18 @@ Tipo op_ponval(Operación op)
             }
             else
             {
-                aborta(módulo, var.línea, "No he podido obtener un tipo para el identificador '" ~ var.dato ~ "'");
+                aborta(módulo, var.posición.línea, "No he podido obtener un tipo para el identificador '" ~ var.dato ~ "'");
             }
 
             if(!compara_árboles(&ntip2, &ntval))
             {
-                aborta(módulo, op.línea, "El tipo declarado y el tipo del identificador no coinciden.");
+                aborta(módulo, op.posición.línea, "El tipo declarado y el tipo del identificador no coinciden.");
                 return null;
             }
         }
         else
         {
-            aborta(módulo, op.línea, "ponval <tipo_vector> <literal_vector>, <tipo> <literal>, <índice>");
+            aborta(módulo, op.posición.línea, "ponval <tipo_vector> <literal_vector>, <tipo> <literal>, <índice>");
             return null;
         }
 
@@ -2515,7 +2515,7 @@ Tipo op_ponval(Operación op)
 
             if(índice > to!uint(tip1.elementos))
             {
-                aborta(módulo, op.línea, "El índice es demasiado grande. Desbordará la memoria reservada.");
+                aborta(módulo, op.posición.línea, "El índice es demasiado grande. Desbordará la memoria reservada.");
             }
         }
 
@@ -2541,7 +2541,7 @@ Tipo op_ponval(Operación op)
             }
             else
             {
-                aborta(módulo, op.línea, "Al trabajar con estructuras, el índice debe ser conocido en tiempo de compilación.");
+                aborta(módulo, op.posición.línea, "Al trabajar con estructuras, el índice debe ser conocido en tiempo de compilación.");
                 return null;
             }
 
@@ -2549,7 +2549,7 @@ Tipo op_ponval(Operación op)
         }
         else
         {
-            aborta(módulo, op.línea, "el tipo debe ser un vector o una estructura.");
+            aborta(módulo, op.posición.línea, "el tipo debe ser un vector o una estructura.");
             return null;
         }
     }

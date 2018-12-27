@@ -29,7 +29,7 @@ private Módulo módulo()
 
     if(auto r = reservada("módulo"))
     {
-        o.línea = r.línea;
+        o.posición = r.posición;
         línea = true;
 
         if(auto n = nombre())
@@ -49,7 +49,7 @@ private Módulo módulo()
         {
             if(!línea)
             {
-                o.línea = d.línea;
+                o.posición = d.posición;
             }
 
             o.ramas ~= d;
@@ -59,7 +59,7 @@ private Módulo módulo()
         {
             if(!línea)
             {
-                o.línea = d.línea;
+                o.posición = d.posición;
             }
 
             o.ramas ~= d;
@@ -71,7 +71,7 @@ private Módulo módulo()
 
     if(!fda())
     {
-        aborta(nombre_módulo, símbolos[cursor].línea, "Esperaba llegar al final del"
+        aborta(nombre_módulo, símbolos[cursor].posición.línea, "Esperaba llegar al final del"
         ~ " archivo, pero me encuentro en [" ~ símbolos[cursor].símbolo ~ "]");
     }
 
@@ -135,7 +135,7 @@ private DefineFunción define_función()
     {
 
         auto df = new DefineFunción();
-        df.línea = n.línea;
+        df.posición = n.posición;
 
         if(Tipo r = tipo())
         {
@@ -193,7 +193,7 @@ private DeclaraFunción declara_función()
     if(auto n = reservada("declara"))
     {
         auto df = new DeclaraFunción();
-        df.línea = n.línea;
+        df.posición = n.posición;
 
         if(Tipo r = tipo())
         {
@@ -240,7 +240,7 @@ private Argumentos argumentos()
     auto a = new Argumentos();
     if(auto arg = argumento())
     {
-        a.línea = arg.línea;
+        a.posición = arg.posición;
         a.ramas ~= arg;
 
         while(notación(","))
@@ -277,7 +277,7 @@ private Argumento argumento()
         {
             a.tipo = t;
             a.nombre = i.nombre;
-            a.línea = t.línea;
+            a.posición = t.posición;
 
             return a;
         }
@@ -296,7 +296,7 @@ private Nodo bloque()
     if(auto n = notación("{"))
     {
         auto b = new Bloque();
-        b.línea = n.línea;
+        b.posición = n.posición;
 
         Nodo r;
         do {
@@ -365,7 +365,7 @@ private DeclaraIdentificadorGlobal declara_identificador_global()
     if(auto id = identificador())
     {
         e.nombre = id.nombre;
-        e.línea = id.línea;
+        e.posición = id.posición;
     }
     else
     {
@@ -419,7 +419,7 @@ private DefineIdentificadorGlobal define_identificador_global()
     if(auto id = identificador())
     {
         i.nombre = id.nombre;
-        i.línea = id.línea;
+        i.posición = id.posición;
     }
     else
     {
@@ -515,7 +515,7 @@ private Asignación asignación()
     if(Nodo r = operación())
     {
         r2 = r;
-        a.línea = r1.línea;
+        a.posición = r1.posición;
         a.ramas ~= r1;
         a.ramas ~= r2;
         return a;
@@ -523,7 +523,7 @@ private Asignación asignación()
     else if(Nodo f = llama_función())
     {
         r2 = f;
-        a.línea = r1.línea;
+        a.posición = r1.posición;
         a.ramas ~= r1;
         a.ramas ~= r2;
         return a;
@@ -621,7 +621,7 @@ private Operación operación()
             // Si llegamos hasta aquí, nos encontramos ante un lexema de
             // una operación que no hemos sabido identificar.
 
-            aborta(nombre_módulo, símbolos[cursor].línea, "operación() - No reconozco el op '" ~ símbolos[cursor].símbolo ~ "'");
+            aborta(nombre_módulo, símbolos[cursor].posición.línea, "operación() - No reconozco el op '" ~ símbolos[cursor].símbolo ~ "'");
         }
     }
 
@@ -643,7 +643,7 @@ private Operación op_aritmética()
             Operación o = new Operación();
 
             o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            o.posición = símbolos[cursor].posición;
 
             if( (o.dato != "sum")
              && (o.dato != "res")
@@ -662,7 +662,7 @@ private Operación op_aritmética()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_aritmética() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_aritmética() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Tipo'");
                 return null;
@@ -678,7 +678,7 @@ private Operación op_aritmética()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_aritmética() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_aritmética() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Identificador' o 'Literal'");
                 return null;
@@ -686,7 +686,7 @@ private Operación op_aritmética()
 
             if(!notación(","))
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_aritmética() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_aritmética() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba ','");
                 cursor = c;
@@ -703,7 +703,7 @@ private Operación op_aritmética()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_aritmética() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_aritmética() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Identificador' o 'Literal'");
                 return null;
@@ -735,7 +735,7 @@ private Operación op_conv()
             Operación o = new Operación();
 
             o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            o.posición = símbolos[cursor].posición;
 
             if(o.dato != "conv")
             {
@@ -750,7 +750,7 @@ private Operación op_conv()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_conv() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_conv() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Tipo'");
                 return null;
@@ -766,7 +766,7 @@ private Operación op_conv()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_conv() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_conv() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Identificador' o 'Literal'");
                 return null;
@@ -774,7 +774,7 @@ private Operación op_conv()
 
             if(!reservada("a"))
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_conv() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_conv() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'a'");
                 cursor = c;
@@ -789,7 +789,7 @@ private Operación op_conv()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_conv() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_conv() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Tipo'");
                 return null;
@@ -821,7 +821,7 @@ private Operación op_ret()
             Operación o = new Operación();
 
             o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            o.posición = símbolos[cursor].posición;
 
             if(o.dato != "ret")
             {
@@ -846,7 +846,7 @@ private Operación op_ret()
                 }
                 else // Error.
                 {
-                    aborta(nombre_módulo, símbolos[cursor].línea, "op_ret() - "
+                    aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_ret() - "
                     ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                     ~ "correcta. Esperaba 'Identificador' o 'Literal'");
                     return null;
@@ -884,7 +884,7 @@ private Operación op_cmp()
             Tipo t;
 
             o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            o.posición = símbolos[cursor].posición;
 
             // comprueba que el cod_op es 'cmp'
             if(o.dato != "cmp")
@@ -921,7 +921,7 @@ private Operación op_cmp()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_cmp() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_cmp() - "
                 ~ "La estructura de la operación 'cmp' no es correcta. "
                 ~ "Esperaba 'Comparación'");
                 return null;
@@ -934,7 +934,7 @@ private Operación op_cmp()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_cmp() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_cmp() - "
                 ~ "La estructura de la operación 'cmp' no es correcta. "
                 ~ "Esperaba 'Tipo'");
                 return null;
@@ -950,7 +950,7 @@ private Operación op_cmp()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_cmp() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_cmp() - "
                 ~ "La estructura de la operación 'cmp' no es correcta. "
                 ~ "Esperaba 'Literal' o 'Identificador'");
                 return null;
@@ -958,7 +958,7 @@ private Operación op_cmp()
 
             if(!notación(","))
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_cmp() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_cmp() - "
                 ~ "La estructura de la operación 'cmp' no es correcta. "
                 ~ "Esperaba ','");
                 
@@ -976,7 +976,7 @@ private Operación op_cmp()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_cmp() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_cmp() - "
                 ~ "La estructura de la operación 'cmp' no es correcta. "
                 ~ "Esperaba 'Literal' o 'Identificador'");
                 return null;
@@ -1007,7 +1007,7 @@ private Operación op_slt()
             Operación o = new Operación();
 
             o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            o.posición = símbolos[cursor].posición;
 
             // comprueba que el cod_op es 'slt'
             if(o.dato != "slt")
@@ -1040,7 +1040,7 @@ private Operación op_slt()
                 }
                 else // Error.
                 {
-                    aborta(nombre_módulo, símbolos[cursor].línea, "op_slt() - "
+                    aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_slt() - "
                     ~ "La estructura de la operación 'slt' no es correcta. "
                     ~ "Esperaba 'Literal' o 'Identificador'");
                     return null;
@@ -1048,7 +1048,7 @@ private Operación op_slt()
 
                 if(!notación(","))
                 {
-                    aborta(nombre_módulo, símbolos[cursor].línea, "op_slt() - "
+                    aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_slt() - "
                     ~ "La estructura de la operación 'slt' no es correcta. "
                     ~ "Esperaba ','");
                     
@@ -1068,7 +1068,7 @@ private Operación op_slt()
                 }
                 else // Error.
                 {
-                    aborta(nombre_módulo, símbolos[cursor].línea, "op_slt() - "
+                    aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_slt() - "
                     ~ "La estructura de la operación 'slt' no es correcta. "
                     ~ "Esperaba 'Etiqueta'");
                     return null;
@@ -1076,7 +1076,7 @@ private Operación op_slt()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_slt() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_slt() - "
                 ~ "La estructura de la operación 'slt' no es correcta. "
                 ~ "Esperaba 'Tipo'");
                 return null;
@@ -1102,7 +1102,7 @@ private Operación op_phi()
             Operación o = new Operación();
 
             o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            o.posición = símbolos[cursor].posición;
 
             if(o.dato != "phi")
             {
@@ -1117,7 +1117,7 @@ private Operación op_phi()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_phi() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_phi() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Tipo'");
                 return null;
@@ -1125,7 +1125,7 @@ private Operación op_phi()
 
             if(!notación("["))
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_phi() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_phi() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba ^[Literal, Etiqueta], o bien "
                 ~ "^[Identificador, Etiqueta]");
@@ -1142,7 +1142,7 @@ private Operación op_phi()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_phi() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_phi() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
                 return null;
@@ -1150,7 +1150,7 @@ private Operación op_phi()
 
             if(!notación(","))
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_phi() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_phi() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba [Literal^, Etiqueta], o bien "
                 ~ "[Identificador^, Etiqueta]");
@@ -1163,7 +1163,7 @@ private Operación op_phi()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_phi() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_phi() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Etiqueta'");
                 return null;
@@ -1171,7 +1171,7 @@ private Operación op_phi()
 
             if(!notación("]"))
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_phi() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_phi() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba ^[Literal, Etiqueta], o bien "
                 ~ "^[Identificador, Etiqueta]");
@@ -1187,7 +1187,7 @@ private Operación op_phi()
 
                 if(!notación("["))
                 {
-                    aborta(nombre_módulo, símbolos[cursor].línea, "op_phi() - "
+                    aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_phi() - "
                     ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                     ~ "correcta. Esperaba ^[Literal, Etiqueta], o bien "
                     ~ "^[Identificador, Etiqueta]");
@@ -1204,7 +1204,7 @@ private Operación op_phi()
                 }
                 else // Error.
                 {
-                    aborta(nombre_módulo, símbolos[cursor].línea, "op_phi() - "
+                    aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_phi() - "
                     ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                     ~ "correcta. Esperaba 'Identificador' o 'Literal'");
                     return null;
@@ -1212,7 +1212,7 @@ private Operación op_phi()
 
                 if(!notación(","))
                 {
-                    aborta(nombre_módulo, símbolos[cursor].línea, "op_phi() - "
+                    aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_phi() - "
                     ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                     ~ "correcta. Esperaba [Literal^, Etiqueta], o bien "
                     ~ "[Identificador^, Etiqueta]");
@@ -1225,7 +1225,7 @@ private Operación op_phi()
                 }
                 else // Error.
                 {
-                    aborta(nombre_módulo, símbolos[cursor].línea, "op_phi() - "
+                    aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_phi() - "
                     ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                     ~ "correcta. Esperaba 'Identificador' o 'Literal'");
                     return null;
@@ -1233,7 +1233,7 @@ private Operación op_phi()
 
                 if(!notación("]"))
                 {
-                    aborta(nombre_módulo, símbolos[cursor].línea, "op_phi() - "
+                    aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_phi() - "
                     ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                     ~ "correcta. Esperaba [Literal, Etiqueta^], o bien "
                     ~ "[Identificador, Etiqueta^]");
@@ -1268,7 +1268,7 @@ private Operación op_llama()
             Tipo t;
 
             o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            o.posición = símbolos[cursor].posición;
 
             if(o.dato != "llama")
             {
@@ -1283,9 +1283,9 @@ private Operación op_llama()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_llama() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_llama() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
-                ~ "correcta. Esperaba '@función()' [línea:" ~ to!dstring(o.línea)
+                ~ "correcta. Esperaba '@función()' [línea:" ~ to!dstring(o.posición.línea)
                 ~ "]");
                 return null;
             }
@@ -1297,7 +1297,7 @@ private Operación op_llama()
             }
             else
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_llama() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_llama() - "
                 ~ "Debería haber llegado al final de la operación '"
                 ~ o.dato ~ "', sin embargo, no he encontrado un ';'");
             }
@@ -1322,7 +1322,7 @@ private Operación op_rsrva()
             Operación o = new Operación();
 
             o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            o.posición = símbolos[cursor].posición;
 
             if(o.dato != "rsrva")
             {
@@ -1337,7 +1337,7 @@ private Operación op_rsrva()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_rsrva() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_rsrva() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Tipo'");
                 return null;
@@ -1369,7 +1369,7 @@ private Operación op_lee()
             Operación o = new Operación();
 
             o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            o.posición = símbolos[cursor].posición;
 
             if(o.dato != "lee")
             {
@@ -1384,7 +1384,7 @@ private Operación op_lee()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_lee() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_lee() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Tipo1'");
                 return null;
@@ -1392,7 +1392,7 @@ private Operación op_lee()
 
             if(!notación(",")) // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_lee() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_lee() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba ','");
                 return null;
@@ -1404,7 +1404,7 @@ private Operación op_lee()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_lee() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_lee() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Tipo2'");
                 return null;
@@ -1412,7 +1412,7 @@ private Operación op_lee()
 
             if(!notación("*")) // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_lee() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_lee() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba '*'");
                 return null;
@@ -1428,7 +1428,7 @@ private Operación op_lee()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_lee() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_lee() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
                 return null;
@@ -1459,7 +1459,7 @@ private Operación op_guarda()
             Operación o = new Operación();
 
             o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            o.posición = símbolos[cursor].posición;
 
             if(o.dato != "guarda")
             {
@@ -1474,7 +1474,7 @@ private Operación op_guarda()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_guarda() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_guarda() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Tipo1'");
                 return null;
@@ -1490,7 +1490,7 @@ private Operación op_guarda()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_guarda() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_guarda() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
                 return null;
@@ -1498,7 +1498,7 @@ private Operación op_guarda()
 
             if(!notación(",")) // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_guarda() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_guarda() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba ','");
                 return null;
@@ -1510,7 +1510,7 @@ private Operación op_guarda()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_guarda() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_guarda() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Tipo2'");
                 return null;
@@ -1518,7 +1518,7 @@ private Operación op_guarda()
 
             if(!notación("*")) // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_guarda() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_guarda() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba '*'");
                 return null;
@@ -1534,7 +1534,7 @@ private Operación op_guarda()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_guarda() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_guarda() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
                 return null;
@@ -1565,7 +1565,7 @@ private Operación op_leeval()
             Operación o = new Operación();
 
             o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            o.posición = símbolos[cursor].posición;
 
             if(o.dato != "leeval")
             {
@@ -1581,7 +1581,7 @@ private Operación op_leeval()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_leeval() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_leeval() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Tipo' conteniendo 'Vector' ó 'Estructura'");
                 return null;
@@ -1597,7 +1597,7 @@ private Operación op_leeval()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_leeval() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_leeval() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
                 return null;
@@ -1605,7 +1605,7 @@ private Operación op_leeval()
 
             if(!notación(",")) // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_leeval() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_leeval() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba ','");
                 return null;
@@ -1621,7 +1621,7 @@ private Operación op_leeval()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_leeval() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_leeval() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Indice'");
                 return null;
@@ -1652,7 +1652,7 @@ private Operación op_ponval()
             Operación o = new Operación();
 
             o.dato = símbolos[cursor].símbolo;
-            o.línea = símbolos[cursor].línea;
+            o.posición = símbolos[cursor].posición;
 
             if(o.dato != "ponval")
             {
@@ -1670,7 +1670,7 @@ private Operación op_ponval()
                 }
                 else
                 {
-                    aborta(nombre_módulo, símbolos[cursor].línea, "op_ponval() - "
+                    aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_ponval() - "
                     ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                     ~ "correcta. Esperaba 'Tipo' conteniendo 'Vector' ó 'Estructura'");
                     return null;
@@ -1678,7 +1678,7 @@ private Operación op_ponval()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_ponval() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_ponval() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Tipo' conteniendo 'Vector'");
                 return null;
@@ -1694,7 +1694,7 @@ private Operación op_ponval()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_ponval() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_ponval() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
                 return null;
@@ -1702,7 +1702,7 @@ private Operación op_ponval()
 
             if(!notación(",")) // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_ponval() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_ponval() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba ','");
                 return null;
@@ -1714,7 +1714,7 @@ private Operación op_ponval()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_ponval() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_ponval() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Tipo'");
                 return null;
@@ -1730,7 +1730,7 @@ private Operación op_ponval()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_ponval() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_ponval() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 1er 'Identificador' o 'Literal'");
                 return null;
@@ -1738,7 +1738,7 @@ private Operación op_ponval()
 
             if(!notación(",")) // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_ponval() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_ponval() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba ','");
                 return null;
@@ -1754,7 +1754,7 @@ private Operación op_ponval()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "op_ponval() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "op_ponval() - "
                 ~ "La estructura de la operación '" ~ o.dato ~ "' no es "
                 ~ "correcta. Esperaba 'Indice'");
                 return null;
@@ -1801,7 +1801,7 @@ private LlamaFunción llama_función()
         if(Identificador r = identificador())
         {
             f.nombre = r.nombre;
-            f.línea = r.línea;
+            f.posición = r.posición;
         }
         else
         {
@@ -1884,7 +1884,7 @@ private Identificador identificador()
         {
             Identificador id = new Identificador();
             id.nombre = símbolos[cursor].símbolo;
-            id.línea = símbolos[cursor].línea;
+            id.posición = símbolos[cursor].posición;
             
             cursor++;
             return id;
@@ -1906,7 +1906,7 @@ private Literal literal()
     {
         l.dato = n.dato;
         l.tipo.tipo = "número";
-        l.línea = n.línea;
+        l.posición = n.posición;
 
         return l;
     }
@@ -1919,7 +1919,7 @@ private Literal literal()
         }
 
         l.dato = to!dstring(dato);
-        l.línea = n.línea;
+        l.posición = n.posición;
 
         return l;
     }
@@ -1959,7 +1959,7 @@ private Nodo número()
         {
             n.categoría = Categoría.NÚMERO;
             n.dato ~= símbolos[cursor].símbolo;
-            n.línea = símbolos[cursor].línea;
+            n.posición = símbolos[cursor].posición;
 
             cursor++;
             return n;
@@ -1984,7 +1984,7 @@ private Nodo carácter()
         {
             n.categoría = Categoría.CARÁCTER;
             n.dato = símbolos[cursor].símbolo;
-            n.línea = símbolos[cursor].línea;
+            n.posición = símbolos[cursor].posición;
 
             cursor++;
             return n;
@@ -2067,7 +2067,7 @@ private Literal vector()
         }
         else // Error.
         {
-            aborta(nombre_módulo, símbolos[cursor].línea, "vector() - "
+            aborta(nombre_módulo, símbolos[cursor].posición.línea, "vector() - "
                 ~ "Literal de Vector: Esperaba 'Identificador' o 'Literal'");
             return null;
         }
@@ -2095,7 +2095,7 @@ private Literal vector()
             }
             else // Error.
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "vector() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "vector() - "
                 ~ "Literal de Vector: Esperaba 'Identificador' o 'Literal'");
                 return null;
             }
@@ -2103,7 +2103,7 @@ private Literal vector()
 
         if(!notación("]"))
         {
-            aborta(nombre_módulo, símbolos[cursor].línea, "vector() - "
+            aborta(nombre_módulo, símbolos[cursor].posición.línea, "vector() - "
                 ~ "Literal de Vector: Esperaba ']'");
             return null;
         }
@@ -2142,7 +2142,7 @@ private Literal estructura()
         }
         else
         {
-            aborta(nombre_módulo, símbolos[cursor].línea, "estructura() - "
+            aborta(nombre_módulo, símbolos[cursor].posición.línea, "estructura() - "
                 ~ "Esperaba 'Literal' ó 'Id': {dato}");
             cursor = c;
             return null;
@@ -2160,7 +2160,7 @@ private Literal estructura()
             }
             else
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "estructura() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "estructura() - "
                 ~ "Esperaba 'Literal' ó 'Id': {dato, ...}");
                 cursor = c;
                 return null;
@@ -2169,7 +2169,7 @@ private Literal estructura()
 
         if(!notación("}"))
         {
-            aborta(nombre_módulo, símbolos[cursor].línea, "estructura() - "
+            aborta(nombre_módulo, símbolos[cursor].posición.línea, "estructura() - "
                 ~ "Esperaba '}': {dato, ...}");
             cursor = c;
             return null;
@@ -2195,7 +2195,7 @@ private Tipo tipo()
             Tipo t = new Tipo();
             t.categoría = Categoría.TIPO;
             t.tipo = símbolos[cursor].símbolo;
-            t.línea = símbolos[cursor].línea;
+            t.posición = símbolos[cursor].posición;
             
             cursor++;
             return t;
@@ -2208,11 +2208,11 @@ private Tipo tipo()
             if(auto elementos = número())
             {
                 t.elementos = elementos.dato;
-                t.línea = elementos.línea;
+                t.posición = elementos.posición;
             }
             else
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "tipo() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "tipo() - "
                 ~ "Esperaba 'Número': [N x Tipo]");
                 cursor = c;
                 return null;
@@ -2220,7 +2220,7 @@ private Tipo tipo()
 
             if(reservada("x") is null)
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "tipo() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "tipo() - "
                 ~ "Esperaba 'x': [N x Tipo]");
                 cursor = c;
                 return null;
@@ -2232,7 +2232,7 @@ private Tipo tipo()
             }
             else
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "tipo() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "tipo() - "
                 ~ "Esperaba 'Tipo': [N x Tipo]");
                 cursor = c;
                 return null;
@@ -2240,7 +2240,7 @@ private Tipo tipo()
 
             if(!notación("]"))
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "tipo() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "tipo() - "
                 ~ "Esperaba ']': [N x Tipo]");
                 cursor = c;
                 return null;
@@ -2259,7 +2259,7 @@ private Tipo tipo()
             }
             else
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "tipo() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "tipo() - "
                 ~ "Esperaba 'Tipo': {Tipo}");
                 cursor = c;
                 return null;
@@ -2273,7 +2273,7 @@ private Tipo tipo()
                 }
                 else
                 {
-                    aborta(nombre_módulo, símbolos[cursor].línea, "tipo() - "
+                    aborta(nombre_módulo, símbolos[cursor].posición.línea, "tipo() - "
                 ~ "Esperaba 'Tipo': {Tipo}");
                     cursor = c;
                     return null;
@@ -2282,7 +2282,7 @@ private Tipo tipo()
 
             if(!notación("}"))
             {
-                aborta(nombre_módulo, símbolos[cursor].línea, "tipo() - "
+                aborta(nombre_módulo, símbolos[cursor].posición.línea, "tipo() - "
                 ~ "Esperaba '}': {Tipo}");
                 cursor = c;
                 return null;
@@ -2318,7 +2318,7 @@ private Nodo nombre()
 
         Nodo n = new Nodo();
         n.dato = símbolos[cursor].símbolo;
-        n.línea = símbolos[cursor].línea;
+        n.posición = símbolos[cursor].posición;
 
         cursor++;
         return n;
@@ -2354,7 +2354,7 @@ private Etiqueta etiqueta()
         }
 
         e.dato = txt;
-        e.línea = símbolos[cursor].línea;
+        e.posición = símbolos[cursor].posición;
         
         cursor++;
         return e;
@@ -2388,7 +2388,7 @@ private Reservada reservada(dstring txt)
 
         Reservada n = new Reservada();
         n.dato = txt;
-        n.línea = símbolos[cursor].línea;
+        n.posición = símbolos[cursor].posición;
 
         cursor++;
         return n;
@@ -2415,7 +2415,7 @@ private Nodo notación(dstring c)
     if((símbolos[cursor].categoría == lexema_e.NOTACIÓN) && (símbolos[cursor].símbolo == c))
     {
         Nodo n = new Nodo();
-        n.línea = símbolos[cursor].línea;
+        n.posición = símbolos[cursor].posición;
 
         cursor++;
         return n;

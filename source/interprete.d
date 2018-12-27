@@ -43,7 +43,7 @@ Literal analiza(Nodo n)
         }
         else
         {
-            aborta(módulo, retorno.línea, "El tipo de retorno no coincide con la declaración de inicio()");
+            aborta(módulo, retorno.posición.línea, "El tipo de retorno no coincide con la declaración de inicio()");
         }
     }
 
@@ -93,7 +93,7 @@ bool declFunc_retorno_correcto(dstring f, Nodo n)
         }
         else
         {
-            aborta(módulo, n.línea, "Me has dado algo diferente a 'null' o un literal");
+            aborta(módulo, n.posición.línea, "Me has dado algo diferente a 'null' o un literal");
         }
     }
 
@@ -105,7 +105,7 @@ bool declFunc_retorno_correcto(dstring f, Nodo n)
         }
         else
         {
-            aborta(módulo, n.línea, "No has declarado la función '" ~ f ~ "()'.");
+            aborta(módulo, n.posición.línea, "No has declarado la función '" ~ f ~ "()'.");
         }
     }
 
@@ -120,7 +120,7 @@ bool declFunc_retorno_correcto(dstring f, Nodo n)
         }
         else
         {
-            aborta(módulo, n.línea, "No has definido la función '" ~ f ~ "()'.");
+            aborta(módulo, n.posición.línea, "No has definido la función '" ~ f ~ "()'.");
         }
     }
 
@@ -168,12 +168,12 @@ void obtén_identificadores_globales(Nodo n)
                 // Debería tener colgando un hijo de clase 'Literal'
                 if(did.ramas.length != 1)
                 {
-                    aborta(módulo, n.línea, "El nodo DefineIdentificadorGlobal debería tener un hijo 'Literal'");
+                    aborta(módulo, n.posición.línea, "El nodo DefineIdentificadorGlobal debería tener un hijo 'Literal'");
                 }
 
                 if(did.ramas[0].categoría != Categoría.LITERAL)
                 {
-                    aborta(módulo, n.línea, "El nodo DefineIdentificadorGlobal debería tener un hijo 'Literal'");
+                    aborta(módulo, n.posición.línea, "El nodo DefineIdentificadorGlobal debería tener un hijo 'Literal'");
                 }
 
                 Literal lit = cast(Literal)(did.ramas[0]);
@@ -243,7 +243,7 @@ Bloque prepara_función(dstring fid, Literal[] args)
     ulong línea_actual = 0;
     if(args.length > 0)
     {
-        línea_actual = args[0].línea;
+        línea_actual = args[0].posición.línea;
     }
     
     if(tid_global.lee_id(fid).nombre is null)
@@ -278,7 +278,7 @@ Bloque prepara_función(dstring fid, Literal[] args)
     
     foreach(arg; args)
     {
-        arg.línea = def_func.línea;
+        arg.posición.línea = def_func.posición.línea;
     }
 
     define_argumentos(def_func, args);
@@ -411,7 +411,7 @@ Nodo interpreta(Bloque bloque)
         {
             if(resultado.categoría == Categoría.ETIQUETA)
             {
-                i = cast(int)(resultado.línea);
+                i = cast(int)(resultado.posición.línea);
             }
         }
     }
@@ -461,7 +461,7 @@ Nodo interpreta_nodo(Nodo n)
                 charlatán(" [id:");
                 charlatán(l.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(l.línea));
+                charlatán(to!dstring(l.posición.línea));
                 charlatánln("]");
                 return null;
                 //break;
@@ -482,7 +482,7 @@ Nodo interpreta_nodo(Nodo n)
 
                 if(lit is null)
                 {
-                    aborta(módulo, a.línea, "He obtenido un literal nulo");
+                    aborta(módulo, a.posición.línea, "He obtenido un literal nulo");
                 }
 
                 tid_local.define_identificador(id.nombre, a, lit);
@@ -506,7 +506,7 @@ Nodo interpreta_nodo(Nodo n)
                 charlatán("] [nombre:");
                 charlatán(did.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(did.línea));
+                charlatán(to!dstring(did.posición.línea));
                 charlatánln("]");
                 return null;
                 //break;
@@ -521,7 +521,7 @@ Nodo interpreta_nodo(Nodo n)
                 charlatán("] [nombre:");
                 charlatán(idex.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(idex.línea));
+                charlatán(to!dstring(idex.posición.línea));
                 charlatánln("]");
                 return null;
                 //break;
@@ -530,7 +530,7 @@ Nodo interpreta_nodo(Nodo n)
                 auto b = cast(Bloque)n;
                 charlatán(to!dstring(b.categoría));
                 charlatán(" [línea:");
-                charlatán(to!dstring(b.línea));
+                charlatán(to!dstring(b.posición.línea));
                 charlatánln("]");
                 return null;
                 //break;
@@ -539,7 +539,7 @@ Nodo interpreta_nodo(Nodo n)
                 auto a = cast(Argumentos)n;
                 charlatán(to!dstring(a.categoría));
                 charlatán(" [línea:");
-                charlatán(to!dstring(a.línea));
+                charlatán(to!dstring(a.posición.línea));
                 charlatánln("]");
                 return null;
                 //break;
@@ -552,7 +552,7 @@ Nodo interpreta_nodo(Nodo n)
                 charlatán("] [nombre:");
                 charlatán(a.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(a.línea));
+                charlatán(to!dstring(a.posición.línea));
                 charlatánln("]");
                 return null;
                 //break;
@@ -565,7 +565,7 @@ Nodo interpreta_nodo(Nodo n)
                 charlatán("] [nombre:");
                 charlatán(df.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(df.línea));
+                charlatán(to!dstring(df.posición.línea));
                 charlatánln("]");
                 return null;
                 //break;
@@ -578,7 +578,7 @@ Nodo interpreta_nodo(Nodo n)
                 charlatán("] [nombre:");
                 charlatán(df.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(df.línea));
+                charlatán(to!dstring(df.posición.línea));
                 charlatánln("]");
                 return null;
                 //break;
@@ -589,7 +589,7 @@ Nodo interpreta_nodo(Nodo n)
                 charlatán(" [nombre:");
                 charlatán(obj.nombre);
                 charlatán("] [línea:");
-                charlatán(to!dstring(obj.línea));
+                charlatán(to!dstring(obj.posición.línea));
                 charlatánln("]");
                 return null;
                 //break;
@@ -714,7 +714,7 @@ Literal op_ret(Operación op)
 
     if(op.dato != "ret")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'ret'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'ret'");
         return null;
     }
 
@@ -735,7 +735,7 @@ Literal op_ret(Operación op)
     }
     else
     {
-        aborta(módulo, op.línea, "Esperaba que 'ret' tuviera uno o ningún argumento");
+        aborta(módulo, op.posición.línea, "Esperaba que 'ret' tuviera uno o ningún argumento");
         return null;
     }
 }
@@ -744,13 +744,13 @@ Literal op_sum(Operación op)
 {
     if(op.dato != "sum")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'sum'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'sum'");
         return null;
     }
 
     if(op.ramas.length != 3)
     {
-        aborta(módulo, op.línea, "sum <tipo> <arg1>, <arg2>");
+        aborta(módulo, op.posición.línea, "sum <tipo> <arg1>, <arg2>");
         return null;
     }
 
@@ -776,7 +776,7 @@ Literal op_sum(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:sum - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:sum - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -785,7 +785,7 @@ Literal op_sum(Operación op)
 
             if((tamaño < 2) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:sum - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:sum - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -817,7 +817,7 @@ Literal op_sum(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:sum - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:sum - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -826,7 +826,7 @@ Literal op_sum(Operación op)
 
             if((tamaño < 1) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:sum - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:sum - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -858,7 +858,7 @@ Literal op_sum(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:sum - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:sum - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -867,7 +867,7 @@ Literal op_sum(Operación op)
 
             if((tamaño < 16) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:sum - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:sum - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -907,13 +907,13 @@ Literal op_res(Operación op)
 {
     if(op.dato != "res")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'res'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'res'");
         return null;
     }
 
     if(op.ramas.length != 3)
     {
-        aborta(módulo, op.línea, "res <tipo> <arg1>, <arg2>");
+        aborta(módulo, op.posición.línea, "res <tipo> <arg1>, <arg2>");
         return null;
     }
 
@@ -939,7 +939,7 @@ Literal op_res(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:res - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:res - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -948,7 +948,7 @@ Literal op_res(Operación op)
 
             if((tamaño < 2) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:res - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:res - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -980,7 +980,7 @@ Literal op_res(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:res - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:res - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -989,7 +989,7 @@ Literal op_res(Operación op)
 
             if((tamaño < 1) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:res - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:res - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -1021,7 +1021,7 @@ Literal op_res(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:res - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:res - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -1030,7 +1030,7 @@ Literal op_res(Operación op)
 
             if((tamaño < 16) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:res - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:res - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -1070,13 +1070,13 @@ Literal op_mul(Operación op)
 {
     if(op.dato != "mul")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'mul'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'mul'");
         return null;
     }
 
     if(op.ramas.length != 3)
     {
-        aborta(módulo, op.línea, "mul <tipo> <arg1>, <arg2>");
+        aborta(módulo, op.posición.línea, "mul <tipo> <arg1>, <arg2>");
         return null;
     }
 
@@ -1102,7 +1102,7 @@ Literal op_mul(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:mul - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:mul - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -1111,7 +1111,7 @@ Literal op_mul(Operación op)
 
             if((tamaño < 2) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:mul - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:mul - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -1143,7 +1143,7 @@ Literal op_mul(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:mul - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:mul - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -1152,7 +1152,7 @@ Literal op_mul(Operación op)
 
             if((tamaño < 1) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:mul - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:mul - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -1184,7 +1184,7 @@ Literal op_mul(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:mul - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:mul - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -1193,7 +1193,7 @@ Literal op_mul(Operación op)
 
             if((tamaño < 16) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:mul - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:mul - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -1233,13 +1233,13 @@ Literal op_div(Operación op)
 {
     if(op.dato != "div")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'div'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'div'");
         return null;
     }
 
     if(op.ramas.length != 3)
     {
-        aborta(módulo, op.línea, "div <tipo> <arg1>, <arg2>");
+        aborta(módulo, op.posición.línea, "div <tipo> <arg1>, <arg2>");
         return null;
     }
 
@@ -1265,7 +1265,7 @@ Literal op_div(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:div - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:div - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -1274,7 +1274,7 @@ Literal op_div(Operación op)
 
             if((tamaño < 2) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:div - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:div - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -1286,7 +1286,7 @@ Literal op_div(Operación op)
 
             if(e1 == 0)
             {
-                aborta(módulo, op.línea, "op:div - división por 0");
+                aborta(módulo, op.posición.línea, "op:div - división por 0");
             }
 
             resultado = e0 / e1;
@@ -1311,7 +1311,7 @@ Literal op_div(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:div - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:div - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -1320,7 +1320,7 @@ Literal op_div(Operación op)
 
             if((tamaño < 1) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:div - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:div - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -1332,7 +1332,7 @@ Literal op_div(Operación op)
 
             if(n1 == 0)
             {
-                aborta(módulo, op.línea, "op:div - división por 0");
+                aborta(módulo, op.posición.línea, "op:div - división por 0");
             }
 
             resultado = n0 / n1;
@@ -1357,7 +1357,7 @@ Literal op_div(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:div - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:div - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -1366,7 +1366,7 @@ Literal op_div(Operación op)
 
             if((tamaño < 16) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:div - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:div - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -1406,13 +1406,13 @@ Literal op_llama(Operación op)
 {
     if(op.dato != "llama")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'llama'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'llama'");
         return null;
     }
 
     if(op.ramas.length != 1)
     {
-        aborta(módulo, op.línea, "Esperaba que la operación 'llama' se acompañara de una función");
+        aborta(módulo, op.posición.línea, "Esperaba que la operación 'llama' se acompañara de una función");
         return null;
     }
 
@@ -1478,7 +1478,7 @@ Literal op_llama(Operación op)
 
     if(!declFunc_retorno_correcto(f.nombre, n))
     {
-        aborta(módulo, op.línea, "op:llama - El tipo de retorno no coincide con la declaración de "
+        aborta(módulo, op.posición.línea, "op:llama - El tipo de retorno no coincide con la declaración de "
                  ~ f.nombre ~ "()");
     }
 
@@ -1497,13 +1497,13 @@ Literal op_cmp(Operación op)
 {
     if(op.dato != "cmp")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'cmp'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'cmp'");
         return null;
     }
 
     if(op.ramas.length != 4)
     {
-        aborta(módulo, op.línea, "cmp <comparación> <tipo> (<literal>|<id>), (<literal>|<id>)");
+        aborta(módulo, op.posición.línea, "cmp <comparación> <tipo> (<literal>|<id>), (<literal>|<id>)");
         return null;
     }
 
@@ -1521,7 +1521,7 @@ Literal op_cmp(Operación op)
     {}
     else
     {
-        aborta(módulo, op.línea, "op:cmp - El comando de comparación es incorrecto");
+        aborta(módulo, op.posición.línea, "op:cmp - El comando de comparación es incorrecto");
     }
 
     Nodo n;
@@ -1539,7 +1539,7 @@ Literal op_cmp(Operación op)
 
     if((lit0 is null) || (lit1 is null))
     {
-        aborta(módulo, op.línea, "op:cmp - Los argumentos son incorrectos");
+        aborta(módulo, op.posición.línea, "op:cmp - Los argumentos son incorrectos");
     }
     
     semantico.imprime_árbol(lit0);
@@ -1552,7 +1552,7 @@ Literal op_cmp(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:cmp - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:cmp - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -1561,7 +1561,7 @@ Literal op_cmp(Operación op)
 
             if((tamaño < 2) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:cmp - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:cmp - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -1623,7 +1623,7 @@ Literal op_cmp(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:cmp - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:cmp - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -1632,7 +1632,7 @@ Literal op_cmp(Operación op)
 
             if((tamaño < 1) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:cmp - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:cmp - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -1694,7 +1694,7 @@ Literal op_cmp(Operación op)
             {
                 if(!esdígito(t.tipo[i]))
                 {
-                    aborta(módulo, op.línea, "op:cmp - Formato incorrecto del 'tipo'");
+                    aborta(módulo, op.posición.línea, "op:cmp - Formato incorrecto del 'tipo'");
                     return null;
                 }
             }
@@ -1703,7 +1703,7 @@ Literal op_cmp(Operación op)
 
             if((tamaño < 16) || (tamaño > 64))
             {
-                aborta(módulo, op.línea, "op:cmp - El tamaño del tipo se sale del rango");
+                aborta(módulo, op.posición.línea, "op:cmp - El tamaño del tipo se sale del rango");
                 return null;
             }
 
@@ -1760,7 +1760,7 @@ Literal op_cmp(Operación op)
             break;
         
         default:
-            aborta(módulo, op.línea, "op:cmp - no reconozco ningún tipo");
+            aborta(módulo, op.posición.línea, "op:cmp - no reconozco ningún tipo");
             break;
     }
 
@@ -1829,7 +1829,7 @@ Literal op_conv(Operación op)
                         }
                         else
                         {
-                            aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                            aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                             ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
                         }
                         
@@ -1840,7 +1840,7 @@ Literal op_conv(Operación op)
 
                         if(tamaño_destino < 1)
                         {
-                            aborta(módulo, op.línea, "op:conv - El tamaño del tipo de destino es erróneo");
+                            aborta(módulo, op.posición.línea, "op:conv - El tamaño del tipo de destino es erróneo");
                         }
                         else if(tamaño_destino == 64)
                         {
@@ -1853,7 +1853,7 @@ Literal op_conv(Operación op)
 
                         if(to!uint64_t(origen.dato) > valmaxnat)
                         {
-                            aborta(módulo, op.línea, "op:conv - Has desbordado el tipo de dato. El valor "
+                            aborta(módulo, op.posición.línea, "op:conv - Has desbordado el tipo de dato. El valor "
                             ~ "máximo del tipo destino es " ~
                             to!dstring(valmaxnat));
                         }
@@ -1876,7 +1876,7 @@ Literal op_conv(Operación op)
                             }
                             else
                             {
-                                aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                                aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                                 ~ " pedido " ~ destino.tipo[1..$] ~ " bits");
                             }
                         }
@@ -1908,7 +1908,7 @@ Literal op_conv(Operación op)
                         }
                         else
                         {
-                            aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                            aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                             ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
                         }
                         
@@ -1934,7 +1934,7 @@ Literal op_conv(Operación op)
                         if(  (to!int64_t(origen.dato) > valmaxent)
                           || (to!int64_t(origen.dato) < valminent))
                         {
-                            aborta(módulo, op.línea, "op:conv - Has desbordado el tipo de dato. El valor "
+                            aborta(módulo, op.posición.línea, "op:conv - Has desbordado el tipo de dato. El valor "
                             ~ "máximo del tipo destino es '+"
                             ~ to!dstring(valmaxent) ~ "', y el valor mínimo es '-("
                             ~ to!dstring(valmaxent) ~ "+1)'");
@@ -1961,7 +1961,7 @@ Literal op_conv(Operación op)
                     // El tamaño no está en el rango
                     else
                     {
-                        aborta(módulo, op.línea, "op:conv - el rango de tamaño del tipo es 2-64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el rango de tamaño del tipo es 2-64 bits, y has"
                         ~ " pedido " ~ destino.tipo[1..$] ~ " bits");
                     }
                     break;
@@ -1986,14 +1986,14 @@ Literal op_conv(Operación op)
                     }
                     else
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                         ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
                     }
                     
                     break;
 
                 default:
-                    aborta(módulo, op.línea, "op:conv - tipo desconocido");
+                    aborta(módulo, op.posición.línea, "op:conv - tipo desconocido");
                     break;
             }
 
@@ -2009,7 +2009,7 @@ Literal op_conv(Operación op)
                     
                     if(to!int64_t(origen.dato) < 0)
                     {
-                        aborta(módulo, op.línea, "op:conv - Intentas convertir en 'natural' un entero negativo");
+                        aborta(módulo, op.posición.línea, "op:conv - Intentas convertir en 'natural' un entero negativo");
                     }
 
                     // Hay espacio suficiente
@@ -2032,7 +2032,7 @@ Literal op_conv(Operación op)
                         }
                         else
                         {
-                            aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                            aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                             ~ " pedido " ~ destino.tipo[1..$] ~ " bits");
                         }
                     }
@@ -2043,7 +2043,7 @@ Literal op_conv(Operación op)
 
                         if(tamaño_destino < 1)
                         {
-                            aborta(módulo, op.línea, "op:conv - El tamaño del tipo de destino es erróneo");
+                            aborta(módulo, op.posición.línea, "op:conv - El tamaño del tipo de destino es erróneo");
                         }
                         else if(tamaño_destino == 64)
                         {
@@ -2056,7 +2056,7 @@ Literal op_conv(Operación op)
 
                         if(to!uint64_t(origen.dato) > valmaxnat)
                         {
-                            aborta(módulo, op.línea, "op:conv - Has desbordado el tipo de dato. El valor "
+                            aborta(módulo, op.posición.línea, "op:conv - Has desbordado el tipo de dato. El valor "
                             ~ "máximo del tipo destino es " ~
                             to!dstring(valmaxnat));
                         }
@@ -2079,7 +2079,7 @@ Literal op_conv(Operación op)
                             }
                             else
                             {
-                                aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                                aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                                 ~ " pedido " ~ destino.tipo[1..$] ~ " bits");
                             }
                         }
@@ -2110,7 +2110,7 @@ Literal op_conv(Operación op)
                         }
                         else
                         {
-                            aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                            aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                             ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
                         }
                         
@@ -2134,18 +2134,18 @@ Literal op_conv(Operación op)
                         }
                         else
                         {
-                            aborta(módulo, op.línea, "op:conv - El tamaño del tipo de destino se sale del rango");
+                            aborta(módulo, op.posición.línea, "op:conv - El tamaño del tipo de destino se sale del rango");
                         }
 
                         if( to!int64_t(origen.dato) > valmaxent )
                         {
-                            aborta(módulo, op.línea, "op:conv - Has desbordado el tipo de dato. El valor "
+                            aborta(módulo, op.posición.línea, "op:conv - Has desbordado el tipo de dato. El valor "
                             ~ "máximo del tipo destino es '+"
                             ~ to!dstring(valmaxent) ~ "'");
                         }
                         else if( to!int64_t(origen.dato) < valminent )
                         {
-                            aborta(módulo, op.línea, "op:conv - Has desbordado el tipo de dato. El valor "
+                            aborta(módulo, op.posición.línea, "op:conv - Has desbordado el tipo de dato. El valor "
                             ~ "mínimo es '-(" ~ to!dstring(valmaxent) ~ "+1)'");
                         }
                         // el valor es menor que el valor máximo para el tipo
@@ -2172,7 +2172,7 @@ Literal op_conv(Operación op)
                     // El tamaño no está en el rango
                     else
                     {
-                        aborta(módulo, op.línea, "op:conv - el rango de tamaño del tipo es 2-64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el rango de tamaño del tipo es 2-64 bits, y has"
                         ~ " pedido " ~ destino.tipo[1..$] ~ " bits");
                     }
                     break;
@@ -2197,14 +2197,14 @@ Literal op_conv(Operación op)
                     }
                     else
                     {
-                        aborta(módulo, op.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
+                        aborta(módulo, op.posición.línea, "op:conv - el tamaño del tipo máximo es 64 bits, y has"
                         ~ " pedido " ~ destino.tipo[1..$] ~ "bits");
                     }
 
                     break;
 
                 default:
-                    aborta(módulo, op.línea, "op:conv - tipo desconocido");
+                    aborta(módulo, op.posición.línea, "op:conv - tipo desconocido");
                     break;
             }
             
@@ -2222,7 +2222,7 @@ Literal op_conv(Operación op)
 
                     if(tamaño_destino < 1)
                     {
-                        aborta(módulo, op.línea, "op:conv - El tamaño del tipo de destino es erróneo");
+                        aborta(módulo, op.posición.línea, "op:conv - El tamaño del tipo de destino es erróneo");
                     }
                     else if(tamaño_destino == 64)
                     {
@@ -2234,12 +2234,12 @@ Literal op_conv(Operación op)
                     }
                     else
                     {
-                        aborta(módulo, op.línea, "op:conv - El tipo se sale de rango");
+                        aborta(módulo, op.posición.línea, "op:conv - El tipo se sale de rango");
                     }
 
                     if(to!double(origen.dato) > to!double(valmaxnat))
                     {
-                        aborta(módulo, op.línea, "op:conv - El 'real' se sale del rango del 'natural'");
+                        aborta(módulo, op.posición.línea, "op:conv - El 'real' se sale del rango del 'natural'");
                     }
                     else
                     {
@@ -2257,7 +2257,7 @@ Literal op_conv(Operación op)
 
                     if(tamaño_destino < 2)
                     {
-                        aborta(módulo, op.línea, "op:conv - El tamaño del tipo de destino es erróneo");
+                        aborta(módulo, op.posición.línea, "op:conv - El tamaño del tipo de destino es erróneo");
                     }
                     else if(tamaño_destino == 64)
                     {
@@ -2271,7 +2271,7 @@ Literal op_conv(Operación op)
                     }
                     else
                     {
-                        aborta(módulo, op.línea, "op:conv - El tipo se sale de rango");
+                        aborta(módulo, op.posición.línea, "op:conv - El tipo se sale de rango");
                     }
 
                     if( (to!double(origen.dato) > to!double(valmaxent))
@@ -2281,7 +2281,7 @@ Literal op_conv(Operación op)
                         charlatánln(origen.dato);
                         charlatánln(to!dstring(valmaxent));
                         charlatánln(to!dstring(valminent));
-                        aborta(módulo, op.línea, "op:conv - El 'real' se sale del rango del 'entero'");
+                        aborta(módulo, op.posición.línea, "op:conv - El 'real' se sale del rango del 'entero'");
                     }
                     else
                     {
@@ -2300,14 +2300,14 @@ Literal op_conv(Operación op)
                     break;
 
                 default:
-                    aborta(módulo, op.línea, "op:conv - tipo desconocido");
+                    aborta(módulo, op.posición.línea, "op:conv - tipo desconocido");
                     break;
             }
             
             break;
 
         default:
-            aborta(módulo, op.línea, "op:conv - tipo desconocido");
+            aborta(módulo, op.posición.línea, "op:conv - tipo desconocido");
             break;
     }
 
@@ -2332,7 +2332,7 @@ Etiqueta op_slt(Operación op)
 {
     if(op.dato != "slt")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'slt'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'slt'");
         return null;
     }
 
@@ -2348,7 +2348,7 @@ Etiqueta op_slt(Operación op)
 
             Literal l = cast(Literal)(tid_local.lee_id(etiqueta.dato).valor);
             int contador = to!int(l.dato);
-            etiqueta.línea = contador;
+            etiqueta.posición.línea = contador;
 
             infoln("op: slt " ~ nombre ~ to!dstring(contador));
 
@@ -2356,7 +2356,7 @@ Etiqueta op_slt(Operación op)
         }
         else
         {
-            aborta(módulo, op.línea, "op:slt - La etiqueta no existe");
+            aborta(módulo, op.posición.línea, "op:slt - La etiqueta no existe");
         }
     }
     // Salto condicional
@@ -2368,12 +2368,12 @@ Etiqueta op_slt(Operación op)
 
         if(t is null)
         {
-            aborta(módulo, op.línea, "op:slt - Tipo 'null'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
+            aborta(módulo, op.posición.línea, "op:slt - Tipo 'null'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
             return null;
         }
         else if(t.tipo != "n1")
         {
-            aborta(módulo, op.línea, "op:slt - Tipo incorrecto. Esperaba 'n1'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
+            aborta(módulo, op.posición.línea, "op:slt - Tipo incorrecto. Esperaba 'n1'.\nslt [n1 (<id>|<literal>)] :<etiqueta>");
             return null;
         }
         
@@ -2392,7 +2392,7 @@ Etiqueta op_slt(Operación op)
 
                 Literal l = cast(Literal)(tid_local.lee_id(etiqueta.dato).valor);
                 int contador = to!int(l.dato);
-                etiqueta.línea = contador;
+                etiqueta.posición.línea = contador;
 
                 infoln("op: slt [n1:1] " ~ nombre ~ "["
                      ~ to!dstring(contador) ~ "]");
@@ -2401,7 +2401,7 @@ Etiqueta op_slt(Operación op)
             }
             else
             {
-                aborta(módulo, op.línea, "op:slt - La etiqueta no existe");
+                aborta(módulo, op.posición.línea, "op:slt - La etiqueta no existe");
             }
         }
         else
@@ -2411,7 +2411,7 @@ Etiqueta op_slt(Operación op)
         }
     }
 
-    aborta(módulo, op.línea, "slt [n1 (<id>|<literal>)] :<etiqueta>");
+    aborta(módulo, op.posición.línea, "slt [n1 (<id>|<literal>)] :<etiqueta>");
     return null;
 }
 
@@ -2428,19 +2428,19 @@ Literal op_phi(Operación op)
     }
     else
     {
-        aborta(módulo, op.línea, "op:phi - No ha llegado a declararse ninguna etiqueta");
+        aborta(módulo, op.posición.línea, "op:phi - No ha llegado a declararse ninguna etiqueta");
     }
 
     if(op.dato != "phi")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'phi'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'phi'");
         return null;
     }
 
     t = cast(Tipo)(op.ramas[0]);
     if(t is null)
     {
-        aborta(módulo, op.línea, "op:phi - Esperaba Tipo.\nphi <tipo> '[' <id>|<literal>, :<etiqueta> ']',... ");
+        aborta(módulo, op.posición.línea, "op:phi - Esperaba Tipo.\nphi <tipo> '[' <id>|<literal>, :<etiqueta> ']',... ");
     }
 
     if((op.ramas.length > 2) && ((op.ramas.length % 2) == 1))
@@ -2451,7 +2451,7 @@ Literal op_phi(Operación op)
             Nodo n = op.ramas[i];
             if(n.categoría != Categoría.ETIQUETA)
             {
-                aborta(módulo, op.línea, "op:phi - Esperaba una etiqueta");
+                aborta(módulo, op.posición.línea, "op:phi - Esperaba una etiqueta");
             }
             else
             {
@@ -2465,16 +2465,16 @@ Literal op_phi(Operación op)
                     return lit;
                 }
 
-                aborta(módulo, op.línea, "op:phi - Esperaba Etiqueta.\nphi <tipo> '[' <id>|<literal>, :<etiqueta> ']',... ");
+                aborta(módulo, op.posición.línea, "op:phi - Esperaba Etiqueta.\nphi <tipo> '[' <id>|<literal>, :<etiqueta> ']',... ");
                 return null;
             }
         }
 
-        aborta(módulo, op.línea, "op:phi - La última etiqueta no se ha declarado en 'phi'");
+        aborta(módulo, op.posición.línea, "op:phi - La última etiqueta no se ha declarado en 'phi'");
         return null;
     }
     
-    aborta(módulo, op.línea, "op:phi - Esperaba que 'phi' tuviera un número impar de argumentos, y al menos 3");
+    aborta(módulo, op.posición.línea, "op:phi - Esperaba que 'phi' tuviera un número impar de argumentos, y al menos 3");
     return null;
 }
 
@@ -2482,7 +2482,7 @@ Literal op_rsrva(Operación op)
 {
     if(op.dato != "rsrva")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'rsrva'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'rsrva'");
         return null;
     }
 
@@ -2500,7 +2500,7 @@ Literal op_rsrva(Operación op)
         return l;
     }
 
-    aborta(módulo, op.línea, "rsrva <tipo>");
+    aborta(módulo, op.posición.línea, "rsrva <tipo>");
     
     return null;
 }
@@ -2509,7 +2509,7 @@ Literal op_lee(Operación op)
 {
     if(op.dato != "lee")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'lee'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'lee'");
         return null;
     }
 
@@ -2529,7 +2529,7 @@ Literal op_lee(Operación op)
         return *l;
     }
 
-    aborta(módulo, op.línea, "lee <tipo>, <tipo> * ( <id>|<literal> )");
+    aborta(módulo, op.posición.línea, "lee <tipo>, <tipo> * ( <id>|<literal> )");
     return null;
 }
 
@@ -2537,7 +2537,7 @@ Literal op_guarda(Operación op)
 {
     if(op.dato != "guarda")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'guarda'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'guarda'");
         return null;
     }
 
@@ -2560,7 +2560,7 @@ Literal op_guarda(Operación op)
         return null;
     }
 
-    aborta(módulo, op.línea, "guarda <tipo> '(' <id>|<literal> ')', <tipo>* '(' <id>|<literal> ')'");
+    aborta(módulo, op.posición.línea, "guarda <tipo> '(' <id>|<literal> ')', <tipo>* '(' <id>|<literal> ')'");
     return null;
 }
 
@@ -2568,7 +2568,7 @@ Literal op_leeval(Operación op)
 {
     if(op.dato != "leeval")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'leeval'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'leeval'");
         return null;
     }
 
@@ -2582,7 +2582,7 @@ Literal op_leeval(Operación op)
         {
             if(!lit0.vector)
             {
-                aborta(módulo, op.línea, "op:leeval - Indicas a la operación 'leeval' que debe trabajar con" ~
+                aborta(módulo, op.posición.línea, "op:leeval - Indicas a la operación 'leeval' que debe trabajar con" ~
                         " un vector, pero como argumento no proporcionas uno");
                 return null;
             }
@@ -2602,7 +2602,7 @@ Literal op_leeval(Operación op)
         {
             if(!lit0.estructura)
             {
-                aborta(módulo, op.línea, "op:leeval - Indicas a la operación 'leeval' que debe trabajar con " ~
+                aborta(módulo, op.posición.línea, "op:leeval - Indicas a la operación 'leeval' que debe trabajar con " ~
                         "una estructura, pero como argumento no proporcionas una");
                 return null;
             }
@@ -2619,7 +2619,7 @@ Literal op_leeval(Operación op)
         }
     }
 
-    aborta(módulo, op.línea, "leeval <tipo_vector> <literal>, <índice>");
+    aborta(módulo, op.posición.línea, "leeval <tipo_vector> <literal>, <índice>");
     return null;
 }
 
@@ -2627,7 +2627,7 @@ Literal op_ponval(Operación op)
 {
     if(op.dato != "ponval")
     {
-        aborta(módulo, op.línea, "Esperaba que el código de la operación fuera 'ponval'");
+        aborta(módulo, op.posición.línea, "Esperaba que el código de la operación fuera 'ponval'");
         return null;
     }
 
@@ -2643,7 +2643,7 @@ Literal op_ponval(Operación op)
         {
             if(!lit1.vector)
             {
-                aborta(módulo, op.línea, "op:ponval - Indicas a la operación 'ponval' que debe trabajar con" ~
+                aborta(módulo, op.posición.línea, "op:ponval - Indicas a la operación 'ponval' que debe trabajar con" ~
                         " un vector, pero como argumento no proporcionas uno");
                 return null;
             }
@@ -2666,7 +2666,7 @@ Literal op_ponval(Operación op)
         {
             if(!lit1.estructura)
             {
-                aborta(módulo, op.línea, "op:ponval - Indicas a la operación 'ponval' que debe trabajar con" ~
+                aborta(módulo, op.posición.línea, "op:ponval - Indicas a la operación 'ponval' que debe trabajar con" ~
                         " una estructura, pero como argumento no proporcionas una");
                 return null;
             }
@@ -2686,6 +2686,6 @@ Literal op_ponval(Operación op)
         }
     }
 
-    aborta(módulo, op.línea, "ponval <tipo_vector> <literal_vector>, <tipo> <literal>, <índice>");
+    aborta(módulo, op.posición.línea, "ponval <tipo_vector> <literal_vector>, <tipo> <literal>, <índice>");
     return null;
 }

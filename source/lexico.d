@@ -12,6 +12,7 @@ public dstring código  = "";
 private lexema[] análisis;
 
 public uint cursor = 0;
+private uint inicio_línea = 0;
 private uint64_t línea  = 1;
 
 
@@ -112,7 +113,9 @@ public lexema[] analiza(dstring cód)
 
     lexema fda;
     fda.categoría = lexema_e.FDA;
-    fda.línea = línea;
+    fda.posición.línea = línea;
+    fda.posición.columna = cursor - inicio_línea;
+    fda.posición.desplazamiento = cursor;
 
     análisis ~= fda;
 
@@ -129,6 +132,7 @@ private bool nuevalínea()
         resultado = true;
         cursor++;
         línea++;
+        inicio_línea = 0;
     }
     else
     {
@@ -157,18 +161,13 @@ private bool espacio()
         } while(esespacio(código[cursor]));
     }
 
-    if(resultado)
-    {
-        //emiteln("ESPACIO");
-    }
-
     return resultado;
 }
 
 private bool comentario1L()
 {
     bool resultado = false;
-    if(mismocarácter(código[cursor],'/'))
+    if(mismocarácter(código[cursor], '/'))
     {
         const uint c = cursor;
         cursor++;
@@ -276,7 +275,9 @@ private bool notación()
         lexema l;
         l.categoría = lexema_e.NOTACIÓN;
         l.símbolo  ~= código[cursor];
-        l.línea     = línea;
+        l.posición.línea = línea;
+        l.posición.columna = cursor - inicio_línea;
+        l.posición.desplazamiento = cursor;
 
         análisis ~= l;
 
@@ -326,7 +327,9 @@ private bool reservada()
             lexema l;
             l.categoría = lexema_e.RESERVADA;
             l.símbolo = s;
-            l.línea = línea;
+            l.posición.línea = línea;
+            l.posición.columna = cursor - inicio_línea;
+            l.posición.desplazamiento = cursor;
 
             análisis ~= l;
         }
@@ -352,7 +355,9 @@ private bool etiqueta()
             lexema l;
             l.categoría = lexema_e.ETIQUETA;
             l.símbolo = código[c..cursor];
-            l.línea = línea;
+            l.posición.línea = línea;
+            l.posición.columna = cursor - inicio_línea;
+            l.posición.desplazamiento = cursor;
 
             análisis ~= l;
             return true;
@@ -369,7 +374,9 @@ private bool etiqueta()
             lexema l;
             l.categoría = lexema_e.ETIQUETA;
             l.símbolo = código[c..cursor];
-            l.línea = línea;
+            l.posición.línea = línea;
+            l.posición.columna = cursor - inicio_línea;
+            l.posición.desplazamiento = cursor;
 
             análisis ~= l;
             return true;
@@ -397,17 +404,6 @@ private bool _nombre()
             }
             cursor++;
         } while(esalfanum(código[cursor]));
-    }
-
-    if(resultado)
-    {
-        /*
-        dstring s = código[c..cursor];
-
-        write("NOMBRE [ ");
-        write(s);
-        writeln(" ]");
-        */
     }
 
     return resultado;
@@ -505,7 +501,9 @@ private bool _notacióncientífica()
         lexema l;
         l.categoría = lexema_e.NÚMERO;
         l.símbolo   = s;
-        l.línea     = línea;
+        l.posición.línea = línea;
+        l.posición.columna = cursor - inicio_línea;
+        l.posición.desplazamiento = cursor;
 
         análisis ~= l;
 
@@ -580,7 +578,9 @@ private bool _númerodecimales()
         lexema l;
         l.categoría = lexema_e.NÚMERO;
         l.símbolo   = s;
-        l.línea     = línea;
+        l.posición.línea = línea;
+        l.posición.columna = cursor - inicio_línea;
+        l.posición.desplazamiento = cursor;
 
         análisis ~= l;
     }
@@ -620,7 +620,9 @@ private bool _número()
         lexema l;
         l.categoría = lexema_e.NÚMERO;
         l.símbolo   = s;
-        l.línea     = línea;
+        l.posición.línea = línea;
+        l.posición.columna = cursor - inicio_línea;
+        l.posición.desplazamiento = cursor;
 
         análisis ~= l;
     }
@@ -679,7 +681,9 @@ private bool texto()
 
         l.categoría = lexema_e.TEXTO;
         l.símbolo   = texto;
-        l.línea     = línea;
+        l.posición.línea = línea;
+        l.posición.columna = cursor - inicio_línea;
+        l.posición.desplazamiento = cursor;
 
         if(!mismocarácter(código[cursor],'\"'))
         {
@@ -751,7 +755,9 @@ private bool carácter()
 
         l.categoría = lexema_e.CARÁCTER;
         l.símbolo   = car;
-        l.línea     = línea;
+        l.posición.línea = línea;
+        l.posición.columna = cursor - inicio_línea;
+        l.posición.desplazamiento = cursor;
 
         if(!mismocarácter(código[cursor],'\''))
         {
@@ -794,7 +800,9 @@ private bool tipo()
             lexema l;
             l.categoría = lexema_e.TIPO;
             l.símbolo   = s;
-            l.línea     = línea;
+            l.posición.línea = línea;
+            l.posición.columna = cursor - inicio_línea;
+            l.posición.desplazamiento = cursor;
 
             análisis ~= l;
         }
@@ -814,7 +822,9 @@ private bool tipo()
             lexema l;
             l.categoría = lexema_e.TIPO;
             l.símbolo   = s;
-            l.línea     = línea;
+            l.posición.línea = línea;
+            l.posición.columna = cursor - inicio_línea;
+            l.posición.desplazamiento = cursor;
 
             análisis ~= l;
 
@@ -854,7 +864,9 @@ private bool _idglobal()
         lexema l;
         l.categoría = lexema_e.IDENTIFICADOR;
         l.símbolo = s;
-        l.línea = línea;
+        l.posición.línea = línea;
+        l.posición.columna = cursor - inicio_línea;
+        l.posición.desplazamiento = cursor;
 
         análisis ~= l;
 
@@ -885,7 +897,9 @@ private bool _idlocal()
         lexema l;
         l.categoría = lexema_e.IDENTIFICADOR;
         l.símbolo = s;
-        l.línea = línea;
+        l.posición.línea = línea;
+        l.posición.columna = cursor - inicio_línea;
+        l.posición.desplazamiento = cursor;
 
         análisis ~= l;
 
@@ -925,7 +939,9 @@ private bool _registro()
             lexema l;
             l.categoría = lexema_e.IDENTIFICADOR;
             l.símbolo = s;
-            l.línea = línea;
+            l.posición.línea = línea;
+            l.posición.columna = cursor - inicio_línea;
+            l.posición.desplazamiento = cursor;
             análisis ~= l;
 
             return true;
@@ -970,7 +986,9 @@ private bool operación()
             lexema l;
             l.categoría = lexema_e.OPERACIÓN;
             l.símbolo = s;
-            l.línea = línea;
+            l.posición.línea = línea;
+            l.posición.columna = cursor - inicio_línea;
+            l.posición.desplazamiento = cursor;
 
             análisis ~= l;
         }
@@ -1008,7 +1026,9 @@ private bool nombre()
         lexema l;
         l.categoría = lexema_e.NOMBRE;
         l.símbolo = s;
-        l.línea = línea;
+        l.posición.línea = línea;
+        l.posición.columna = cursor - inicio_línea;
+        l.posición.desplazamiento = cursor;
 
         análisis ~= l;
     }

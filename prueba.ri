@@ -3,7 +3,8 @@ módulo prueba;
 declara nada @#poncar(n32 %carácter);
 
 @texto_de_prueba = "PRUEBA - texto de prueba: CORRECTO.\n";
-@lol = n8 28;
+
+@hola = n32 288;
 
 define e32 @inicio(r32 %pi)
 {
@@ -11,7 +12,6 @@ define e32 @inicio(r32 %pi)
 
     ret e32 0;
 }
-
 
 define nada @escribe([0 x n32] %txt)
 {

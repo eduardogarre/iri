@@ -45,7 +45,7 @@ class Nodo
     Categoría categoría;
     dstring     dato = "";
     Nodo[]      ramas;
-    uint64_t    línea;
+    posición3d  posición;
     dstring     etiqueta;
 
     this()
@@ -108,7 +108,7 @@ class Literal : Nodo
         l.vector = this.vector;
         l.estructura = this.estructura;
         l.ramas = this.ramas.dup();
-        l.línea = this.línea;
+        l.posición = this.posición;
         l.etiqueta = this.etiqueta;
 
         return l;
@@ -254,7 +254,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
         // Comprobaciones de la categoría base, "Nodo"
         if(n.categoría != m.categoría)
         {
-            aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+            aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
              ~ "Nodo1.categoría y Nodo2.categoría no coinciden:\n["
              ~ to!dstring(n.categoría) ~ "] vs ["
              ~ to!dstring(m.categoría) ~ "]");
@@ -263,7 +263,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
         }
         else if(n.dato != m.dato)
         {
-            aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+            aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
              ~ "Nodo1.dato y Nodo2.dato no coinciden:\n["
              ~ to!dstring(n.dato) ~ "] vs ["
              ~ to!dstring(m.dato) ~ "]");
@@ -272,7 +272,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
         }
         else if(n.ramas.length != m.ramas.length)
         {
-            aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+            aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
              ~ "Nodo1.ramas.length y Nodo2.ramas.length no coinciden:\n["
              ~ to!dstring(n.ramas.length) ~ "] vs ["
              ~ to!dstring(m.ramas.length) ~ "]");
@@ -294,7 +294,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 // t.vector, .estructura, .tipo, .elementos
                 if(t1.vector != t2.vector)
                 {
-                    aborta(módulo, t1.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, t1.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "Tipo.vector y Tipo.vector no coinciden:\n["
                     ~ to!dstring(t1.vector) ~ "] vs ["
                     ~ to!dstring(t2.vector) ~ "]");
@@ -303,7 +303,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(t1.estructura != t2.estructura)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "Tipo.estructura y Tipo.estructura no coinciden:\n["
                     ~ to!dstring(t1.estructura) ~ "] vs ["
                     ~ to!dstring(t2.estructura) ~ "]");
@@ -312,7 +312,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(t1.tipo != t2.tipo)
                 {
-                    aborta(módulo, n.línea, "Estos 2 tipos no coinciden: ["
+                    aborta(módulo, n.posición.línea, "Estos 2 tipos no coinciden: ["
                     ~ to!dstring(t1.tipo) ~ "] vs ["
                     ~ to!dstring(t2.tipo) ~ "]");
 
@@ -320,7 +320,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(t1.elementos != t2.elementos)
                 {
-                    avisa(módulo, n.línea, "Estos 2 tipos tienen tamaños distintos: ["
+                    avisa(módulo, n.posición.línea, "Estos 2 tipos tienen tamaños distintos: ["
                     ~ to!dstring(t1.elementos) ~ "] vs ["
                     ~ to!dstring(t2.elementos) ~ "]");
 
@@ -339,7 +339,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 // l.vector, .estructura, .tipo
                 if(l1.vector != l2.vector)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "Literal.vector y Literal.vector no coinciden:\n["
                     ~ to!dstring(l1.vector) ~ "] vs ["
                     ~ to!dstring(l2.vector) ~ "]");
@@ -348,7 +348,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(l1.estructura != l2.estructura)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "Literal.estructura y Literal.estructura no coinciden:\n["
                     ~ to!dstring(l1.estructura) ~ "] vs ["
                     ~ to!dstring(l2.estructura) ~ "]");
@@ -357,7 +357,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(!compara_árboles(cast(Nodo *)(&(l1.tipo)), cast(Nodo *)(&(l2.tipo))))
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "Literal.tipo y Literal.tipo no coinciden:\n["
                     ~ to!dstring(l1.tipo) ~ "] vs ["
                     ~ to!dstring(l2.tipo) ~ "]");
@@ -373,7 +373,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 // i.nombre
                 if(i1.nombre != i2.nombre)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "Identificador.nombre y Identificador.nombre no coinciden:\n["
                     ~ to!dstring(i1.nombre) ~ "] vs ["
                     ~ to!dstring(i1.nombre) ~ "]");
@@ -389,7 +389,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 // l.nombre, .retorno
                 if(l1.nombre != l2.nombre)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "LlamaFunción.nombre y LlamaFunción.nombre no coinciden:\n["
                     ~ to!dstring(l1.nombre) ~ "] vs ["
                     ~ to!dstring(l2.nombre) ~ "]");
@@ -398,7 +398,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(!compara_árboles(cast(Nodo *)(&(l1.retorno)), cast(Nodo *)(&(l2.retorno))))
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "LlamaFunción.tipo y LlamaFunción.tipo no coinciden:\n["
                     ~ to!dstring(l1.retorno) ~ "] vs ["
                     ~ to!dstring(l2.retorno) ~ "]");
@@ -422,7 +422,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 // d.ámbito, .nombre, .tipo
                 if(did1.ámbito != did2.ámbito)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "DefineIdentificadorGlobal.ámbito y DefineIdentificadorGlobal.ámbito no coinciden:\n["
                     ~ to!dstring(did1.ámbito) ~ "] vs ["
                     ~ to!dstring(did2.ámbito) ~ "]");
@@ -431,7 +431,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(did1.nombre != did2.nombre)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "DefineIdentificadorGlobal.nombre y DefineIdentificadorGlobal.nombre no coinciden:\n["
                     ~ to!dstring(did1.nombre) ~ "] vs ["
                     ~ to!dstring(did2.nombre) ~ "]");
@@ -440,7 +440,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(did1.tipo != did2.tipo)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "DefineIdentificadorGlobal.tipo y DefineIdentificadorGlobal.tipo no coinciden:\n["
                     ~ to!dstring(did1.tipo) ~ "] vs ["
                     ~ to!dstring(did2.tipo) ~ "]");
@@ -456,7 +456,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 // d.ámbito, .nombre, .tipo
                 if(idex1.ámbito != idex2.ámbito)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "DeclaraIdentificadorGlobal.ámbito y DeclaraIdentificadorGlobal.ámbito no coinciden:\n["
                     ~ to!dstring(idex1.ámbito) ~ "] vs ["
                     ~ to!dstring(idex2.ámbito) ~ "]");
@@ -465,7 +465,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(idex1.nombre != idex2.nombre)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "DeclaraIdentificadorGlobal.nombre y DeclaraIdentificadorGlobal.nombre no coinciden:\n["
                     ~ to!dstring(idex1.nombre) ~ "] vs ["
                     ~ to!dstring(idex2.nombre) ~ "]");
@@ -474,7 +474,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(idex1.tipo != idex2.tipo)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "DeclaraIdentificadorGlobal.tipo y DeclaraIdentificadorGlobal.tipo no coinciden:\n["
                     ~ to!dstring(idex1.tipo) ~ "] vs ["
                     ~ to!dstring(idex2.tipo) ~ "]");
@@ -498,7 +498,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 // a.nombre, .tipo
                 if(a1.nombre != a2.nombre)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "Argumento1.nombre y Argumento2.nombre no coinciden:\n["
                     ~ to!dstring(a1.nombre) ~ "] vs ["
                     ~ to!dstring(a2.nombre) ~ "]");
@@ -514,7 +514,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                     imprime_árbol(a2);
                     CHARLATÁN = ch;
 
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "Argumento1.tipo y Argumento2.tipo no coinciden:\n["
                     ~ to!dstring(a1.tipo) ~ "] vs ["
                     ~ to!dstring(a2.tipo) ~ "]");
@@ -530,7 +530,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 // df.nombre, .retorno
                 if(df1.nombre != df2.nombre)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "DefineFunción1.nombre y DefineFunción2.nombre no coinciden:\n["
                     ~ to!dstring(df1.nombre) ~ "] vs ["
                     ~ to!dstring(df2.nombre) ~ "]");
@@ -539,7 +539,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(!compara_árboles(cast(Nodo *)(&(df1.retorno)), cast(Nodo *)(&(df2.retorno))))
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "DefineFunción1.retorno y DefineFunción2.retorno no coinciden:\n["
                     ~ to!dstring(df1.retorno) ~ "] vs ["
                     ~ to!dstring(df2.retorno) ~ "]");
@@ -555,7 +555,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 // df.nombre, .retorno
                 if(df1.nombre != df2.nombre)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "DeclaraFunción1.nombre y DeclaraFunción2.nombre no coinciden:\n["
                     ~ to!dstring(df1.nombre) ~ "] vs ["
                     ~ to!dstring(df2.nombre) ~ "]");
@@ -564,7 +564,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 }
                 else if(!compara_árboles(cast(Nodo *)(&(df1.retorno)), cast(Nodo *)(&(df2.retorno))))
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "DeclaraFunción1.nombre y DeclaraFunción2.nombre no coinciden:\n["
                     ~ to!dstring(df1.retorno) ~ "] vs ["
                     ~ to!dstring(df2.retorno) ~ "]");
@@ -580,7 +580,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 // obj.nombre
                 if(obj1.nombre != obj2.nombre)
                 {
-                    aborta(módulo, n.línea, "compara_nodos(Nodo1, Nodo2): \n"
+                    aborta(módulo, n.posición.línea, "compara_nodos(Nodo1, Nodo2): \n"
                     ~ "Módulo1.nombre y Módulo2.nombre no coinciden:\n["
                     ~ to!dstring(obj1.nombre) ~ "] vs ["
                     ~ to!dstring(obj2.nombre) ~ "]");
@@ -590,7 +590,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
                 break;
 
             default:
-                aborta(módulo, n.línea, "Error al comparar los árboles de nodos: no existen reglas para este nodo");
+                aborta(módulo, n.posición.línea, "Error al comparar los árboles de nodos: no existen reglas para este nodo");
                 return false;
                 //break;
         }

@@ -17,11 +17,18 @@ bool AVISO = true;
 
 dstring archivo;
 
+struct posición3d
+{
+    uint64_t    línea;
+    uint64_t    columna;
+    uint64_t    desplazamiento;
+}
+
 struct lexema
 {
     lexema_e    categoría;
     dstring     símbolo;
-    uint64_t    línea;
+    posición3d  posición;
 }
 
 enum lexema_e
@@ -159,15 +166,15 @@ class TablaIdentificadores
                 
                 if(eid.declarado && eid.declaración !is null)
                 {
-                    línea = eid.declaración.línea;
+                    línea = eid.declaración.posición.línea;
                 }
                 else if(eid.definido && eid.definición !is null)
                 {
-                    línea = eid.definición.línea;
+                    línea = eid.definición.posición.línea;
                 }
                 else if(eid.nombre[0] == ':')
                 {
-                    línea = eid.valor.línea;
+                    línea = eid.valor.posición.línea;
                 }
                 avisa(módulo, línea, "No has usado el identificador '" ~ eid.nombre ~ "'");
             }
@@ -184,7 +191,7 @@ class TablaIdentificadores
             }
             else
             {
-                aborta("Apoyo.d", declaración.línea, "Me has pasado un identificador nulo");
+                aborta("Apoyo.d", declaración.posición.línea, "Me has pasado un identificador nulo");
             }
             
             return false;
@@ -205,7 +212,7 @@ class TablaIdentificadores
 
             if(eid.declarado)
             {
-                aborta("Apoyo.d", declaración.línea, "El identidicador ya se había declarado.");
+                aborta("Apoyo.d", declaración.posición.línea, "El identidicador ya se había declarado.");
             }
         }
 
@@ -251,7 +258,7 @@ class TablaIdentificadores
             }
             else
             {
-                aborta("Apoyo.d", definición.línea, "Me has pasado un identificador nulo");
+                aborta("Apoyo.d", definición.posición.línea, "Me has pasado un identificador nulo");
             }
             
             return false;
