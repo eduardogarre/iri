@@ -50,14 +50,14 @@ class Nodo
 
     this()
     {
-
+        posición = new posición3d();
     }
 }
 
 class Etiqueta : Nodo
 {
     uint64_t línea;
-    
+
     this()
     {
         super();
@@ -600,8 +600,7 @@ bool compara_nodos(Nodo* n, Nodo* m)
         return true;
     }
 
-    posición3d pos;
-    avisa(módulo, pos, "Alguno de los nodos es nulo, no puedo realizar una comparación de árboles");
+    avisa(módulo, null, "Alguno de los nodos es nulo, no puedo realizar una comparación de árboles");
 
     return false;
 }

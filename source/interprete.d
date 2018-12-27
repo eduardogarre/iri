@@ -39,8 +39,7 @@ Literal analiza(Nodo n)
     {
         if(retorno is null)
         {
-            posición3d pos;
-            aborta(módulo, pos, "El tipo de retorno no coincide con la declaración de inicio()");
+            aborta(módulo, null, "El tipo de retorno no coincide con la declaración de inicio()");
         }
         else
         {
@@ -90,8 +89,7 @@ bool declFunc_retorno_correcto(dstring f, Nodo n)
         // Error:
         if(n is null)
         {
-            posición3d pos;
-            aborta(módulo, pos, "Me has dado algo diferente a 'null' o un literal");
+            aborta(módulo, null, "Me has dado algo diferente a 'null' o un literal");
         }
         else
         {
@@ -103,8 +101,7 @@ bool declFunc_retorno_correcto(dstring f, Nodo n)
     {
         if(n is null)
         {
-            posición3d pos;
-            aborta(módulo, pos, "No has declarado la función '" ~ f ~ "()'.");
+            aborta(módulo, null, "No has declarado la función '" ~ f ~ "()'.");
         }
         else
         {
@@ -119,8 +116,7 @@ bool declFunc_retorno_correcto(dstring f, Nodo n)
     {
         if(n is null)
         {
-            posición3d pos;
-            aborta(módulo, pos, "No has definido la función '" ~ f ~ "()'.");
+            aborta(módulo, null, "No has definido la función '" ~ f ~ "()'.");
         }
         else
         {
@@ -248,6 +244,10 @@ Bloque prepara_función(dstring fid, Literal[] args)
     if(args.length > 0)
     {
         pos = args[0].posición;
+    }
+    else
+    {
+        pos = null;
     }
     
     if(tid_global.lee_id(fid).nombre is null)

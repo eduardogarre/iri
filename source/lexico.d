@@ -111,7 +111,7 @@ public lexema[] analiza(dstring cód)
         break;
     }
 
-    lexema fda;
+    lexema fda = new lexema();
     fda.categoría = lexema_e.FDA;
     fda.posición.línea = línea;
     fda.posición.columna = cursor - inicio_línea;
@@ -272,7 +272,7 @@ private bool notación()
         )
     {
 
-        lexema l;
+        lexema l = new lexema();
         l.categoría = lexema_e.NOTACIÓN;
         l.símbolo  ~= código[cursor];
         l.posición.línea = línea;
@@ -324,7 +324,7 @@ private bool reservada()
         {
             resultado = true;
             
-            lexema l;
+            lexema l = new lexema();
             l.categoría = lexema_e.RESERVADA;
             l.símbolo = s;
             l.posición.línea = línea;
@@ -352,7 +352,7 @@ private bool etiqueta()
         {
             cursor++;
             
-            lexema l;
+            lexema l = new lexema();
             l.categoría = lexema_e.ETIQUETA;
             l.símbolo = código[c..cursor];
             l.posición.línea = línea;
@@ -371,7 +371,7 @@ private bool etiqueta()
         cursor++;
         if(_nombre())
         {
-            lexema l;
+            lexema l = new lexema();
             l.categoría = lexema_e.ETIQUETA;
             l.símbolo = código[c..cursor];
             l.posición.línea = línea;
@@ -498,7 +498,7 @@ private bool _notacióncientífica()
 
         //double n = to!double(s);
 
-        lexema l;
+        lexema l = new lexema();
         l.categoría = lexema_e.NÚMERO;
         l.símbolo   = s;
         l.posición.línea = línea;
@@ -575,7 +575,7 @@ private bool _númerodecimales()
 
         //double n = to!double(s);
 
-        lexema l;
+        lexema l = new lexema();
         l.categoría = lexema_e.NÚMERO;
         l.símbolo   = s;
         l.posición.línea = línea;
@@ -617,7 +617,7 @@ private bool _número()
 
         //int n = to!int(s);
 
-        lexema l;
+        lexema l = new lexema();
         l.categoría = lexema_e.NÚMERO;
         l.símbolo   = s;
         l.posición.línea = línea;
@@ -639,7 +639,7 @@ private bool texto()
 
         dstring texto;
 
-        lexema l;
+        lexema l = new lexema();
 
         while((!mismocarácter(código[cursor],'\"')) && (cursor < código.length-1))
         {
@@ -712,7 +712,7 @@ private bool carácter()
 
         dstring car;
 
-        lexema l;
+        lexema l = new lexema();
 
         if(mismocarácter(código[cursor],'\\'))
         {
@@ -743,7 +743,7 @@ private bool carácter()
             }
             else
             {
-                posición3d pos;
+                posición3d pos = new posición3d();
                 pos.línea = línea;
                 pos.columna = cursor - inicio_línea;
                 pos.desplazamiento = cursor;
@@ -801,7 +801,7 @@ private bool tipo()
         {
             resultado = true;
             
-            lexema l;
+            lexema l = new lexema();
             l.categoría = lexema_e.TIPO;
             l.símbolo   = s;
             l.posición.línea = línea;
@@ -823,7 +823,7 @@ private bool tipo()
 
             resultado = true;
             
-            lexema l;
+            lexema l = new lexema();
             l.categoría = lexema_e.TIPO;
             l.símbolo   = s;
             l.posición.línea = línea;
@@ -865,7 +865,7 @@ private bool _idglobal()
     {
         dstring s = código[c .. cursor];
         
-        lexema l;
+        lexema l = new lexema();
         l.categoría = lexema_e.IDENTIFICADOR;
         l.símbolo = s;
         l.posición.línea = línea;
@@ -898,7 +898,7 @@ private bool _idlocal()
     {
         dstring s = código[c .. cursor];
         
-        lexema l;
+        lexema l = new lexema();
         l.categoría = lexema_e.IDENTIFICADOR;
         l.símbolo = s;
         l.posición.línea = línea;
@@ -940,7 +940,7 @@ private bool _registro()
 
             //int n = to!int(código[c+1 .. cursor]);
             
-            lexema l;
+            lexema l = new lexema();
             l.categoría = lexema_e.IDENTIFICADOR;
             l.símbolo = s;
             l.posición.línea = línea;
@@ -987,7 +987,7 @@ private bool operación()
         {
             resultado = true;
             
-            lexema l;
+            lexema l = new lexema();
             l.categoría = lexema_e.OPERACIÓN;
             l.símbolo = s;
             l.posición.línea = línea;
@@ -1027,7 +1027,7 @@ private bool nombre()
     {
         dstring s = código[c..cursor];
             
-        lexema l;
+        lexema l = new lexema();
         l.categoría = lexema_e.NOMBRE;
         l.símbolo = s;
         l.posición.línea = línea;

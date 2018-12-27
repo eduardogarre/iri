@@ -526,8 +526,7 @@ void comprueba_tipo_literal(ref Tipo t, ref Literal l)
     {
         if(l is null)
         {
-            posición3d pos;
-            aborta(módulo, pos, "El tipo y el literal son nulos");
+            aborta(módulo, null, "El tipo y el literal son nulos");
         }
         else
         {
@@ -804,8 +803,7 @@ void paso_comprueba_funciones()
     if(inicio == EntradaTablaIdentificadores(null, false, null, false, null, null))
     {
         // No existe una función @inicio()
-        posición3d pos;
-        avisa(módulo, pos, "No has definido una función '@inicio()'");
+        avisa(módulo, null, "No has definido una función '@inicio()'");
     }
 }
 
@@ -975,8 +973,7 @@ Nodo coge_identificador(Nodo n)
 {
     if(n is null)
     {
-        posición3d pos;
-        aborta(módulo, pos, "Has pasado como argumento un Nodo nulo");
+        aborta(módulo, null, "Has pasado como argumento un Nodo nulo");
     }
 
     if(n.categoría == Categoría.IDENTIFICADOR)
@@ -1029,8 +1026,7 @@ Nodo lee_identificador(Nodo n)
 {
     if(n is null)
     {
-        posición3d pos;
-        aborta(módulo, pos, "Has pasado como argumento un Nodo nulo");
+        aborta(módulo, null, "Has pasado como argumento un Nodo nulo");
     }
 
     if(n.categoría == Categoría.IDENTIFICADOR)

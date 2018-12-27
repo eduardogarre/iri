@@ -17,18 +17,23 @@ bool AVISO = true;
 
 dstring archivo;
 
-struct posición3d
+class posición3d
 {
     uint64_t    línea;
     uint64_t    columna;
     uint64_t    desplazamiento;
 }
 
-struct lexema
+class lexema
 {
     lexema_e    categoría;
     dstring     símbolo;
     posición3d  posición;
+
+    this()
+    {
+        posición = new posición3d();
+    }
 }
 
 enum lexema_e
@@ -154,8 +159,7 @@ class TablaIdentificadores
         {
             if(eid.nombre is null)
             {
-                posición3d pos;
-                aborta(módulo, pos, "eid.nombre es nulo");
+                aborta(módulo, null, "eid.nombre es nulo");
             }
             else if(eid.nombre == ":")
             {
@@ -163,7 +167,7 @@ class TablaIdentificadores
             }
             else if(!eid.usado)
             {
-                posición3d pos;
+                posición3d pos = null;
                 
                 if(eid.declarado && eid.declaración !is null)
                 {
@@ -188,8 +192,7 @@ class TablaIdentificadores
         {
             if(declaración is null)
             {
-                posición3d pos;
-                aborta("Apoyo.d", pos, "Me has pasado un identificador nulo");
+                aborta("Apoyo.d", null, "Me has pasado un identificador nulo");
             }
             else
             {
@@ -256,8 +259,7 @@ class TablaIdentificadores
         {
             if(definición is null)
             {
-                posición3d pos;
-                aborta("Apoyo.d", pos, "Me has pasado un identificador nulo");
+                aborta("Apoyo.d", null, "Me has pasado un identificador nulo");
             }
             else
             {
@@ -352,7 +354,7 @@ void charlatán(dstring txt)
 
 void error(dstring módulo, posición3d posición, dstring s)
 {
-    if(posición.línea == 0)
+    if(posición is null)
     {
         stdout.writeln("ERROR [" ~ archivo ~ "] ", s, ". [MODULO: ", módulo, "]");
     }
@@ -367,7 +369,7 @@ void avisa(dstring módulo, posición3d posición, dstring s)
 {
     if(AVISO)
     {
-        if(posición.línea == 0)
+        if(posición is null)
         {
             stdout.writeln("AVISO [" ~ archivo ~ "] ", s, ". [MODULO: ", módulo, "]");
         }
