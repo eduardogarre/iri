@@ -435,7 +435,7 @@ void paso_comprueba_concordancia_declaraciones_y_definiciones()
             Nodo def = eid.definición;
 
             switch(def.categoría)
-        {
+            {
             case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
                 auto defid = cast(DefineIdentificadorGlobal)def;
                 

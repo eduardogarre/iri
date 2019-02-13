@@ -473,3 +473,33 @@ bool esalfanum(dchar c)
 
     return s || a || p || alm || ma || me;
 }
+
+void vuelca_tid(ref TablaIdentificadores tid)
+{
+    // recorre los id's globales
+    foreach(ref EntradaTablaIdentificadores eid; tid.tabla)
+    {
+        // en cada iteración, eid contiene una entrada con un id global
+
+        // Muestra sólo los id's declarados
+        if(eid.declarado)
+        {
+            Nodo dec = eid.declaración;
+
+            // Muestra la declaración
+            muestra_árbol(dec);
+        }
+
+        // Muestra sólo los id's definidos
+        if(eid.definido)
+        {
+            Nodo def = eid.definición;
+            Nodo val = eid.valor;
+
+            // Muestra la definición
+            muestra_árbol(def);
+            // Muestra el valor
+            muestra_árbol(val);
+        }
+    }
+}

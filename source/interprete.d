@@ -130,30 +130,6 @@ bool declFunc_retorno_correcto(dstring f, Nodo n)
     return def_func.retorno.tipo == tipo;
 }
 
-void obtén_etiquetas(Nodo n)
-{
-    if(n)
-    {
-        tid_local.define_identificador(":", null, null);
-
-        for(int i = 0; i < n.ramas.length; i++)
-        {
-            if(n.ramas[i].etiqueta.length > 0)
-            {
-                auto lit = new Literal();
-                lit.dato = to!dstring(i-1);
-                lit.tipo = new Tipo();
-                lit.tipo.tipo = "nada";
-
-                if(tid_local.define_identificador(n.ramas[i].etiqueta, null, lit))
-                {
-                    charlatánln("ETIQUETA: " ~ tid_local.lee_id(n.ramas[i].etiqueta).nombre);
-                }
-            }
-        }
-    }
-}
-
 // Rellena tid_global con los id's globales, tanto variables como funciones,
 // independientemente de que sean declarados o definidos
 void obtén_identificadores_globales(Nodo n)
@@ -296,7 +272,7 @@ Bloque prepara_función(dstring fid, Literal[] args)
         aborta(módulo, _pos, "No puedo ejecutar el bloque");
     }
 
-    obtén_etiquetas(bloque);
+    obtén_etiquetas(bloque, tid_local);
 
     return bloque;
 }
@@ -361,23 +337,6 @@ void define_argumentos(Nodo n, Literal[] args)
             default: break;
         }
     }
-}
-
-Bloque obtén_bloque(Nodo nodo)
-{
-    Bloque bloque = null;
-
-    for(int i = 0; i<nodo.ramas.length; i++)
-    {
-        Nodo r = cast(Nodo)nodo.ramas[i];
-        if(r.categoría == Categoría.BLOQUE)
-        {
-            bloque = cast(Bloque)r;
-            break;
-        }
-    }
-
-    return bloque;
 }
 
 Nodo interpreta(Bloque bloque)

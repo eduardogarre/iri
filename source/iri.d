@@ -1,6 +1,7 @@
 import apoyo;
 import arbol;
 import docopt;
+static import compilador;
 static import interprete;
 static import lexico;
 static import semantico;
@@ -70,7 +71,6 @@ Argumentos:
 
 void iri(dstring código)
 {
-
 	lexema[] resultado_lex = lexico.analiza(código);
 
 	charlatánln();
@@ -92,4 +92,6 @@ void iri(dstring código)
 	charlatánln();
 
 	Literal resultado = interprete.analiza(árbol_semántico);
+
+	compilador.compila(árbol_semántico);
 }

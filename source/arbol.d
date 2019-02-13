@@ -10,6 +10,8 @@ import std.stdio;
 
 enum Categoría
 {
+    VÉRTICE,
+
     RESERVADA,
     TIPO,
     NÚMERO,
@@ -42,7 +44,7 @@ enum Categoría
 
 class Nodo
 {
-    Categoría categoría;
+    Categoría   categoría;
     dstring     dato = "";
     Nodo[]      ramas;
     posición3d  posición;
@@ -51,6 +53,63 @@ class Nodo
     this()
     {
         posición = new posición3d();
+    }
+}
+
+class Vértice : Nodo
+{
+    dstring     etiqueta;
+    dstring     salto;
+    bool        salto_condicional;
+    int[]       aristas;
+    int         número_vértice;
+
+    Arista[]  aristas_entrada;
+    Arista[]  aristas_salida;
+
+    this()
+    {
+        super();
+        this.categoría = Categoría.VÉRTICE;
+    }
+
+    void añade_arista(int a)
+    {
+        for(int i = 0; i < aristas.length; i++)
+        {
+            if(aristas[i] == a)
+            {
+                return;
+            }
+        }
+
+        aristas ~= a;
+    }
+
+    void añade_arista_entrada(ref Arista entrada)
+    {
+        for(int i = 0; i < aristas_entrada.length; i++)
+        {
+            if(aristas_entrada[i].entrada == entrada.entrada)
+            {
+                return;
+            }
+        }
+
+        aristas_entrada ~= entrada;
+    }
+
+    void añade_arista_salida(ref Arista salida)
+    {
+        for(int i = 0; i < aristas_salida.length; i++)
+        {
+            if(aristas_salida[i].salida == salida.salida)
+            {
+                return;
+            }
+        }
+
+        aristas_salida ~= salida;
     }
 }
 
@@ -699,4 +758,333 @@ bool tipo_real(Nodo n)
     }
     
     return false;
+}
+
+Bloque obtén_bloque(Nodo nodo)
+{
+    Bloque bloque = null;
+
+    for(int i = 0; i<nodo.ramas.length; i++)
+    {
+        Nodo r = cast(Nodo)nodo.ramas[i];
+        if(r.categoría == Categoría.BLOQUE)
+        {
+            bloque = cast(Bloque)r;
+            break;
+        }
+    }
+
+    return bloque;
+}
+
+void obtén_etiquetas(Nodo n, ref TablaIdentificadores tid_local)
+{
+    if(n)
+    {
+        tid_local.define_identificador(":", null, null);
+
+        for(int i = 0; i < n.ramas.length; i++)
+        {
+            if(n.ramas[i].etiqueta.length > 0)
+            {
+                auto lit = new Literal();
+                lit.dato = to!dstring(i-1);
+                lit.tipo = new Tipo();
+                lit.tipo.tipo = "nada";
+
+                if(tid_local.define_identificador(n.ramas[i].etiqueta, null, lit))
+                {
+                    charlatánln("ETIQUETA: " ~ tid_local.lee_id(n.ramas[i].etiqueta).nombre);
+                }
+            }
+        }
+    }
+}
+
+private uint profundidad_árbol_gramatical = 0;
+
+void muestra_árbol(Nodo n)
+{
+    profundidad_árbol_gramatical++;
+    if(n)
+    {
+        if(n.etiqueta.length > 0)
+        {
+            writeln(n.etiqueta);
+        }
+
+        for(int i = 1; i < profundidad_árbol_gramatical; i++)
+        {
+            write("   ");
+        }
+        write("[hijos:");
+        write(to!dstring(n.ramas.length));
+        write("] ");
+        
+        switch(n.categoría)
+        {
+            case Categoría.VÉRTICE:
+                auto v = cast(Vértice)n;
+                write(to!dstring(v.categoría));
+                write(" " ~ to!dstring(v.número_vértice));
+                write(" [etiqueta ");
+                write(v.etiqueta);
+                write("] [salto ");
+                write(v.salto);
+                if(v.salto_condicional)
+                {
+                    write(" condicional]");
+                }
+                else
+                {
+                    write(" incondicional]");
+                }
+
+                write(" [ARISTAS ");
+                write(v.aristas_entrada.length);
+                write(":");
+                write(v.aristas_salida.length);
+                write("] [ ");
+                foreach(a; v.aristas_entrada)
+                {
+                    write(a.entrada.número_vértice);
+                    write("->");
+                    write(a.salida.número_vértice);
+                    write(" ");
+                }
+                write("] [ ");
+                foreach(a; v.aristas_salida)
+                {
+                    write(a.entrada.número_vértice);
+                    write("->");
+                    write(a.salida.número_vértice);
+                    write(" ");
+                }
+                write("] [línea:");
+                write(to!dstring(v.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.ETIQUETA:
+                auto e = cast(Etiqueta)n;
+                write(to!dstring(e.categoría));
+                write(" [");
+                write(e.dato);
+                write("] [línea:");
+                write(to!dstring(e.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.TIPO:
+                auto t = cast(Tipo)n;
+                write(to!dstring(t.categoría));
+                if(t.vector)
+                {
+                    write(" [" ~ to!dstring(t.elementos) ~ " x " ~ t.tipo);
+                    write("]");
+                }
+                else if(t.estructura)
+                {
+                    write(" {estructura}");
+                }
+                else
+                {
+                    write(" [tipo:" ~ t.tipo);
+                    write("]");
+                }
+                write(" [línea:");
+                write(to!dstring(t.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.RESERVADA:
+                auto l = cast(Reservada)n;
+                write(to!dstring(l.categoría));
+                write("] [dato:");
+                write(l.dato);
+                write("] [línea:");
+                write(to!dstring(l.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.LITERAL:
+                auto l = cast(Literal)n;
+                write(to!dstring(l.categoría));
+                if(l.vector)
+                {
+                    write(" [vector]");
+                }
+                else if(l.estructura)
+                {
+                    write(" {estructura}");
+                }
+                else
+                {
+                    if(l.tipo is null)
+                    {
+
+                    }
+                    else
+                    {
+                        write("] [tipo:");
+                        write(l.tipo.tipo);
+                    }
+                    write("] [dato:");
+                    write(l.dato ~ "]");
+                }
+                write(" [línea:");
+                write(to!dstring(l.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.IDENTIFICADOR:
+                auto l = cast(Identificador)n;
+                write(to!dstring(l.categoría));
+                write(" [id:");
+                write(l.nombre);
+                write("] [línea:");
+                write(to!dstring(l.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.LLAMA_FUNCIÓN:
+                auto l = cast(LlamaFunción)n;
+                write(to!dstring(l.categoría));
+                write(" [id:");
+                write(l.nombre);
+                write(" [devuelve:");
+                write(to!dstring(l.retorno));
+                write("] [línea:");
+                write(to!dstring(l.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.OPERACIÓN:
+                auto o = cast(Operación)n;
+                write(to!dstring(o.categoría));
+                write(" [op:");
+                write(o.dato);
+                write("] [línea:");
+                write(to!dstring(o.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.ASIGNACIÓN:
+                auto a = cast(Asignación)n;
+                write(to!dstring(a.categoría));
+                write(" [línea:");
+                write(to!dstring(a.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.DEFINE_IDENTIFICADOR_GLOBAL:
+                auto did = cast(DefineIdentificadorGlobal)n;
+                write(to!dstring(did.categoría));
+                write(" [ámbito:");
+                write(did.ámbito);
+                if(did.tipo !is null)
+                {
+                    write("] [tipo:");
+                    write((cast(Tipo)(did.tipo)).tipo);
+                }
+                write("] [nombre:");
+                write(did.nombre);
+                write("] [línea:");
+                write(to!dstring(did.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.DECLARA_IDENTIFICADOR_GLOBAL:
+                auto idex = cast(DeclaraIdentificadorGlobal)n;
+                write(to!dstring(idex.categoría));
+                write(" [ámbito:");
+                write(idex.ámbito);
+                write("] [tipo:");
+                write((cast(Tipo)(idex.tipo)).tipo);
+                write("] [nombre:");
+                write(idex.nombre);
+                write("] [línea:");
+                write(to!dstring(idex.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.BLOQUE:
+                auto b = cast(Bloque)n;
+                write(to!dstring(b.categoría));
+                write(" [línea:");
+                write(to!dstring(b.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.ARGUMENTOS:
+                auto a = cast(Argumentos)n;
+                write(to!dstring(a.categoría));
+                write(" [línea:");
+                write(to!dstring(a.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.ARGUMENTO:
+                auto a = cast(Argumento)n;
+                write(to!dstring(a.categoría));
+                write(" [tipo:");
+                write(a.tipo.tipo);
+                write("] [nombre:");
+                write(a.nombre);
+                write("] [línea:");
+                write(to!dstring(a.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.DEFINE_FUNCIÓN:
+                auto df = cast(DefineFunción)n;
+                write(to!dstring(df.categoría));
+                write(" [ret:");
+                write(df.retorno.tipo);
+                write("] [nombre:");
+                write(df.nombre);
+                write("] [línea:");
+                write(to!dstring(df.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.DECLARA_FUNCIÓN:
+                auto df = cast(DeclaraFunción)n;
+                write(to!dstring(df.categoría));
+                write(" [ret:");
+                write((cast(Tipo)(df.retorno)).tipo);
+                write("] [nombre:");
+                write(df.nombre);
+                write("] [línea:");
+                write(to!dstring(df.posición.línea));
+                writeln("]");
+                break;
+
+            case Categoría.MÓDULO:
+                auto obj = cast(Módulo)n;
+                write(to!dstring(obj.categoría));
+                write(" [nombre:");
+                write(obj.nombre);
+                write("] [línea:");
+                write(to!dstring(obj.posición.línea));
+                writeln("]");
+                break;
+
+            default: break;
+        }
+
+        int i;
+        for(i = 0; i < n.ramas.length; i++)
+        {
+            muestra_árbol(n.ramas[i]);
+        }
+    }
+
+    profundidad_árbol_gramatical--;
+}
+
+class Arista
+{
+    Vértice entrada;
+    Vértice salida;
 }
