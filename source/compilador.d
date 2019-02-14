@@ -5,6 +5,7 @@ dstring módulo = "Compilador.d";
 import apoyo;
 import arbol;
 import gcf;
+import longevidad;
 static import semantico;
 import std.conv;
 import std.stdio;
@@ -22,7 +23,10 @@ Nodo compila(Nodo n)
     // Modifica cada función para incluir un Grafo de Control de Flujo
     genera_grafos_control_flujo(nodo, tid_global);
 
-    vuelca_tid(tid_global);
+    //vuelca_tid(tid_global);
+
+    // obtén la longevidad para cada función
+    analiza_longevidad(tid_global);
 
     return nodo;
 }
@@ -105,6 +109,27 @@ void obtén_identificadores_globales(Nodo n)
         for(i = 0; i < n.ramas.length; i++)
         {
             obtén_identificadores_globales(n.ramas[i]);
+        }
+    }
+}
+
+void analiza_longevidad(ref TablaIdentificadores tid)
+{
+    // recorre los id's globales
+    foreach(ref EntradaTablaIdentificadores eid; tid.tabla)
+    {
+        // en cada iteración, eid contiene una entrada con un id global
+
+        // Analiza sólo los id's que ya están definidos
+        if(eid.definido)
+        {
+            Nodo def = eid.definición;
+
+            // Analiza sólo las definiciones de funciones
+            if(def.categoría == Categoría.DEFINE_FUNCIÓN)
+            {
+                obtén_longevidad(def);
+            }
         }
     }
 }
