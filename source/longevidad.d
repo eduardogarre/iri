@@ -4,6 +4,7 @@ dstring módulo = "Longevidad.d";
 
 import apoyo;
 import arbol;
+import std.algorithm.mutation;
 import std.conv;
 import std.stdio;
 
@@ -71,16 +72,16 @@ Longevidad[][] obtén_longevidad_función(ref Nodo nodo)
 
         for(int i = 0; i < bloque.ramas.length; i++)
         {
-            obtén_longevidad_vértice(bloque.ramas[i], longevidad[i]);
+            obtén_longevidad_vértice(bloque.ramas[i], longevidad[i], false);
         }
     } while(cambio_calculando_longevidad);
 
     return longevidad;
 }
 
-void obtén_longevidad_vértice(ref Nodo nodo, ref Longevidad[] longevidad)
+void obtén_longevidad_vértice(ref Nodo nodo, ref Longevidad[] longevidad, bool verborrea)
 {
-    writeln("VÉRTICE [" ~ to!dstring(nodo.ramas.length) ~ " ramas]");
+    if(verborrea) writeln("VÉRTICE [" ~ to!dstring(nodo.ramas.length) ~ " ramas]");
 
     // Navega las instrucciones en orden inverso obteniendo, para cada
     // instrucción, la lista de variables empleadas (variables_vivas)
@@ -88,18 +89,23 @@ void obtén_longevidad_vértice(ref Nodo nodo, ref Longevidad[] longevidad)
     for(int i = nodo.ramas.length - 1; i >= 0; i--)
     {
         bool he_cambiado = false;
-        write("RAMA #" ~ to!dstring(i));
+        
+        if(verborrea) write("RAMA #" ~ to!dstring(i));
+        
         if(nodo.ramas[i].categoría == Categoría.ASIGNACIÓN)
         {
-            write("  As :: ");
-
-            write("[ ");
-            foreach(v; longevidad[i].variables_vivas)
+            if(verborrea)
             {
-                write(v);
-                write(" ");
+                write("  As :: ");
+
+                write("[ ");
+                foreach(v; longevidad[i].variables_vivas)
+                {
+                    write(v);
+                    write(" ");
+                }
+                write("] ");
             }
-            write("] ");
             
             // Se va a definir una variable. En el subárbol, el identificador es
             // el nodo en la primera rama.
@@ -107,7 +113,7 @@ void obtén_longevidad_vértice(ref Nodo nodo, ref Longevidad[] longevidad)
             Identificador id = cast(Identificador)(asignación.ramas[0]);
             dstring variable_definida = id.nombre;
 
-            write("[ -- " ~ variable_definida ~ " ] ");
+            if(verborrea) write("[ -- " ~ variable_definida ~ " ] ");
 
             // POR COMPLETAR qué hacer con las variables recién definidas
 
@@ -116,116 +122,59 @@ void obtén_longevidad_vértice(ref Nodo nodo, ref Longevidad[] longevidad)
 
             dstring[] variables_empleadas = obtén_variables_empleadas(asignación.ramas[1]);
 
-            write(" [ ++ ");
-            foreach(v; variables_empleadas)
+            if(verborrea) 
             {
-                write(v);
-                write(" ");
+                write(" [ ++ ");
+                foreach(v; variables_empleadas)
+                {
+                    write(v);
+                    write(" ");
+                }
+                write("]  ==>  ");
             }
-            write("]  ==>  ");
-
             // POR COMPLETAR qué hacer con las variables empleadas
             // Añado las variables empleadas ahora a las empleadas en la instrucción siguiente
             // Tengo cuidado de no duplicar variables
             dstring[] variables_pendientes = longevidad[i+1].variables_vivas;
             variables_pendientes ~= variables_empleadas;
-            foreach(var; variables_pendientes)
-            {
-                bool ya_existe = false;
 
-                foreach(var_establecida; longevidad[i].variables_vivas)
-                {
-                    if(var == var_establecida)
-                    {
-                        ya_existe = true;
-                        break;
-                    }
-                }
-
-                if(!ya_existe) // No duplicar la variable
-                {
-                    if(variable_definida != var) // La variable ha sido definida
-                    {
-                        longevidad[i].variables_vivas ~= var;
-                        cambio_calculando_longevidad = true;
-                        he_cambiado = true;
-                    }
-                }
-            }
-
-            write("[ ");
-            foreach(v; longevidad[i].variables_vivas)
-            {
-                write(v);
-                write(" ");
-            }
-            write("]");
-            if(he_cambiado)
-            {
-                write("#################");
-            }
-            writeln();
+            añade_variables_vivas(longevidad[i].variables_vivas, variables_pendientes, variable_definida, verborrea);
         }
         else if(nodo.ramas[i].categoría == Categoría.OPERACIÓN)
         {
-            write("  Op :: ");
-
-            write("[ ");
-            foreach(v; longevidad[i].variables_vivas)
+            if(verborrea)
             {
-                write(v);
-                write(" ");
+                write("  Op :: ");
+
+                write("[ ");
+                foreach(v; longevidad[i].variables_vivas)
+                {
+                    write(v);
+                    write(" ");
+                }
+                write("] ");
             }
-            write("] ");
 
             dstring[] variables_empleadas = obtén_variables_empleadas(nodo.ramas[i]);
 
-            write("[ ++ ");
-            foreach(v; variables_empleadas)
+            if(verborrea)
             {
-                write(v);
-                write(" ");
+                write("[ ++ ");
+                foreach(v; variables_empleadas)
+                {
+                    write(v);
+                    write(" ");
+                }
+                write("]  ==>  ");
             }
-            write("]  ==>  ");
 
             // Qué hacer con las variables empleadas
             // Añado las variables empleadas ahora a las empleadas en la instrucción siguiente
             // Tengo cuidado de no duplicar variables
             dstring[] variables_pendientes = longevidad[i+1].variables_vivas;
             variables_pendientes ~= variables_empleadas;
-            foreach(var; variables_pendientes)
-            {
-                bool ya_existe = false;
 
-                foreach(var_establecida; longevidad[i].variables_vivas)
-                {
-                    if(var == var_establecida)
-                    {
-                        ya_existe = true;
-                        break;
-                    }
-                }
-
-                if(!ya_existe) // No duplicar la variable
-                {
-                    longevidad[i].variables_vivas ~= var;
-                    cambio_calculando_longevidad = true;
-                    he_cambiado = true;
-                }
-            }
-
-            write("[ ");
-            foreach(v; longevidad[i].variables_vivas)
-            {
-                write(v);
-                write(" ");
-            }
-            write("]");
-            if(he_cambiado)
-            {
-                write("#################");
-            }
-            writeln();
+            añade_variables_vivas(longevidad[i].variables_vivas, variables_pendientes, null, verborrea);
         }
         else
         {
@@ -257,4 +206,54 @@ dstring[] obtén_variables_empleadas(ref Nodo nodo)
     }
 
     return variables_vivas;
+}
+
+bool añade_variables_vivas(ref dstring[] lista_previa, dstring[] nueva_lista, dstring definición, bool verborrea)
+{
+    bool he_cambiado = false;
+
+    // 1.- INCLUYO VARIABLES NUEVAS
+    // Para todas las variables en la nueva_lista
+    foreach(var; nueva_lista)
+    {
+        // Comprueba que previamente no estaban ya incluidas en la lista_previa
+        bool incluida = false;
+        foreach(var_previa; lista_previa)
+        {
+            if(var == var_previa)
+            {
+                incluida = true;
+                break;
+            }
+        }
+
+        // Sólo si todavía no estaba incluida
+        if(!incluida)
+        {
+            if((definición is null) || (var != definición))
+            {
+                lista_previa ~= var;
+                cambio_calculando_longevidad = true;
+                he_cambiado = true;
+            }
+        }
+    }
+    
+    if(verborrea)
+    {
+        write("[ ");
+        foreach(v; lista_previa)
+        {
+            write(v);
+            write(" ");
+        }
+        write("]");
+        if(he_cambiado)
+        {
+            write(" #################");
+        }
+        writeln();
+    }
+
+    return he_cambiado;
 }
