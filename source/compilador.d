@@ -21,7 +21,7 @@ Nodo compila(Nodo n)
     obtén_identificadores_globales(nodo);
 
     // Modifica cada función para incluir un Grafo de Control de Flujo
-    genera_grafos_control_flujo(nodo, tid_global);
+    genera_grafos_control_flujo(tid_global);
 
     //vuelca_tid(tid_global);
 

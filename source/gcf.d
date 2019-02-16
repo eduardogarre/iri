@@ -11,7 +11,7 @@ import std.stdio;
 TablaIdentificadores tid_local;
 
 // Modifica cada función para incluir un Grafo de Control de Flujo
-void genera_grafos_control_flujo(ref Nodo n, ref TablaIdentificadores tid)
+void genera_grafos_control_flujo(ref TablaIdentificadores tid)
 {
     // Genera un GCF para cada función definida en los identificadores globales...
 
