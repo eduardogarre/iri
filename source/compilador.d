@@ -17,16 +17,16 @@ Nodo compila(Nodo n)
 {
     Nodo nodo = n;
 
+    // Durante la compilación, guardo las nuevas estructuras en definiciones de
+    // los identificadores, en la Tabla de Identificadores Globales.
+
     // Obtén los identificadores globales
     obtén_identificadores_globales(nodo);
 
     // Modifica cada función para incluir un Grafo de Control de Flujo
-    genera_grafos_control_flujo(tid_global);
+    compila_identificadores_globales(tid_global);
 
     //vuelca_tid(tid_global);
-
-    // obtén la longevidad para cada función
-    analiza_longevidad(tid_global);
 
     return nodo;
 }
@@ -113,46 +113,38 @@ void obtén_identificadores_globales(Nodo n)
     }
 }
 
-void analiza_longevidad(ref TablaIdentificadores tid)
+void compila_identificadores_globales(ref TablaIdentificadores tid)
 {
     // recorre los id's globales
     foreach(ref EntradaTablaIdentificadores eid; tid.tabla)
     {
-        // en cada iteración, eid contiene una entrada con un id global
+        // Cada iteración guardo un identificador global en eid
 
-        // Analiza sólo los id's que ya están definidos
+        // Analiza definiciones ...
         if(eid.definido)
         {
             Nodo def = eid.definición;
 
-            // Analiza sólo las definiciones de funciones
+            // ... de funciones
             if(def.categoría == Categoría.DEFINE_FUNCIÓN)
             {
-                Longevidad[][] longevidad = obtén_longevidad(def);
-
-                bool verborrea = true;
-                if(verborrea)
-                {
-                    DefineFunción deffn = cast(DefineFunción)def;
-                    writeln();
-                    writeln();
-                    writeln("func " ~ deffn.nombre ~ "()");
-                    foreach(v; longevidad)
-                    {
-                        writeln("  vértice");
-                        foreach(i; v)
-                        {
-                            write("    :: ");
-                            foreach(l; i.variables_vivas)
-                            {
-                                write(l);
-                                write(" ");
-                            }
-                            writeln();
-                        }
-                    }
-                }
+                compila_función(def, eid);
             }
         }
     }
+}
+
+void compila_función(ref Nodo func, ref EntradaTablaIdentificadores eid)
+{
+    // Verborrea...
+    auto deffn = cast(DefineFunción)func;
+    charlatánln();
+    charlatánln("Compilando " ~ deffn.nombre ~ "()");
+
+    // El grafo de la función se guarda en el árbol de su definición, accesible
+    // a través de la Tabla de Identificadores
+    genera_grafo_control_flujo(func, eid);
+
+    // Obtengo longevidad
+    Longevidad[][] longevidad = obtén_longevidad(func, false);
 }

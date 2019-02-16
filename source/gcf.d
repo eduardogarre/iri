@@ -11,68 +11,50 @@ import std.stdio;
 TablaIdentificadores tid_local;
 
 // Modifica cada función para incluir un Grafo de Control de Flujo
-void genera_grafos_control_flujo(ref TablaIdentificadores tid)
+void genera_grafo_control_flujo(ref Nodo def, ref EntradaTablaIdentificadores eid)
 {
-    // Genera un GCF para cada función definida en los identificadores globales...
+    auto deffn = cast(DefineFunción)def;
 
-    // recorre los id's globales
-    foreach(ref EntradaTablaIdentificadores eid; tid.tabla)
+    charlatánln();
+    charlatánln("Genero Grafo de Control de Flujo para " ~ deffn.nombre ~ "()");
+
+    // Genera el Grafo de Control de Flujo para esta función
+    Bloque bloque = crea_GCF(def);
+
+    if(def.ramas.length == 2)
     {
-        // en cada iteración, eid contiene una entrada con un id global
-
-        // Analiza sólo los id's que ya están definidos
-        if(eid.definido)
+        if(def.ramas[1].categoría == Categoría.BLOQUE)
         {
-            Nodo def = eid.definición;
-
-            // Analiza sólo las definiciones de funciones
-            if(def.categoría == Categoría.DEFINE_FUNCIÓN)
-            {
-                auto deffn = cast(DefineFunción)def;
-
-                charlatánln();
-                charlatánln("Genero Grafo de Control de Flujo para " ~ deffn.nombre ~ "()");
-
-                // Genera el Grafo de Control de Flujo para esta función
-                Bloque bloque = crea_GCF(def);
-
-                if(def.ramas.length == 2)
-                {
-                    if(def.ramas[1].categoría == Categoría.BLOQUE)
-                    {
-                        def.ramas[1] = bloque;
-                    }
-                    else
-                    {
-                        error(módulo, def.posición, "No encuentro el Bloque en la definición de esta función");
-                        muestra_árbol(def);
-                        aborta(módulo, def.posición, "Aborto");
-                    }
-                }
-                else if(def.ramas.length == 1)
-                {
-                    if(def.ramas[0].categoría == Categoría.BLOQUE)
-                    {
-                        def.ramas[0] = bloque;
-                    }
-                    else
-                    {
-                        error(módulo, def.posición, "No encuentro el Bloque en la definición de esta función");
-                        muestra_árbol(def);
-                        aborta(módulo, def.posición, "Aborto");
-                    }
-                }
-                else
-                {
-                        error(módulo, def.posición, "No encuentro el Bloque en la definición de esta función");
-                        muestra_árbol(def);
-                        aborta(módulo, def.posición, "Aborto");
-                }
-
-                eid.definición = def;
-            }
+            def.ramas[1] = bloque;
+        }
+        else
+        {
+            error(módulo, def.posición, "No encuentro el Bloque en la definición de esta función");
+            muestra_árbol(def);
+            aborta(módulo, def.posición, "Aborto");
         }
     }
+    else if(def.ramas.length == 1)
+    {
+        if(def.ramas[0].categoría == Categoría.BLOQUE)
+        {
+            def.ramas[0] = bloque;
+        }
+        else
+        {
+            error(módulo, def.posición, "No encuentro el Bloque en la definición de esta función");
+            muestra_árbol(def);
+            aborta(módulo, def.posición, "Aborto");
+        }
+    }
+    else
+    {
+            error(módulo, def.posición, "No encuentro el Bloque en la definición de esta función");
+            muestra_árbol(def);
+            aborta(módulo, def.posición, "Aborto");
+    }
+
+    eid.definición = def;
 }
 
 Bloque crea_GCF(Nodo deffn)

@@ -10,7 +10,7 @@ import std.stdio;
 
 bool cambio_calculando_longevidad;
 
-Longevidad[][] obtén_longevidad(ref Nodo nodo)
+Longevidad[][] obtén_longevidad(ref Nodo nodo, bool verborrea)
 {
     cambio_calculando_longevidad = false;
 
@@ -20,6 +20,28 @@ Longevidad[][] obtén_longevidad(ref Nodo nodo)
     }
 
     Longevidad[][] longevidad = obtén_longevidad_función(nodo);
+
+    if(verborrea)
+    {
+        DefineFunción deffn = cast(DefineFunción)nodo;
+        writeln();
+        writeln();
+        writeln("func " ~ deffn.nombre ~ "()");
+        foreach(v; longevidad)
+        {
+            writeln("  vértice");
+            foreach(i; v)
+            {
+                write("    :: ");
+                foreach(l; i.variables_vivas)
+                {
+                    write(l);
+                    write(" ");
+                }
+                writeln();
+            }
+        }
+    }
 
     return longevidad;
 }
