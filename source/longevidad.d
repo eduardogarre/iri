@@ -74,6 +74,7 @@ Longevidad[][] obtén_longevidad_función(ref Nodo nodo)
         {
             obtén_longevidad_vértice(bloque.ramas[i], longevidad[i], false);
         }
+        obtén_longevidad_inter_vértices(nodo, longevidad, false);
     } while(cambio_calculando_longevidad);
 
     return longevidad;
@@ -256,4 +257,20 @@ bool añade_variables_vivas(ref dstring[] lista_previa, dstring[] nueva_lista, d
     }
 
     return he_cambiado;
+}
+
+void obtén_longevidad_inter_vértices(ref Nodo nodoFunción, ref Longevidad[][] variables_vivas, bool verborrea)
+{
+    Bloque bloque = obtén_bloque(nodoFunción);
+
+    for(int v = bloque.ramas.length-1; v >= 0; v--)
+    {
+        Vértice vér = cast(Vértice)(bloque.ramas[v]);
+        
+        foreach(a; vér.aristas_entrada)
+        {
+            int origen = a.entrada.número_vértice;
+            añade_variables_vivas(variables_vivas[origen][$-1].variables_vivas, variables_vivas[v][0].variables_vivas, null, verborrea);
+        }
+    }
 }

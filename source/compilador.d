@@ -128,7 +128,30 @@ void analiza_longevidad(ref TablaIdentificadores tid)
             // Analiza sólo las definiciones de funciones
             if(def.categoría == Categoría.DEFINE_FUNCIÓN)
             {
-                obtén_longevidad(def);
+                Longevidad[][] longevidad = obtén_longevidad(def);
+
+                bool verborrea = true;
+                if(verborrea)
+                {
+                    DefineFunción deffn = cast(DefineFunción)def;
+                    writeln();
+                    writeln();
+                    writeln("func " ~ deffn.nombre ~ "()");
+                    foreach(v; longevidad)
+                    {
+                        writeln("  vértice");
+                        foreach(i; v)
+                        {
+                            write("    :: ");
+                            foreach(l; i.variables_vivas)
+                            {
+                                write(l);
+                                write(" ");
+                            }
+                            writeln();
+                        }
+                    }
+                }
             }
         }
     }
