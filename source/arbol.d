@@ -774,6 +774,11 @@ Bloque obtén_bloque(Nodo nodo)
         }
     }
 
+    if(bloque is null)
+    {
+        aborta(módulo, nodo.posición, "La función no contiene un bloque");
+    }
+
     return bloque;
 }
 
