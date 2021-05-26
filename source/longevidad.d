@@ -109,7 +109,7 @@ void obtén_longevidad_vértice(ref Nodo nodo, ref Longevidad[] longevidad, bool
     // Navega las instrucciones en orden inverso obteniendo, para cada
     // instrucción, la lista de variables empleadas (variables_vivas)
     // y la variable definida (variable_definida)
-    for(int i = nodo.ramas.length - 1; i >= 0; i--)
+    for(int i = cast(int)(nodo.ramas.length) - 1; i >= 0; i--)
     {
         bool he_cambiado = false;
         
@@ -285,7 +285,7 @@ void obtén_longevidad_inter_vértices(ref Nodo nodoFunción, ref Longevidad[][]
 {
     Bloque bloque = obtén_bloque(nodoFunción);
 
-    for(int v = bloque.ramas.length-1; v >= 0; v--)
+    for(int v = cast(int)(bloque.ramas.length) - 1; v >= 0; v--)
     {
         Vértice vér = cast(Vértice)(bloque.ramas[v]);
         
