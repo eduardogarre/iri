@@ -1,16 +1,16 @@
-# **RIE - Representación Intermedia, en Español**
+# **RI - Representación Intermedia, en Español**
 
-RIE es un lenguaje de Representación Intermedia creado con el objetivo de ser capaz de representar lenguajes de alto nivel con sintaxis en español.
+RI es un lenguaje de Representación Intermedia creado con el objetivo de ser capaz de representar lenguajes de alto nivel con sintaxis en español.
 
-RIE pretende ser ligero, por lo que usa abstracciones de bajo nivel, sin renunciar a ser expresivo, tipado y extensible. El objetivo de RIE es ser un lenguaje de representación intermedia universal: que pudiera ser usado como representación intermedia, potencialmente, por cualquier lenguaje de alto nivel.
+RI pretende ser ligero, por lo que usa abstracciones de bajo nivel, sin renunciar a ser expresivo, tipado y extensible. El objetivo de RI es ser un lenguaje de representación intermedia universal: que pudiera ser usado como representación intermedia, potencialmente, por cualquier lenguaje de alto nivel.
 
-Además, puesto que RIE es un lenguaje tipado y con la propiedad de la asignación única estática, permite más opciones en las fases de análisis, optimización e interpretación/producción de código, generando programas potencialmente más eficientes.
+Además, puesto que RI es un lenguaje tipado y con la propiedad de la asignación única estática, permite más opciones en las fases de análisis, optimización e interpretación/producción de código, generando programas potencialmente más eficientes.
 
-Aquí tienes un ejemplo en RIE, para multiplicar la variable `%var` por `8`:
+Aquí tienes un ejemplo en RI, para multiplicar la variable `%var` por `8`:
 `%resultado = mul e32 %var, 8;`
 
 ## Estructura general
-Los programas de RIE se dividen en módulos, siendo cada módulo el resultado de la traducción de una unidad de un lenguaje de más alto nivel.
+Los programas de RI se dividen en módulos, siendo cada módulo el resultado de la traducción de una unidad de un lenguaje de más alto nivel.
 En general, cada módulo se compone de listas de declaraciones y definiciones globales: funciones y variables. Aquí tienes un ejemplo del módulo `hola`, en el archivo `hola.ri`, que imprime el texto `hola, mundo.`:
 
 ```
@@ -66,11 +66,11 @@ En general, el formato del identificador, global o local, es el siguiente:
 Algunos ejemplos de identificadores válidos serían: `@hola`, `%adiós`, `%2048`, `@nrm.es.escribe`, `@#poncar`, `%var<mitipo>`, `@función#mitipo2#mitipo3`, etc...
 
 Los identificadores empiezan con un prefijo por dos motivos:
- - Evitar que los identificadores de los lenguajes de alto nivel colisionen con las palabras reservadas de RIE
+ - Evitar que los identificadores de los lenguajes de alto nivel colisionen con las palabras reservadas de RI
  - Permitir el uso de identificadores sin nombre (registros) mediante números precedidos de `%`, p.ej `%0`, `%42`, `%288`.
 
 ##### Ámbito de los identificadores
-En cuanto al ámbito, en RIE los identificadores se dividen en 2 clases:
+En cuanto al ámbito, en RI los identificadores se dividen en 2 clases:
 
 **Globales:** Funciones o variables. Empiezan por el carácter '@'
 > Por ejemplo: `@función()`, `@var_global`
@@ -79,7 +79,7 @@ En cuanto al ámbito, en RIE los identificadores se dividen en 2 clases:
 > Por ejemplo: `%var_local`, `%42`, `%mi_tipo`
 
 ## Palabras reservadas
-Las palabras reservadas de RIE son muy intuitivas. Hay claves para las operaciones (`sum`, `res`, `mul`, `llama`, `cmp`, `ret`, etc...), para los tipos básicos (`nada`, `n64`, `e32`, `r32`, etc...), y otras (`define`, `declara`, `módulo`, etc...). Todas estas palabras no pueden colisionar con los identificadores porque ninguna comienza por los prefijos `%` ó `@`. Las palabras reservadas se pueden agrupar por categorías: 
+Las palabras reservadas de RI son muy intuitivas. Hay claves para las operaciones (`sum`, `res`, `mul`, `llama`, `cmp`, `ret`, etc...), para los tipos básicos (`nada`, `n64`, `e32`, `r32`, etc...), y otras (`define`, `declara`, `módulo`, etc...). Todas estas palabras no pueden colisionar con los identificadores porque ninguna comienza por los prefijos `%` ó `@`. Las palabras reservadas se pueden agrupar por categorías: 
  - Instrucciones: `ret`, `sum`, `res`, `mul`, `div`, `cmp`, `slt`, `phi`, `conv`, `llama`, `rsrva`, `lee`, `guarda`, `leeval`, `ponval`.
  - Comparadores: `ig`, `dsig`, `ma`, `me`, `maig`, `meig`, `y`, `o`, `no`, `oex`.
  - Tipos: `nada`, `n1-64`, `e2-64`, `r16|32|64`.
@@ -87,7 +87,7 @@ Las palabras reservadas de RIE son muy intuitivas. Hay claves para las operacion
  - Otras: `módulo`, `define`, `declara`, `tipo`, `global`, `local`, `x`, `a`.
 
 ## Tipos
-El sistema de tipos de RIE se compone de tipos básicos y compuestos.
+El sistema de tipos de RI se compone de tipos básicos y compuestos.
 
 Los tipos básicos son los enteros, los naturales y los reales, además del tipo especial `nada`. A la hora de usar los tipos, siempre debemos definir el espacio que asignaremos al tipo, de la siguiente forma: los enteros en el rango e2-64 (p.ej `e32` es un entero de 32 dígitos), los naturales en el rango n1-64 (siendo `n1` un tipo booleano, y `n16` un natural de 16dig sin signo), y los reales únicamente r16|32|64 (son válidos `r16`, `r32` y `r64`).
 
@@ -302,7 +302,7 @@ En la lista indicada por `<literal_lista>`, en la posición indicada por `<índi
 #### @#poncar(n32 %carácter);
 Imprime un carácter
 ##### Aviso
-Disponible únicamente si ejecutas el programa RIE con el intérprete `iri`.
+Disponible únicamente si ejecutas el programa RI con el intérprete `iri`.
 
 ## Licencia
 Publicado bajo la Licencia de Programación Libre ("LPL"), en su versión 0.1, ó versiones más modernas
